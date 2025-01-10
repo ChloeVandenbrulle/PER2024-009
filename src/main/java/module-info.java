@@ -1,5 +1,4 @@
-module com.example.test_librairies {
-    requires atlantafx.base;
+module fr.inria.corese.demo {
     requires javafx.controls;
     requires javafx.fxml;
 
@@ -7,6 +6,6 @@ module com.example.test_librairies {
     requires org.kordamp.bootstrapfx.core;
     requires javafx.web;
 
-    opens com.example.test_librairies to javafx.fxml;
-    exports com.example.test_librairies;
+    opens fr.inria.corese.demo to javafx.fxml;
+    exports fr.inria.corese.demo;
 }
