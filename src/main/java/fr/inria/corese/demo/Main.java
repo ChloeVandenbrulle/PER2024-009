@@ -19,6 +19,8 @@ public class Main extends Application {
             throw new IllegalStateException("Cannot find FXML file at: /fr/inria/corese/demo/main-view.fxml");
         }
         Scene scene = new Scene(loader.load());
+        scene.getStylesheets().add(getClass().getResource("/styles/custom-button.css").toExternalForm());
+
 
         primaryStage.setTitle("RDF Editor");
         primaryStage.setScene(scene);

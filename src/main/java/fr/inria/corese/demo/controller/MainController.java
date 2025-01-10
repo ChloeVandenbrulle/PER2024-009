@@ -7,6 +7,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import lombok.Getter;
 import org.fxmisc.richtext.CodeArea;
+import atlantafx.base.theme.Styles;
 
 import java.io.File;
 import java.net.URL;
@@ -72,6 +73,21 @@ public class MainController {
         validationButton.setOnAction(e -> switchToValidation());
         queryButton.setOnAction(e -> switchToQuery());
         settingsButton.setOnAction(e -> switchToSettings());
+
+        // Application du thème AtlantaFX
+        applyAtlantaFXStyles();
+    }
+
+    private void applyAtlantaFXStyles() {
+        newFileButton.getStyleClass().add(Styles.BUTTON_OUTLINED);
+        openFileButton.getStyleClass().add(Styles.BUTTON_OUTLINED);
+        saveButton.getStyleClass().add(Styles.BUTTON_OUTLINED);
+
+        dataButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
+        rdfEditorButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
+        validationButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
+        queryButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
+        settingsButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
     }
 
     private void createNewFile() {
