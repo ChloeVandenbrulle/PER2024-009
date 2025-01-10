@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="fr.inria.corese.demo.controller.MainController"
+            prefHeight="600.0" prefWidth="800.0">
+
+    <left>
+        <VBox spacing="10" styleClass="sidebar">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <!-- Menu latéral -->
+            <Button fx:id="dataButton" text="Data" maxWidth="Infinity" />
+            <Button fx:id="rdfEditorButton" text="RDF Editor" maxWidth="Infinity" />
+            <Button fx:id="validationButton" text="Validation" maxWidth="Infinity" />
+            <Button fx:id="queryButton" text="Query" maxWidth="Infinity" />
+            <Button fx:id="settingsButton" text="Settings" maxWidth="Infinity" />
+        </VBox>
+    </left>
+
+    <center>
+        <BorderPane fx:id="contentArea">
+            <!-- Zone d'édition -->
+            <top>
+                <ToolBar>
+                    <HBox spacing="5">
+                        <Button fx:id="newFileButton" text="New File"/>
+                        <Button fx:id="openFileButton" text="Open File"/>
+                        <Button fx:id="saveButton" text="Save"/>
+                    </HBox>
+                </ToolBar>
+            </top>
+
+            <center>
+                <SplitPane>
+                    <!-- L'arborescence des fichiers -->
+                    <TreeView fx:id="fileTreeView" VBox.vgrow="ALWAYS"/>
+
+                    <!-- La zone d'édition (sera remplacée par CodeMirror) -->
+                    <StackPane fx:id="editorContainer" VBox.vgrow="ALWAYS"/>
+                </SplitPane>
+            </center>
+        </BorderPane>
+    </center>
+
+</BorderPane>

@@ -1,19 +1,16 @@
-package fr.inria.corese.demo;
+package fr.inria.corese.demo.view;
 
-import javafx.fxml.FXML;
+import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
-import javafx.fxml.Initializable;
-import java.net.URL;
-import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.concurrent.Worker.State;
 
-public class HelloController implements Initializable {
-    @FXML
-    private WebView codeEditor;
+public class CodeMirrorView extends StackPane {
+    private final WebView webView;
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public CodeMirrorView() {
+        webView = new WebView();
+        getChildren().add(webView);
         Platform.runLater(this::initializeCodeMirror);
     }
 
@@ -46,7 +43,7 @@ public class HelloController implements Initializable {
                 <script>
                     var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
                         lineNumbers: true,
-                        theme: "eclipse",
+                        theme: "dracula",
                         mode: "javascript",
                         indentUnit: 2,
                         smartIndent: true,
@@ -58,7 +55,6 @@ public class HelloController implements Initializable {
                         viewportMargin: Infinity
                     });
                     
-                    // Expose methods for JavaFX interaction
                     window.getEditorContent = function() {
                         return editor.getValue();
                     };
@@ -67,10 +63,8 @@ public class HelloController implements Initializable {
                         editor.setValue(content);
                     };
                     
-                    // Initial content
                     editor.setValue("// Votre code ici\\n");
                     
-                    // Force refresh after initialization
                     setTimeout(function() {
                         editor.refresh();
                     }, 100);
@@ -79,25 +73,27 @@ public class HelloController implements Initializable {
             </html>
             """;
 
-        codeEditor.getEngine().loadContent(html);
+        webView.getEngine().loadContent(html);
 
-        // Attendre que la page soit chargée pour initialiser l'éditeur
-        codeEditor.getEngine().getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+        webView.getEngine().getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
             if (newState == State.SUCCEEDED) {
-                // Forcer un refresh après le chargement
                 Platform.runLater(() -> {
-                    codeEditor.getEngine().executeScript("editor.refresh();");
+                    webView.getEngine().executeScript("editor.refresh();");
                 });
             }
         });
     }
 
-    public String getEditorContent() {
-        return (String) codeEditor.getEngine().executeScript("window.getEditorContent()");
+    public String getContent() {
+        return (String) webView.getEngine().executeScript("window.getEditorContent()");
     }
 
-    public void setEditorContent(String content) {
+    public void setContent(String content) {
         String escapedContent = content.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n");
-        codeEditor.getEngine().executeScript("window.setEditorContent('" + escapedContent + "')");
+        webView.getEngine().executeScript("window.setEditorContent('" + escapedContent + "')");
+    }
+
+    public WebView getWebView() {
+        return webView;
     }
 }
