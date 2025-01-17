@@ -1,17 +1,13 @@
 package fr.inria.corese.demo.controller;
 
+import fr.inria.corese.demo.view.CodeMirrorView;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.StackPane;
-import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
-import lombok.Getter;
-import org.fxmisc.richtext.CodeArea;
 import atlantafx.base.theme.Styles;
-import org.kordamp.ikonli.javafx.FontIcon;
 import java.io.File;
-import java.net.URL;
-import java.util.ResourceBundle;
+import java.nio.file.Files;
 
 public class MainController {
 
@@ -24,36 +20,40 @@ public class MainController {
     @FXML private Button openFileButton;
     @FXML private Button saveButton;
     @FXML private TreeView<String> fileTreeView;
-    @FXML private StackPane editorContainer;
-
-    @Getter
-    private CodeArea codeArea;
-    private WebView webView;
+    @FXML private CodeMirrorView editorContainer;
 
     @FXML
     public void initialize() {
-        setupCodeEditor();
         setupFileTree();
         setupButtons();
+        initializeEditor();
     }
 
-    private void setupCodeEditor() {
-        // Création de l'éditeur de code avec RichTextFX
-        codeArea = new CodeArea();
-        codeArea.setStyle("-fx-font-family: 'monospace';");
+    private void initializeEditor() {
+        Platform.runLater(() -> {
+            // Contenu initial
+            String initialContent = """
+                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+                @prefix ex: <http://example.org/> .
+                
+                # Exemple de triplet RDF
+                ex:resource1 rdf:type rdfs:Resource .
+                """;
 
-        // Configuration de la coloration syntaxique RDF/Turtle
-        // TODO: Implémenter la coloration syntaxique
+            editorContainer.setContent(initialContent);
 
-        editorContainer.getChildren().add(codeArea);
+            // Écouter les changements
+            editorContainer.contentProperty().addListener((obs, oldVal, newVal) -> {
+                System.out.println("Contenu modifié");
+            });
+        });
     }
 
     private void setupFileTree() {
-        // Configuration de l'arborescence des fichiers
         TreeItem<String> root = new TreeItem<>("Project");
         root.setExpanded(true);
 
-        // Exemple d'arborescence
         TreeItem<String> src = new TreeItem<>("src");
         TreeItem<String> resources = new TreeItem<>("resources");
 
@@ -67,31 +67,34 @@ public class MainController {
         openFileButton.setOnAction(e -> openFile());
         saveButton.setOnAction(e -> saveFile());
 
-        // Configuration des boutons du menu latéral
         dataButton.setOnAction(e -> switchToDataView());
         rdfEditorButton.setOnAction(e -> switchToRDFEditor());
         validationButton.setOnAction(e -> switchToValidation());
         queryButton.setOnAction(e -> switchToQuery());
         settingsButton.setOnAction(e -> switchToSettings());
 
-        // Application du thème AtlantaFX
-        applyAtlantaFXStyles();
-    }
+        // Application des styles AtlantaFX
+        newFileButton.getStyleClass().addAll(Styles.BUTTON_OUTLINED);
+        openFileButton.getStyleClass().addAll(Styles.BUTTON_OUTLINED);
+        saveButton.getStyleClass().addAll(Styles.BUTTON_OUTLINED);
 
-    private void applyAtlantaFXStyles() {
-        newFileButton.getStyleClass().add(Styles.BUTTON_OUTLINED);
-        openFileButton.getStyleClass().add(Styles.BUTTON_OUTLINED);
-        saveButton.getStyleClass().add(Styles.BUTTON_OUTLINED);
-
+        // Styles spéciaux pour les boutons du menu latéral
         dataButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
         rdfEditorButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
         validationButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
         queryButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
         settingsButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
+
+        // Configuration de la largeur maximale pour les boutons du menu
+        dataButton.setMaxWidth(Double.MAX_VALUE);
+        rdfEditorButton.setMaxWidth(Double.MAX_VALUE);
+        validationButton.setMaxWidth(Double.MAX_VALUE);
+        queryButton.setMaxWidth(Double.MAX_VALUE);
+        settingsButton.setMaxWidth(Double.MAX_VALUE);
     }
 
     private void createNewFile() {
-        // TODO: Implémenter la création de nouveau fichier
+        editorContainer.setContent("");
     }
 
     private void openFile() {
@@ -103,31 +106,58 @@ public class MainController {
 
         File file = fileChooser.showOpenDialog(null);
         if (file != null) {
-            // TODO: Charger le fichier dans l'éditeur
+            try {
+                String content = Files.readString(file.toPath());
+                editorContainer.setContent(content);
+            } catch (Exception e) {
+                showError("Error Opening File", "Could not open the file: " + e.getMessage());
+            }
         }
     }
 
     private void saveFile() {
-        // TODO: Implémenter la sauvegarde de fichier
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Turtle Files", "*.ttl"),
+                new FileChooser.ExtensionFilter("RDF/XML Files", "*.rdf"),
+                new FileChooser.ExtensionFilter("N3 Files", "*.n3")
+        );
+
+        File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            try {
+                Files.writeString(file.toPath(), editorContainer.getContent());
+            } catch (Exception e) {
+                showError("Error Saving File", "Could not save the file: " + e.getMessage());
+            }
+        }
+    }
+
+    private void showError(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     private void switchToDataView() {
-        // TODO: Implémenter le changement de vue
+        System.out.println("Switching to Data view");
     }
 
     private void switchToRDFEditor() {
-        // TODO: Implémenter le changement de vue
+        System.out.println("Switching to RDF Editor view");
     }
 
     private void switchToValidation() {
-        // TODO: Implémenter le changement de vue
+        System.out.println("Switching to Validation view");
     }
 
     private void switchToQuery() {
-        // TODO: Implémenter le changement de vue
+        System.out.println("Switching to Query view");
     }
 
     private void switchToSettings() {
-        // TODO: Implémenter le changement de vue
+        System.out.println("Switching to Settings view");
     }
 }

@@ -20,6 +20,7 @@ public class Main extends Application {
         }
         Scene scene = new Scene(loader.load());
         scene.getStylesheets().add(getClass().getResource("/styles/custom-button.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
 
 
         primaryStage.setTitle("RDF Editor");

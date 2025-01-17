@@ -2,98 +2,160 @@ package fr.inria.corese.demo.view;
 
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
+import javafx.scene.web.WebEngine;
+import javafx.beans.property.StringProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.application.Platform;
-import javafx.concurrent.Worker.State;
+import netscape.javascript.JSObject;
 
 public class CodeMirrorView extends StackPane {
     private final WebView webView;
+    private final WebEngine webEngine;
+    private final StringProperty contentProperty = new SimpleStringProperty("");
+    private boolean initialized = false;
 
     public CodeMirrorView() {
         webView = new WebView();
+        webEngine = webView.getEngine();
+
+        // Configuration de base
+        webView.setContextMenuEnabled(false);
+        webView.prefWidthProperty().bind(widthProperty());
+        webView.prefHeightProperty().bind(heightProperty());
+
         getChildren().add(webView);
-        Platform.runLater(this::initializeCodeMirror);
+
+        Platform.runLater(this::initializeEditor);
+
+        contentProperty.addListener((obs, old, newValue) -> {
+            if (initialized && newValue != null) {
+                updateEditorContent(newValue);
+            }
+        });
     }
 
-    private void initializeCodeMirror() {
+    private void initializeEditor() {
         String html = """
             <!DOCTYPE html>
             <html>
             <head>
                 <meta charset="utf-8">
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
                 <style>
-                    html, body {
+                    body, html {
                         height: 100%;
                         margin: 0;
                         padding: 0;
                         overflow: hidden;
                     }
+                </style>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/turtle/turtle.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js"></script>
+                <style>
                     .CodeMirror {
                         height: 100vh;
-                        width: 100%;
+                        font-family: monospace;
+                        font-size: 14px;
                     }
                 </style>
             </head>
             <body>
                 <textarea id="editor"></textarea>
                 <script>
-                    var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+                    var editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+                        mode: 'turtle',
+                        theme: 'monokai',
                         lineNumbers: true,
-                        theme: "dracula",
-                        mode: "javascript",
-                        indentUnit: 2,
-                        smartIndent: true,
-                        lineWrapping: false,
                         matchBrackets: true,
                         autoCloseBrackets: true,
+                        lineWrapping: true,
                         tabSize: 2,
-                        keyMap: "default",
-                        viewportMargin: Infinity
+                        autofocus: true
                     });
                     
-                    window.getEditorContent = function() {
+                    editor.on('change', function() {
+                        if (window.bridge) {
+                            window.bridge.onContentChanged(editor.getValue());
+                        }
+                    });
+                    
+                    window.setContent = function(content) {
+                        editor.setValue(content || '');
+                        editor.refresh();
+                    };
+                    
+                    window.getContent = function() {
                         return editor.getValue();
                     };
-                    
-                    window.setEditorContent = function(content) {
-                        editor.setValue(content);
-                    };
-                    
-                    editor.setValue("// Votre code ici\\n");
-                    
-                    setTimeout(function() {
-                        editor.refresh();
-                    }, 100);
                 </script>
             </body>
             </html>
             """;
 
-        webView.getEngine().loadContent(html);
+        webEngine.loadContent(html);
 
-        webView.getEngine().getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
-            if (newState == State.SUCCEEDED) {
-                Platform.runLater(() -> {
-                    webView.getEngine().executeScript("editor.refresh();");
-                });
+        webEngine.getLoadWorker().stateProperty().addListener((obs, old, newState) -> {
+            switch (newState) {
+                case SUCCEEDED:
+                    try {
+                        JSObject window = (JSObject) webEngine.executeScript("window");
+                        window.setMember("bridge", new JavaBridge());
+                        initialized = true;
+
+                        String content = contentProperty.get();
+                        if (content != null && !content.isEmpty()) {
+                            updateEditorContent(content);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error during CodeMirror initialization: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                    break;
+                case FAILED:
+                    System.err.println("Failed to load CodeMirror editor");
+                    break;
             }
         });
     }
 
+    public class JavaBridge {
+        public void onContentChanged(String newContent) {
+            Platform.runLater(() -> contentProperty.set(newContent));
+        }
+    }
+
+    private void updateEditorContent(String content) {
+        if (initialized) {
+            try {
+                String escapedContent = content.replace("\\", "\\\\")
+                        .replace("'", "\\'")
+                        .replace("\n", "\\n")
+                        .replace("\r", "\\r");
+                webEngine.executeScript(String.format("window.setContent('%s');", escapedContent));
+            } catch (Exception e) {
+                System.err.println("Error updating editor content: " + e.getMessage());
+            }
+        }
+    }
+
     public String getContent() {
-        return (String) webView.getEngine().executeScript("window.getEditorContent()");
+        if (!initialized) return contentProperty.get();
+        try {
+            return (String) webEngine.executeScript("window.getContent()");
+        } catch (Exception e) {
+            System.err.println("Error getting editor content: " + e.getMessage());
+            return "";
+        }
     }
 
     public void setContent(String content) {
-        String escapedContent = content.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n");
-        webView.getEngine().executeScript("window.setEditorContent('" + escapedContent + "')");
+        contentProperty.set(content);
     }
 
-    public WebView getWebView() {
-        return webView;
+    public StringProperty contentProperty() {
+        return contentProperty;
     }
 }

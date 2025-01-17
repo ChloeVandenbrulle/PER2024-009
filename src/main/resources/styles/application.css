@@ -1,0 +1,35 @@
+.root {
+    -fx-background-color: white;
+}
+
+.sidebar {
+    -fx-background-color: #f8f9fa;
+    -fx-padding: 10;
+    -fx-spacing: 5;
+}
+
+.menu-button {
+    -fx-min-width: 120px;
+    -fx-min-height: 35px;
+}
+
+.split-pane {
+    -fx-background-color: transparent;
+}
+
+.split-pane:horizontal > .split-pane-divider {
+    -fx-background-color: #e9ecef;
+    -fx-padding: 0 0.5px 0 0.5px;
+}
+
+.tree-view {
+    -fx-background-color: white;
+    -fx-border-color: #e9ecef;
+    -fx-border-width: 1px;
+}
+
+.tool-bar {
+    -fx-background-color: transparent;
+    -fx-padding: 5 10 5 10;
+    -fx-spacing: 5;
+}
