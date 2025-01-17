@@ -13,12 +13,12 @@ public class CodeMirrorView extends StackPane {
     private final WebEngine webEngine;
     private final StringProperty contentProperty = new SimpleStringProperty("");
     private boolean initialized = false;
+    private boolean isInternalUpdate = false;
 
     public CodeMirrorView() {
         webView = new WebView();
         webEngine = webView.getEngine();
 
-        // Configuration de base
         webView.setContextMenuEnabled(false);
         webView.prefWidthProperty().bind(widthProperty());
         webView.prefHeightProperty().bind(heightProperty());
@@ -28,7 +28,7 @@ public class CodeMirrorView extends StackPane {
         Platform.runLater(this::initializeEditor);
 
         contentProperty.addListener((obs, old, newValue) -> {
-            if (initialized && newValue != null) {
+            if (initialized && newValue != null && !isInternalUpdate) {
                 updateEditorContent(newValue);
             }
         });
@@ -73,17 +73,30 @@ public class CodeMirrorView extends StackPane {
                         autoCloseBrackets: true,
                         lineWrapping: true,
                         tabSize: 2,
-                        autofocus: true
+                        autofocus: true,
+                        preserveScrollPosition: true
                     });
                     
-                    editor.on('change', function() {
-                        if (window.bridge) {
-                            window.bridge.onContentChanged(editor.getValue());
+                    editor.on('change', function(cm, change) {
+                        // Ne pas envoyer les changements si c'est une mise à jour programmatique
+                        if (!change.origin || change.origin !== 'setValue') {
+                            if (window.bridge) {
+                                window.bridge.onContentChanged(editor.getValue());
+                            }
                         }
                     });
                     
                     window.setContent = function(content) {
+                        // Sauvegarder la position du curseur et le scroll
+                        var cursor = editor.getCursor();
+                        var scrollInfo = editor.getScrollInfo();
+                        
                         editor.setValue(content || '');
+                        
+                        // Restaurer la position du curseur et le scroll
+                        editor.setCursor(cursor);
+                        editor.scrollTo(scrollInfo.left, scrollInfo.top);
+                        
                         editor.refresh();
                     };
                     
@@ -123,7 +136,11 @@ public class CodeMirrorView extends StackPane {
 
     public class JavaBridge {
         public void onContentChanged(String newContent) {
-            Platform.runLater(() -> contentProperty.set(newContent));
+            Platform.runLater(() -> {
+                isInternalUpdate = true;
+                contentProperty.set(newContent);
+                isInternalUpdate = false;
+            });
         }
     }
 
