@@ -6,10 +6,12 @@ module fr.inria.corese.demo {
     requires org.fxmisc.richtext;
     requires static lombok;
     requires org.apache.jena.core;
+    requires org.kordamp.ikonli.javafx;
 
     opens fr.inria.corese.demo to javafx.fxml;
     opens fr.inria.corese.demo.controller to javafx.fxml;
 
     exports fr.inria.corese.demo;
     exports fr.inria.corese.demo.controller;
+    exports fr.inria.corese.demo.view;
 }

@@ -8,7 +8,7 @@ import javafx.stage.FileChooser;
 import lombok.Getter;
 import org.fxmisc.richtext.CodeArea;
 import atlantafx.base.theme.Styles;
-
+import org.kordamp.ikonli.javafx.FontIcon;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;

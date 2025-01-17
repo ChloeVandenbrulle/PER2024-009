@@ -4,6 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
+<?import fr.inria.corese.demo.view.CodeMirrorView?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="fr.inria.corese.demo.controller.MainController"
@@ -43,7 +44,7 @@
                     <TreeView fx:id="fileTreeView" VBox.vgrow="ALWAYS"/>
 
                     <!-- La zone d'édition (sera remplacée par CodeMirror) -->
-                    <StackPane fx:id="editorContainer" VBox.vgrow="ALWAYS"/>
+                    <CodeMirrorView fx:id="editorContainer" VBox.vgrow="ALWAYS"/>
                 </SplitPane>
             </center>
         </BorderPane>
