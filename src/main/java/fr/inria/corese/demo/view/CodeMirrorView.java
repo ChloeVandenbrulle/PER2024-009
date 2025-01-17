@@ -49,7 +49,7 @@ public class CodeMirrorView extends StackPane {
                     }
                 </style>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/eclipse.min.css">
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/turtle/turtle.min.js"></script>
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
@@ -67,7 +67,7 @@ public class CodeMirrorView extends StackPane {
                 <script>
                     var editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
                         mode: 'turtle',
-                        theme: 'monokai',
+                        theme: 'eclipse',
                         lineNumbers: true,
                         matchBrackets: true,
                         autoCloseBrackets: true,
