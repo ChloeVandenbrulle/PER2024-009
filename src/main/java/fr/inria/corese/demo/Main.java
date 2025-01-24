@@ -1,31 +1,28 @@
 package fr.inria.corese.demo;
 
-import atlantafx.base.theme.NordLight;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import fr.inria.corese.demo.controller.NavigationBarController;
 
 public class Main extends Application {
-
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        // Application du thème AtlantaFX
-        Application.setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
+    public void start(Stage primaryStage) {
+        try {
+            // Créer le contrôleur de navigation
+            NavigationBarController navigationController = new NavigationBarController();
 
-        // Chargement de la vue principale
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/fr/inria/corese/demo/main-view.fxml"));
-        if (loader.getLocation() == null) {
-            throw new IllegalStateException("Cannot find FXML file at: /fr/inria/corese/demo/main-view.fxml");
+            // Créer la scène avec la vue de navigation
+            Scene scene = new Scene(navigationController.getView(), 200, 400);
+
+            // Configurer la fenêtre principale
+            primaryStage.setTitle("Navigation");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+
+        } catch(Exception e) {
+            e.printStackTrace();
         }
-        Scene scene = new Scene(loader.load());
-        scene.getStylesheets().add(getClass().getResource("/styles/custom-button.css").toExternalForm());
-        scene.getStylesheets().add(getClass().getResource("/styles/application.css").toExternalForm());
-
-
-        primaryStage.setTitle("RDF Editor");
-        primaryStage.setScene(scene);
-        primaryStage.show();
     }
 
     public static void main(String[] args) {

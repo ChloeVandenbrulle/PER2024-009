@@ -1,69 +1,89 @@
 package fr.inria.corese.demo.view;
 
-import atlantafx.base.theme.Styles;
-import fr.inria.corese.demo.controller.NavigationBarController;
 import javafx.scene.control.Button;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import lombok.Getter;
+import javafx.geometry.Insets;
 
 public class NavigationBarView extends VBox {
-    public final Button dataButton;
-    public final Button rdfEditorButton;
-    public final Button validationButton;
-    public final Button queryButton;
-    public final Button settingsButton;
+    private final Button dataButton;
+    private final Button rdfEditorButton;
+    private final Button validationButton;
+    private final Button queryButton;
+    private final Button settingsButton;
 
     public NavigationBarView() {
-        dataButton = new Button("Data");
-        rdfEditorButton = new Button("RDF Editor");
-        validationButton = new Button("Validation");
-        queryButton = new Button("Query");
-        settingsButton = new Button("Settings");
-        initializeButtonsStyles();
+        setSpacing(8);
+        setPadding(new Insets(10));
+
+        // Création des boutons
+        dataButton = createNavigationButton("Data");
+        rdfEditorButton = createNavigationButton("RDF Editor");
+        validationButton = createNavigationButton("Validation");
+        queryButton = createNavigationButton("Query");
+        settingsButton = createNavigationButton("Settings");
 
         getChildren().addAll(dataButton, rdfEditorButton, validationButton, queryButton, settingsButton);
     }
 
-    private void initializeButtonsStyles() {
-        // Styles spéciaux pour les boutons du menu latéral
-        dataButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
-        rdfEditorButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
-        validationButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
-        queryButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
-        settingsButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
+    private Button createNavigationButton(String text) {
+        Button button = new Button(text);
 
-        // Configuration de la largeur maximale pour les boutons du menu
-        dataButton.setMaxWidth(Double.MAX_VALUE);
-        rdfEditorButton.setMaxWidth(Double.MAX_VALUE);
-        validationButton.setMaxWidth(Double.MAX_VALUE);
-        queryButton.setMaxWidth(Double.MAX_VALUE);
-        settingsButton.setMaxWidth(Double.MAX_VALUE);
+        // Style de base : bleu clair avec bordures arrondies
+        button.setStyle("""
+            -fx-background-color: white;
+            -fx-text-fill: #2196F3;
+            -fx-border-color: #2196F3;
+            -fx-border-radius: 20;
+            -fx-background-radius: 20;
+            -fx-min-height: 35;
+            -fx-max-width: infinity;
+            -fx-font-size: 14;
+            """);
 
-        dataButton.setOnAction(e -> switchToDataView());
-        rdfEditorButton.setOnAction(e -> switchToRDFEditor());
-        validationButton.setOnAction(e -> switchToValidation());
-        queryButton.setOnAction(e -> switchToQuery());
-        settingsButton.setOnAction(e -> switchToSettings());
+        // Effet de survol : légèrement plus foncé
+        button.setOnMouseEntered(e -> button.setStyle("""
+            -fx-background-color: #E3F2FD;
+            -fx-text-fill: #2196F3;
+            -fx-border-color: #2196F3;
+            -fx-border-radius: 20;
+            -fx-background-radius: 20;
+            -fx-min-height: 35;
+            -fx-max-width: infinity;
+            -fx-font-size: 14;
+            """));
+
+        // Retour à l'état normal
+        button.setOnMouseExited(e -> button.setStyle("""
+            -fx-background-color: white;
+            -fx-text-fill: #2196F3;
+            -fx-border-color: #2196F3;
+            -fx-border-radius: 20;
+            -fx-background-radius: 20;
+            -fx-min-height: 35;
+            -fx-max-width: infinity;
+            -fx-font-size: 14;
+            """));
+
+        // Effet de clic
+        button.setOnMousePressed(e -> button.setStyle("""
+            -fx-background-color: #BBDEFB;
+            -fx-text-fill: #2196F3;
+            -fx-border-color: #2196F3;
+            -fx-border-radius: 20;
+            -fx-background-radius: 20;
+            -fx-min-height: 35;
+            -fx-max-width: infinity;
+            -fx-font-size: 14;
+            """));
+
+        button.setPrefWidth(150);
+        return button;
     }
 
-    private void switchToDataView() {
-        System.out.println("Switching to Data view");
-    }
-
-    private void switchToRDFEditor() {
-        System.out.println("Switching to RDF Editor view");
-    }
-
-    private void switchToValidation() {
-        System.out.println("Switching to Validation view");
-    }
-
-    private void switchToQuery() {
-        System.out.println("Switching to Query view");
-    }
-
-    private void switchToSettings() {
-        System.out.println("Switching to Settings view");
-    }
+    // Getters
+    public Button getDataButton() { return dataButton; }
+    public Button getRdfEditorButton() { return rdfEditorButton; }
+    public Button getValidationButton() { return validationButton; }
+    public Button getQueryButton() { return queryButton; }
+    public Button getSettingsButton() { return settingsButton; }
 }

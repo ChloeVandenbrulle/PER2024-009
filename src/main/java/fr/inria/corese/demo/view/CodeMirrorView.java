@@ -36,77 +36,167 @@ public class CodeMirrorView extends StackPane {
 
     private void initializeEditor() {
         String html = """
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="utf-8">
-                <style>
-                    body, html {
-                        height: 100%;
-                        margin: 0;
-                        padding: 0;
-                        overflow: hidden;
-                    }
-                </style>
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/eclipse.min.css">
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/turtle/turtle.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js"></script>
-                <style>
-                    .CodeMirror {
-                        height: 100vh;
-                        font-family: monospace;
-                        font-size: 14px;
-                    }
-                </style>
-            </head>
-            <body>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <style>
+                body, html {
+                    height: 100%;
+                    margin: 0;
+                    padding: 0;
+                    overflow: hidden;
+                }
+                .editor-container {
+                    display: flex;
+                    flex-direction: column;
+                    height: 100vh;
+                }
+                .CodeMirror {
+                    flex-grow: 1;
+                    font-family: 'JetBrains Mono', monospace;
+                    font-size: 14px;
+                }
+                .status-bar {
+                    height: 25px;
+                    background-color: #f3f3f3;
+                    border-top: 1px solid #ddd;
+                    display: flex;
+                    align-items: center;
+                    padding: 0 10px;
+                    font-size: 12px;
+                    font-family: sans-serif;
+                    color: #666;
+                }
+                .status-bar-right {
+                    margin-left: auto;
+                    display: flex;
+                    gap: 15px;
+                }
+                .status-item {
+                    margin-left: 15px;
+                }
+                .syntax-error {
+                    background-color: rgba(255, 0, 0, 0.1);
+                    border-bottom: 2px dotted #f00;
+                }
+                .CodeMirror-lint-tooltip {
+                    background-color: #ffd;
+                    border: 1px solid #886;
+                    border-radius: 4px;
+                    color: #333;
+                    font-family: monospace;
+                    font-size: 10pt;
+                    max-width: 600px;
+                    opacity: 0;
+                    padding: 2px 5px;
+                    position: fixed;
+                    transition: opacity .4s;
+                    white-space: pre-wrap;
+                    z-index: 100;
+                    box-shadow: 2px 3px 5px rgba(0,0,0,.2);
+                }
+                .CodeMirror-lint-mark {
+                    background-position: left bottom;
+                    background-repeat: repeat-x;
+                }
+                .CodeMirror-lint-mark-error {
+                    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9sJDw4cOCW1/KIAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAHElEQVQI12NggIL/DAz/GdA5/xkY/qPKMDAwAADLZwf5rvm+LQAAAABJRU5ErkJggg==");
+                }
+            </style>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/eclipse.min.css">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/turtle/turtle.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/scroll/simplescrollbars.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/selection/active-line.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldcode.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.css">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/lint.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/lint.css">
+            <script src="https://cdn.jsdelivr.net/npm/n3@1.16.2/browser/n3.min.js"></script>
+        </head>
+        <body>
+            <div class="editor-container">
                 <textarea id="editor"></textarea>
-                <script>
-                    var editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
-                        mode: 'turtle',
-                        theme: 'eclipse',
-                        lineNumbers: true,
-                        matchBrackets: true,
-                        autoCloseBrackets: true,
-                        lineWrapping: true,
-                        tabSize: 2,
-                        autofocus: true,
-                        preserveScrollPosition: true
-                    });
-                    
-                    editor.on('change', function(cm, change) {
-                        // Ne pas envoyer les changements si c'est une mise à jour programmatique
-                        if (!change.origin || change.origin !== 'setValue') {
+                <div class="status-bar">
+                    <div class="status-bar-right">
+                        <span id="cursor-position">Ln 1, Col 1</span>
+                        <span class="status-item" id="selection-count"></span>
+                        <span class="status-item" id="file-info">UTF-8</span>
+                        <span class="status-item" id="editor-mode">Turtle</span>
+                    </div>
+                </div>
+            </div>
+            <script>
+                var editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+                    mode: 'turtle',
+                    theme: 'eclipse',
+                    lineNumbers: true,
+                    matchBrackets: true,
+                    autoCloseBrackets: true,
+                    lineWrapping: true,
+                    tabSize: 2,
+                    autofocus: true,
+                    styleActiveLine: true,
+                    scrollbarStyle: 'overlay',
+                    foldGutter: true,
+                    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                    extraKeys: {
+                        "Ctrl-S": function(cm) {
                             if (window.bridge) {
-                                window.bridge.onContentChanged(editor.getValue());
+                                window.bridge.saveFile();
                             }
+                        },
+                        "Ctrl-F": "findPersistent",
+                        "Ctrl-/": "toggleComment",
+                        "Ctrl-Space": "autocomplete"
+                    }
+                });
+
+                // Mise à jour de la position du curseur
+                editor.on('cursorActivity', function() {
+                    var pos = editor.getCursor();
+                    var sel = editor.getSelection();
+                    document.getElementById('cursor-position').textContent = 
+                        'Ln ' + (pos.line + 1) + ', Col ' + (pos.ch + 1);
+                    
+                    // Afficher le nombre de caractères sélectionnés
+                    if (sel && sel.length > 0) {
+                        document.getElementById('selection-count').textContent = 
+                            sel.length + ' selected';
+                    } else {
+                        document.getElementById('selection-count').textContent = '';
+                    }
+                });
+
+                editor.on('change', function(cm, change) {
+                    if (!change.origin || change.origin !== 'setValue') {
+                        if (window.bridge) {
+                            window.bridge.onContentChanged(editor.getValue());
                         }
-                    });
-                    
-                    window.setContent = function(content) {
-                        // Sauvegarder la position du curseur et le scroll
-                        var cursor = editor.getCursor();
-                        var scrollInfo = editor.getScrollInfo();
-                        
-                        editor.setValue(content || '');
-                        
-                        // Restaurer la position du curseur et le scroll
-                        editor.setCursor(cursor);
-                        editor.scrollTo(scrollInfo.left, scrollInfo.top);
-                        
-                        editor.refresh();
-                    };
-                    
-                    window.getContent = function() {
-                        return editor.getValue();
-                    };
-                </script>
-            </body>
-            </html>
-            """;
+                    }
+                });
+
+                window.setContent = function(content) {
+                    var cursor = editor.getCursor();
+                    var scrollInfo = editor.getScrollInfo();
+                    editor.setValue(content || '');
+                    editor.setCursor(cursor);
+                    editor.scrollTo(scrollInfo.left, scrollInfo.top);
+                    editor.refresh();
+                };
+
+                window.getContent = function() {
+                    return editor.getValue();
+                };
+            </script>
+        </body>
+        </html>
+        """;
 
         webEngine.loadContent(html);
 

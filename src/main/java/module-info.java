@@ -6,7 +6,6 @@ module fr.inria.corese.demo {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.feather;
     requires atlantafx.base;
-    requires org.fxmisc.richtext;
     requires jdk.jsobject;
 
     exports fr.inria.corese.demo;

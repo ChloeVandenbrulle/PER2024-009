@@ -1,5 +1,6 @@
 package fr.inria.corese.demo.controller;
 
+import fr.inria.corese.demo.model.CodeEditorModel;
 import fr.inria.corese.demo.view.CodeMirrorView;
 import fr.inria.corese.demo.view.NavigationBarView;
 import javafx.application.Platform;
@@ -19,14 +20,23 @@ public class MainController {
     @FXML private TreeView<String> fileTreeView;
     @FXML private CodeMirrorView editorContainer;
     private NavigationBarController navigationBarController;
-
+    private ValidationResultController validationResultController;
+    private ValidationPageController validationPageController;
+    private CodeEditorModel codeEditorModel;
 
     @FXML
     public void initialize() {
+        codeEditorModel = new CodeEditorModel();
+        validationPageController = new ValidationPageController();
+        validationResultController = new ValidationResultController();
+
         setupFileTree();
         setupButtons();
         initializeEditor();
         initializeNavigationBar();
+
+        validationPageController.setModel(codeEditorModel);
+        validationResultController.setModel(codeEditorModel);
     }
 
     private void initializeEditor() {
@@ -42,17 +52,19 @@ public class MainController {
                 """;
 
             editorContainer.setContent(initialContent);
+            codeEditorModel.setContent(initialContent);
 
             // Écouter les changements
             editorContainer.contentProperty().addListener((obs, oldVal, newVal) -> {
                 System.out.println("Contenu modifié");
+                codeEditorModel.setContent(newVal);
             });
         });
     }
 
     private void initializeNavigationBar() {
         navigationBarView =  new NavigationBarView();
-        navigationBarController = new NavigationBarController(navigationBarView);
+        navigationBarController = new NavigationBarController();
     }
 
     private void setupFileTree() {

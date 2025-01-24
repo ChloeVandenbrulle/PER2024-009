@@ -3,7 +3,7 @@
 }
 
 .sidebar {
-    -fx-background-color: #f8f9fa;
+    -fx-background-color: white;
     -fx-padding: 10;
     -fx-spacing: 5;
 }
@@ -32,4 +32,43 @@
     -fx-background-color: transparent;
     -fx-padding: 5 10 5 10;
     -fx-spacing: 5;
+}
+
+.rounded-button {
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-min-height: 40px;
+}
+
+.sidebar {
+    -fx-background-color: -color-bg-default;
+    -fx-border-color: -color-border-default;
+    -fx-border-width: 0 1 0 0;
+}
+
+.rounded-button .ikonli-font-icon {
+    -fx-icon-color: -color-fg-default;
+}
+
+.nav-button {
+    -fx-background-color: white;
+    -fx-border-color: #CCCCCC;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-min-height: 35;
+    -fx-pref-width: 150;
+    -fx-font-size: 14;
+}
+
+.nav-button:hover {
+    -fx-background-color: #F8F9FA;
+}
+
+.nav-button:pressed {
+    -fx-background-color: #E9ECEF;
+}
+
+.nav-container {
+    -fx-spacing: 8;
+    -fx-padding: 10;
 }
