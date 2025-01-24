@@ -1,6 +1,7 @@
 package fr.inria.corese.demo.controller;
 
 import fr.inria.corese.demo.view.CodeMirrorView;
+import fr.inria.corese.demo.view.NavigationBarView;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -11,22 +12,21 @@ import java.nio.file.Files;
 
 public class MainController {
 
-    @FXML private Button dataButton;
-    @FXML private Button rdfEditorButton;
-    @FXML private Button validationButton;
-    @FXML private Button queryButton;
-    @FXML private Button settingsButton;
+    @FXML private NavigationBarView navigationBarView;
     @FXML private Button newFileButton;
     @FXML private Button openFileButton;
     @FXML private Button saveButton;
     @FXML private TreeView<String> fileTreeView;
     @FXML private CodeMirrorView editorContainer;
+    private NavigationBarController navigationBarController;
+
 
     @FXML
     public void initialize() {
         setupFileTree();
         setupButtons();
         initializeEditor();
+        initializeNavigationBar();
     }
 
     private void initializeEditor() {
@@ -50,6 +50,11 @@ public class MainController {
         });
     }
 
+    private void initializeNavigationBar() {
+        navigationBarView =  new NavigationBarView();
+        navigationBarController = new NavigationBarController(navigationBarView);
+    }
+
     private void setupFileTree() {
         TreeItem<String> root = new TreeItem<>("Project");
         root.setExpanded(true);
@@ -67,30 +72,10 @@ public class MainController {
         openFileButton.setOnAction(e -> openFile());
         saveButton.setOnAction(e -> saveFile());
 
-        dataButton.setOnAction(e -> switchToDataView());
-        rdfEditorButton.setOnAction(e -> switchToRDFEditor());
-        validationButton.setOnAction(e -> switchToValidation());
-        queryButton.setOnAction(e -> switchToQuery());
-        settingsButton.setOnAction(e -> switchToSettings());
-
         // Application des styles AtlantaFX
         newFileButton.getStyleClass().addAll(Styles.BUTTON_OUTLINED);
         openFileButton.getStyleClass().addAll(Styles.BUTTON_OUTLINED);
         saveButton.getStyleClass().addAll(Styles.BUTTON_OUTLINED);
-
-        // Styles spéciaux pour les boutons du menu latéral
-        dataButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
-        rdfEditorButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
-        validationButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
-        queryButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
-        settingsButton.getStyleClass().addAll("rounded-button", Styles.BUTTON_OUTLINED, Styles.ACCENT);
-
-        // Configuration de la largeur maximale pour les boutons du menu
-        dataButton.setMaxWidth(Double.MAX_VALUE);
-        rdfEditorButton.setMaxWidth(Double.MAX_VALUE);
-        validationButton.setMaxWidth(Double.MAX_VALUE);
-        queryButton.setMaxWidth(Double.MAX_VALUE);
-        settingsButton.setMaxWidth(Double.MAX_VALUE);
     }
 
     private void createNewFile() {
@@ -139,25 +124,5 @@ public class MainController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
-    }
-
-    private void switchToDataView() {
-        System.out.println("Switching to Data view");
-    }
-
-    private void switchToRDFEditor() {
-        System.out.println("Switching to RDF Editor view");
-    }
-
-    private void switchToValidation() {
-        System.out.println("Switching to Validation view");
-    }
-
-    private void switchToQuery() {
-        System.out.println("Switching to Query view");
-    }
-
-    private void switchToSettings() {
-        System.out.println("Switching to Settings view");
     }
 }
