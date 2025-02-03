@@ -6,6 +6,7 @@
 <?import fr.inria.corese.demo.view.CodeMirrorView?>
 
 <?import fr.inria.corese.demo.view.NavigationBarView?>
+<?import fr.inria.corese.demo.view.IconButtonBarView?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="fr.inria.corese.demo.controller.MainController"
@@ -42,6 +43,7 @@
                         <!-- Le conteneur de l'éditeur -->
                         <StackPane>
                             <CodeMirrorView fx:id="editorContainer" />
+                            <IconButtonBarView alignment="TOP_RIGHT"/>
                         </StackPane>
                     </items>
                 </SplitPane>
