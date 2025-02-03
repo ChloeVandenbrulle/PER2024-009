@@ -5,18 +5,9 @@ import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.layout.VBox;
-import org.kordamp.ikonli.feather.Feather;
 import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign.MaterialDesign;
 import org.kordamp.ikonli.Ikon;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignE;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignI;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignU;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignR;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignB;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignM;
+import org.kordamp.ikonli.materialdesign2.*;
 
 import javafx.scene.control.Button;
 
@@ -25,8 +16,8 @@ public class IconButtonBarView extends VBox {
     private Button openFilesButton;
     private Button exportButton;
     private Button importButton;
-    private Button previousStepButton;
-    private Button nextStepButton;
+    private Button undoButton;
+    private Button redoButton;
     private Button documentationButton;
     private Button clearButton;
     private Button zoomInButton;
@@ -59,8 +50,8 @@ public class IconButtonBarView extends VBox {
         openFilesButton = createIconButton(MaterialDesignF.FOLDER_OPEN);
         exportButton = createIconButton(MaterialDesignE.EXPORT);
         importButton = createIconButton(MaterialDesignI.IMPORT);
-        previousStepButton = createIconButton(MaterialDesignU.UNDO);
-        nextStepButton = createIconButton(MaterialDesignR.REDO);
+        undoButton = createIconButton(MaterialDesignU.UNDO);
+        redoButton = createIconButton(MaterialDesignR.REDO);
         documentationButton = createIconButton(MaterialDesignB.BOOK_OPEN_VARIANT);
         clearButton = createIconButton(MaterialDesignB.BROOM);
         zoomInButton = createIconButton(MaterialDesignM.MAGNIFY_PLUS_OUTLINE);
@@ -71,8 +62,8 @@ public class IconButtonBarView extends VBox {
             getChildren().addAll(
                     saveButton,
                     exportButton,
-                    previousStepButton,
-                    nextStepButton,
+                    undoButton,
+                    redoButton,
                     documentationButton
             );
         } else if (page=="validation") {
@@ -82,8 +73,8 @@ public class IconButtonBarView extends VBox {
                     importButton,
                     exportButton,
                     clearButton,
-                    previousStepButton,
-                    nextStepButton,
+                    undoButton,
+                    redoButton,
                     documentationButton
             );
         } else if (page=="query") {
@@ -138,5 +129,49 @@ public class IconButtonBarView extends VBox {
             "-fx-max-width: 10;"
         ));
         return button;
+    }
+
+    public Button getSaveButton() {
+        return saveButton;
+    }
+
+    public Button getOpenFilesButton() {
+        return openFilesButton;
+    }
+
+    public Button getExportButton() {
+        return exportButton;
+    }
+
+    public Button getImportButton() {
+        return importButton;
+    }
+
+    public Button getUndoButton() {
+        return undoButton;
+    }
+
+    public Button getRedoButton() {
+        return redoButton;
+    }
+
+    public Button getDocumentationButton() {
+        return documentationButton;
+    }
+
+    public Button getClearButton() {
+        return clearButton;
+    }
+
+    public Button getZoomInButton() {
+        return zoomInButton;
+    }
+
+    public Button getZoomOutButton() {
+        return zoomOutButton;
+    }
+
+    public Button getFullScreenButton() {
+        return fullScreenButton;
     }
 }
