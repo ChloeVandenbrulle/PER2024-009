@@ -43,7 +43,7 @@
                         <!-- Le conteneur de l'éditeur -->
                         <StackPane>
                             <CodeMirrorView fx:id="editorContainer" />
-                            <IconButtonBarView alignment="TOP_RIGHT"/>
+                            <IconButtonBarView alignment="TOP_RIGHT" page="validation"/>
                         </StackPane>
                     </items>
                 </SplitPane>
