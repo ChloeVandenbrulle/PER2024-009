@@ -10,7 +10,8 @@ public enum ButtonType {
     // File Buttons
     CLEAR_GRAPH("Clear graph", "file-button"),
     RELOAD_FILES("Reload files", "file-button"),
-    LOAD_FILES("Load files", "file-button");
+    LOAD_FILES("Load files", "file-button"),
+    LOAD_RULE_FILE( "Load rule file", "file-button");
 
     private final String label;
     private final String styleClass;

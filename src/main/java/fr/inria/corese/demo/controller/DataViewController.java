@@ -3,7 +3,9 @@ package fr.inria.corese.demo.controller;
 import fr.inria.corese.demo.model.ButtonType;
 import fr.inria.corese.demo.view.DataView;
 import fr.inria.corese.demo.model.ProjectDataModel;
+import fr.inria.corese.demo.view.popup.*;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -13,33 +15,48 @@ public class DataViewController {
     private DataView view;
     private ProjectDataModel model;
     private ButtonManager buttonManager;
+    private PopupFactory popupFactory;
 
     @FXML
     private HBox topButtonBox;
     @FXML
     private HBox fileActionBox;
+    @FXML
+    private HBox configActionBox;
 
     public DataViewController() {
         this.view = new DataView();
         this.model = new ProjectDataModel();
+        this.popupFactory = PopupFactory.getInstance(model);
         initializeEventHandlers();
     }
 
     @FXML
     public void initialize() {
+        System.out.println("Initializing DataViewController");
         buttonManager = new ButtonManager(new ProjectDataModel());
+
+        Button showLogsButton = buttonManager.getButton(ButtonType.SHOW_LOGS);
+        showLogsButton.setOnAction(e -> {
+            System.out.println("Log button clicked directly"); // Debug print
+            handleShowLogs();
+        });
 
         // Ajout des boutons à la vue
         topButtonBox.getChildren().addAll(
                 buttonManager.getButton(ButtonType.OPEN_PROJECT),
                 buttonManager.getButton(ButtonType.SAVE_AS),
-                buttonManager.getButton(ButtonType.SHOW_LOGS)
+                showLogsButton
         );
 
         fileActionBox.getChildren().addAll(
                 buttonManager.getButton(ButtonType.CLEAR_GRAPH),
                 buttonManager.getButton(ButtonType.RELOAD_FILES),
                 buttonManager.getButton(ButtonType.LOAD_FILES)
+        );
+
+        configActionBox.getChildren().addAll(
+                buttonManager.getButton(ButtonType.LOAD_RULE_FILE)
         );
 
         topButtonBox.sceneProperty().addListener((obs, oldScene, newScene) -> {
@@ -82,10 +99,6 @@ public class DataViewController {
         }
     }
 
-    private void handleShowLogs() {
-        // Implémenter l'affichage des logs
-    }
-
     private void handleClearGraph() {
         model.clearGraph();
         updateView();
@@ -96,11 +109,45 @@ public class DataViewController {
         updateView();
     }
 
+    private void handleShowLogs() {
+        System.out.println("handleShowLogs called"); // Debug print
+        try {
+            LogDialog logDialog = (LogDialog) popupFactory.createPopup(PopupFactory.LOG_POPUP);
+            System.out.println("LogDialog created"); // Debug print
+            if (logDialog != null) {
+                logDialog.displayPopup();
+                System.out.println("LogDialog displayed"); // Debug print
+            } else {
+                System.out.println("LogDialog is null"); // Debug print
+            }
+        } catch (Exception e) {
+            System.err.println("Error showing logs: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     private void handleLoadFiles() {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(null);
         if (file != null) {
-            model.loadFile(file);
+            try {
+                model.addLogEntry("Starting to load file: " + file.getName());
+                model.loadFile(file);
+                model.addLogEntry("File loaded successfully: " + file.getName());
+
+                // Afficher les informations du fichier
+                IPopup fileInfoPopup = popupFactory.createPopup(PopupFactory.FILE_INFO_POPUP);
+                ((FileInfoPopup) fileInfoPopup).show(file);
+
+            } catch (Exception e) {
+                String errorMessage = "Error loading file: " + e.getMessage();
+                model.addLogEntry("ERROR: " + errorMessage);
+
+                // Afficher un avertissement en cas d'erreur
+                IPopup warningPopup = popupFactory.createPopup(PopupFactory.WARNING_POPUP);
+                warningPopup.setMessage(errorMessage);
+                ((WarningPopup) warningPopup).showAndWait();
+            }
             updateView();
         }
     }

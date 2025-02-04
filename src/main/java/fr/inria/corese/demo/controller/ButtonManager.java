@@ -1,10 +1,14 @@
 package fr.inria.corese.demo.controller;
 
+import com.sun.javafx.event.EventUtil;
 import fr.inria.corese.demo.model.ButtonType;
 import fr.inria.corese.demo.model.ProjectDataModel;
 import fr.inria.corese.demo.view.CustomButton;
 import java.util.HashMap;
 import java.util.Map;
+
+import javafx.event.ActionEvent;
+import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
 import javafx.stage.DirectoryChooser;
 import java.io.File;
@@ -28,6 +32,17 @@ public class ButtonManager {
         createFileButton(ButtonType.CLEAR_GRAPH);
         createFileButton(ButtonType.RELOAD_FILES);
         createFileButton(ButtonType.LOAD_FILES);
+
+        // Add more buttons here
+        createFileButton(ButtonType.LOAD_RULE_FILE);
+
+        Button showLogsButton = new Button("Show Logs");
+        showLogsButton.setOnAction(event -> {
+            System.out.println("Show logs button clicked"); // Debug print
+            if (event.getSource() instanceof Button) {
+                EventUtil.fireEvent(new ActionEvent());
+            }
+        });
     }
 
     private void createProjectButton(ButtonType type) {
@@ -85,6 +100,11 @@ public class ButtonManager {
                 FileChooser chooser = new FileChooser();
                 File file = chooser.showOpenDialog(button.getScene().getWindow());
                 if (file != null) model.loadFile(file);
+            }
+            case LOAD_RULE_FILE -> {
+                FileChooser chooser = new FileChooser();
+                File file = chooser.showOpenDialog(button.getScene().getWindow());
+                if (file != null) model.uploadRuleFile(file);
             }
         }
     }

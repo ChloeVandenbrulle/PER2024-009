@@ -4,35 +4,34 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import fr.inria.corese.demo.view.CodeMirrorView?>
-<?import fr.inria.corese.demo.view.IconButtonBarView?>
 
-<BorderPane fx:id="mainContainer" xmlns="http://javafx.com/javafx"
+<BorderPane fx:id="mainContainer"
+            xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="fr.inria.corese.demo.controller.ValidationViewController">
+            fx:controller="fr.inria.corese.demo.controller.ValidationViewController"
+            stylesheets="@../../../../styles/application.css">
 
     <center>
         <BorderPane fx:id="contentContainer">
             <top>
-                <ToolBar>
+                <ToolBar styleClass="tool-bar">
                     <items>
-                        <Button fx:id="newFileButton" text="New File"/>
-                        <Button fx:id="openFileButton" text="Open File"/>
-                        <Button fx:id="saveButton" text="Save"/>
+                        <Button fx:id="newFileButton" styleClass="rounded-button" text="New File"/>
+                        <Button fx:id="openFileButton" styleClass="rounded-button" text="Open File"/>
+                        <Button fx:id="saveButton" styleClass="rounded-button" text="Save"/>
                     </items>
                 </ToolBar>
             </top>
 
             <center>
                 <SplitPane dividerPositions="0.2">
-                    <items>
-                        <TreeView fx:id="fileTreeView" minWidth="120"/>
-                        <CodeMirrorView fx:id="editorContainer"/>
-                    </items>
+                    <TreeView fx:id="fileTreeView" styleClass="tree-view" minWidth="120"/>
+                    <CodeMirrorView fx:id="editorContainer"/>
                 </SplitPane>
             </center>
 
             <right>
-                <VBox fx:id="iconButtonContainer" maxWidth="50" minWidth="50"/>
+                <VBox fx:id="iconButtonContainer" styleClass="sidebar" maxWidth="50" minWidth="50"/>
             </right>
         </BorderPane>
     </center>

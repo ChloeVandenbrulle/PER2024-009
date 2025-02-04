@@ -10,6 +10,7 @@ module fr.inria.corese.demo {
     requires org.kordamp.ikonli.materialdesign;
     requires org.kordamp.ikonli.materialdesign2;
     requires org.kordamp.ikonli.core;
+    requires java.desktop;
 
     exports fr.inria.corese.demo;
     exports fr.inria.corese.demo.controller;
