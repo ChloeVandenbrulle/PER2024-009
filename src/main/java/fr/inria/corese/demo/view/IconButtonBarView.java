@@ -6,7 +6,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign2.*;
@@ -20,9 +19,7 @@ public class IconButtonBarView extends VBox {
 
     public IconButtonBarView() {
         setSpacing(10);
-        setPadding(new Insets(15, 0, 0, 0));
         setAlignment(Pos.TOP_CENTER);
-
     }
 
     public void initializeButtons(List<IconButtonType> buttonTypes) {
