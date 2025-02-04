@@ -3,6 +3,10 @@ package fr.inria.corese.demo.model;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.io.File;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProjectDataModel {
     private ObservableList<String> fileList;
@@ -11,6 +15,8 @@ public class ProjectDataModel {
     private int graphCount;
     private int rulesLoadedCount;
     private boolean myRuleFileEnabled;
+    private final List<String> logEntries = new ArrayList<>();
+
 
     public ProjectDataModel() {
         fileList = FXCollections.observableArrayList();
@@ -38,6 +44,19 @@ public class ProjectDataModel {
 
     public void loadRuleFile(File file) {
         // Implémenter le chargement d'un fichier de règles
+    }
+
+    public void addLogEntry(String entry) {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        logEntries.add(timestamp + " - " + entry);
+    }
+
+    public String getLogs() {
+        return String.join("\n", logEntries);
+    }
+
+    public void clearLogs() {
+        logEntries.clear();
     }
 
     public void setMyRuleFileEnabled(boolean enabled) {
