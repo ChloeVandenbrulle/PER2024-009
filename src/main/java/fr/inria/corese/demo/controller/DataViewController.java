@@ -1,7 +1,10 @@
 package fr.inria.corese.demo.controller;
 
+import fr.inria.corese.demo.model.ButtonType;
 import fr.inria.corese.demo.view.DataView;
 import fr.inria.corese.demo.model.ProjectDataModel;
+import javafx.fxml.FXML;
+import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import java.io.File;
@@ -9,11 +12,42 @@ import java.io.File;
 public class DataViewController {
     private DataView view;
     private ProjectDataModel model;
+    private ButtonManager buttonManager;
+
+    @FXML
+    private HBox topButtonBox;
+    @FXML
+    private HBox fileActionBox;
 
     public DataViewController() {
         this.view = new DataView();
         this.model = new ProjectDataModel();
         initializeEventHandlers();
+    }
+
+    @FXML
+    public void initialize() {
+        buttonManager = new ButtonManager(new ProjectDataModel());
+
+        // Ajout des boutons à la vue
+        topButtonBox.getChildren().addAll(
+                buttonManager.getButton(ButtonType.OPEN_PROJECT),
+                buttonManager.getButton(ButtonType.SAVE_AS),
+                buttonManager.getButton(ButtonType.SHOW_LOGS)
+        );
+
+        fileActionBox.getChildren().addAll(
+                buttonManager.getButton(ButtonType.CLEAR_GRAPH),
+                buttonManager.getButton(ButtonType.RELOAD_FILES),
+                buttonManager.getButton(ButtonType.LOAD_FILES)
+        );
+
+        topButtonBox.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                String cssPath = getClass().getResource("/styles/buttons.css").toExternalForm();
+                newScene.getStylesheets().add(cssPath);
+            }
+        });
     }
 
     private void initializeEventHandlers() {

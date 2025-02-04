@@ -1,0 +1,69 @@
+/* styles.css */
+
+/* Conteneurs */
+.button-container {
+    -fx-alignment: center-left;
+}
+
+.section-container {
+    -fx-background-color: #f5f5f5;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.stats-container {
+    -fx-background-color: white;
+    -fx-border-color: #ddd;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* Styles de base pour les boutons personnalisés */
+.custom-button {
+    -fx-padding: 6 12;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+
+/* Styles spécifiques pour les types de boutons */
+.project-button {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+}
+
+.project-button:hover {
+    -fx-background-color: #0056b3;
+}
+
+.file-button {
+    -fx-background-color: #6c757d;
+    -fx-text-fill: white;
+}
+
+.file-button:hover {
+    -fx-background-color: #545b62;
+}
+
+.log-button {
+    -fx-background-color: #28a745;
+    -fx-text-fill: white;
+}
+
+.log-button:hover {
+    -fx-background-color: #218838;
+}
+
+.log-button-special {
+    -fx-background-color: #17a2b8;
+    -fx-text-fill: white;
+}
+
+.log-button-special:hover {
+    -fx-background-color: #138496;
+}
+
+/* Styles disabled */
+.custom-button:disabled {
+    -fx-opacity: 0.65;
+    -fx-cursor: default;
+}
