@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="fr.inria.corese.demo.controller.MainController"
+            fx:id="mainContainer"
+            prefHeight="600.0" prefWidth="800.0">
+
+    <!-- Navigation à gauche -->
+    <left>
+        <VBox fx:id="navigationContainer" spacing="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+        </VBox>
+    </left>
+
+    <!-- Zone de contenu qui sera remplacée -->
+    <center>
+        <BorderPane fx:id="contentArea"/>
+    </center>
+
+</BorderPane>

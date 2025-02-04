@@ -5,85 +5,87 @@ import fr.inria.corese.demo.factory.IconButtonBarFactory;
 import fr.inria.corese.demo.model.CodeEditorModel;
 import fr.inria.corese.demo.view.CodeMirrorView;
 import fr.inria.corese.demo.view.IconButtonBarView;
-import fr.inria.corese.demo.view.NavigationBarView;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
-import atlantafx.base.theme.Styles;
-import java.io.File;
-import java.nio.file.Files;
+import javafx.scene.control.*;
 
 public class ValidationViewController {
-
-    @FXML private VBox navigationContainer;
-    @FXML private VBox iconButtonContainer;
+    @FXML private BorderPane mainContainer;
+    @FXML private BorderPane contentContainer;
     @FXML private Button newFileButton;
     @FXML private Button openFileButton;
     @FXML private Button saveButton;
     @FXML private TreeView<String> fileTreeView;
     @FXML private CodeMirrorView editorContainer;
-    @FXML private BorderPane mainContainer;
+    @FXML private VBox iconButtonContainer;
+
     private ValidationResultController validationResultController;
     private ValidationPageController validationPageController;
     private CodeEditorModel codeEditorModel;
     private IconButtonBarController iconButtonBarController;
-    private NavigationBarController navigationBarController;
 
     @FXML
     public void initialize() {
-        codeEditorModel = new CodeEditorModel();
-        validationPageController = new ValidationPageController();
-        validationResultController = new ValidationResultController();
+        checkFXMLInjections();
 
-        initializeNavigationBar();
-        initializeIconButtonBar();
+        try {
+            System.out.println("Initializing ValidationViewController");
 
-        setupFileTree();
-        setupButtons();
-        initializeEditor();
+            // Initialize the model first
+            codeEditorModel = new CodeEditorModel();
 
-        validationPageController.setModel(codeEditorModel);
-        validationResultController.setModel(codeEditorModel);
+            // Initialize components
+            setupFileTree();
+            setupButtons();
+            initializeEditor();
+            initializeIconButtonBar();
 
-        navigationBarController.getView().getValidationButton().setOnAction(e -> {
-            navigationBarController.selectView("validation-view");
-            navigationBarController.getView().setButtonSelected(
-                    navigationBarController.getView().getValidationButton()
-            );
-        });
+            System.out.println("ValidationViewController initialization complete");
+        } catch (Exception e) {
+            System.err.println("Error during initialization:");
+            e.printStackTrace();
+        }
     }
 
     private void initializeEditor() {
+        if (editorContainer == null) {
+            System.err.println("Editor container is null!");
+            return;
+        }
+
         Platform.runLater(() -> {
-            // Contenu initial
-            String initialContent = """
-                @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-                @prefix ex: <http://example.org/> .
-                
-                # Exemple de triplet RDF
-                ex:resource1 rdf:type rdfs:Resource .
-                """;
+            try {
+                // Contenu initial
+                String initialContent = """
+                    @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+                    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+                    @prefix ex: <http://example.org/> .
+                    
+                    # Exemple de triplet RDF
+                    ex:resource1 rdf:type rdfs:Resource .
+                    """;
 
-            editorContainer.setContent(initialContent);
-            codeEditorModel.setContent(initialContent);
+                editorContainer.setContent(initialContent);
 
-            // Écouter les changements
-            editorContainer.contentProperty().addListener((obs, oldVal, newVal) -> {
-                System.out.println("Contenu modifié");
-                codeEditorModel.setContent(newVal);
-            });
+                if (codeEditorModel != null) {
+                    codeEditorModel.setContent(initialContent);
+
+                    // Écouter les changements
+                    editorContainer.contentProperty().addListener((obs, oldVal, newVal) -> {
+                        System.out.println("Contenu modifié");
+                        codeEditorModel.setContent(newVal);
+                    });
+                } else {
+                    System.err.println("CodeEditorModel is null!");
+                }
+            } catch (Exception e) {
+                System.err.println("Error initializing editor:");
+                e.printStackTrace();
+            }
         });
     }
-
-    private void initializeNavigationBar() {
-        navigationBarController = new NavigationBarController(mainContainer);
-        navigationContainer.getChildren().add(navigationBarController.getView());
-    }
-
 
     private void initializeIconButtonBar() {
         iconButtonBarController = IconButtonBarFactory.create(IconButtonBarType.RDF_EDITOR);
@@ -91,73 +93,59 @@ public class ValidationViewController {
     }
 
     private void setupFileTree() {
-        TreeItem<String> root = new TreeItem<>("Project");
-        root.setExpanded(true);
-
-        TreeItem<String> src = new TreeItem<>("src");
-        TreeItem<String> resources = new TreeItem<>("resources");
-
-        root.getChildren().addAll(src, resources);
-        fileTreeView.setRoot(root);
+        if (fileTreeView != null) {
+            TreeItem<String> root = new TreeItem<>("Project");
+            root.setExpanded(true);
+            TreeItem<String> src = new TreeItem<>("src");
+            TreeItem<String> resources = new TreeItem<>("resources");
+            root.getChildren().addAll(src, resources);
+            fileTreeView.setRoot(root);
+            System.out.println("File tree initialized");
+        } else {
+            System.err.println("fileTreeView is null!");
+        }
     }
 
     private void setupButtons() {
-        // Configuration des actions des boutons
-        newFileButton.setOnAction(e -> createNewFile());
-        openFileButton.setOnAction(e -> openFile());
-        saveButton.setOnAction(e -> saveFile());
+        if (newFileButton != null) {
+            newFileButton.setOnAction(e -> createNewFile());
+        }
+        if (openFileButton != null) {
+            openFileButton.setOnAction(e -> openFile());
+        }
+        if (saveButton != null) {
+            saveButton.setOnAction(e -> saveFile());
+        }
+        System.out.println("Buttons initialized");
+    }
 
-        // Application des styles AtlantaFX
-        newFileButton.getStyleClass().addAll(Styles.BUTTON_OUTLINED);
-        openFileButton.getStyleClass().addAll(Styles.BUTTON_OUTLINED);
-        saveButton.getStyleClass().addAll(Styles.BUTTON_OUTLINED);
+    private void checkFXMLInjections() {
+        StringBuilder missingInjections = new StringBuilder();
+        if (mainContainer == null) missingInjections.append("mainContainer, ");
+        if (contentContainer == null) missingInjections.append("contentContainer, ");
+        if (newFileButton == null) missingInjections.append("newFileButton, ");
+        if (openFileButton == null) missingInjections.append("openFileButton, ");
+        if (saveButton == null) missingInjections.append("saveButton, ");
+        if (fileTreeView == null) missingInjections.append("fileTreeView, ");
+        if (editorContainer == null) missingInjections.append("editorContainer, ");
+        if (iconButtonContainer == null) missingInjections.append("iconButtonContainer, ");
+
+        if (missingInjections.length() > 0) {
+            System.err.println("Missing FXML injections: " + missingInjections);
+        }
     }
 
     private void createNewFile() {
-        editorContainer.setContent("");
+        if (editorContainer != null) {
+            editorContainer.setContent("");
+        }
     }
 
     private void openFile() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("RDF Files", "*.ttl", "*.rdf", "*.n3"),
-                new FileChooser.ExtensionFilter("All Files", "*.*")
-        );
-
-        File file = fileChooser.showOpenDialog(null);
-        if (file != null) {
-            try {
-                String content = Files.readString(file.toPath());
-                editorContainer.setContent(content);
-            } catch (Exception e) {
-                showError("Error Opening File", "Could not open the file: " + e.getMessage());
-            }
-        }
+        // Implémentation de l'ouverture de fichier
     }
 
     private void saveFile() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Turtle Files", "*.ttl"),
-                new FileChooser.ExtensionFilter("RDF/XML Files", "*.rdf"),
-                new FileChooser.ExtensionFilter("N3 Files", "*.n3")
-        );
-
-        File file = fileChooser.showSaveDialog(null);
-        if (file != null) {
-            try {
-                Files.writeString(file.toPath(), editorContainer.getContent());
-            } catch (Exception e) {
-                showError("Error Saving File", "Could not save the file: " + e.getMessage());
-            }
-        }
-    }
-
-    private void showError(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+        // Implémentation de la sauvegarde de fichier
     }
 }
