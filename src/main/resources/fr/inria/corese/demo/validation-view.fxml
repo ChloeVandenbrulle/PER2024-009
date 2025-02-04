@@ -4,26 +4,14 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import fr.inria.corese.demo.view.CodeMirrorView?>
-
-<?import fr.inria.corese.demo.view.NavigationBarView?>
 <?import fr.inria.corese.demo.view.IconButtonBarView?>
-<BorderPane xmlns="http://javafx.com/javafx"
+
+<BorderPane fx:id="mainContainer" xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="fr.inria.corese.demo.controller.ValidationViewController"
-            prefHeight="600.0" prefWidth="800.0" styleClass="main-container">
-
-    <left>
-        <VBox spacing="10" styleClass="sidebar">
-            <padding>
-                <Insets top="10" right="10" bottom="10" left="10"/>
-            </padding>
-
-            <VBox fx:id="navigationContainer"/>
-        </VBox>
-    </left>
+            fx:controller="fr.inria.corese.demo.controller.ValidationViewController">
 
     <center>
-        <BorderPane>
+        <BorderPane fx:id="contentContainer">
             <top>
                 <ToolBar>
                     <items>
@@ -35,19 +23,17 @@
             </top>
 
             <center>
-                <HBox>
-                    <SplitPane dividerPositions="0.2" HBox.hgrow="ALWAYS">
-                        <items>
-                            <!-- L'arborescence des fichiers -->
-                            <TreeView fx:id="fileTreeView" minWidth="120"/>
-
-                            <!-- Le conteneur de l'éditeur -->
-                            <CodeMirrorView fx:id="editorContainer"/>
-                        </items>
-                    </SplitPane>
-                    <VBox fx:id="iconButtonContainer" minWidth="45"/>
-                </HBox>
+                <SplitPane dividerPositions="0.2">
+                    <items>
+                        <TreeView fx:id="fileTreeView" minWidth="120"/>
+                        <CodeMirrorView fx:id="editorContainer"/>
+                    </items>
+                </SplitPane>
             </center>
+
+            <right>
+                <VBox fx:id="iconButtonContainer" maxWidth="50" minWidth="50"/>
+            </right>
         </BorderPane>
     </center>
 

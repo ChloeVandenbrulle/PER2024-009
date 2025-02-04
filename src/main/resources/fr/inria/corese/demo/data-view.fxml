@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="fr.inria.corese.demo.controller.DataViewController">
+
+    <!-- Barre d'outils supérieure -->
+    <top>
+        <ToolBar>
+            <items>
+                <Button fx:id="openProjectButton" text="Open project"/>
+                <Button fx:id="saveAsButton" text="Save as"/>
+                <Region HBox.hgrow="ALWAYS"/> <!-- Espace flexible -->
+                <Button fx:id="showLogsButton" text="Show logs"/>
+            </items>
+        </ToolBar>
+    </top>
+
+    <center>
+        <BorderPane>
+            <!-- Zone de gauche pour la liste des fichiers -->
+            <left>
+                <VBox spacing="10" style="-fx-padding: 10;">
+                    <ListView fx:id="fileList" VBox.vgrow="ALWAYS"/>
+                    <HBox spacing="10">
+                        <Button fx:id="clearGraphButton" text="Clear graph"/>
+                        <Button fx:id="reloadFilesButton" text="Reload files"/>
+                        <Button fx:id="loadFilesButton" text="Load files"/>
+                    </HBox>
+                </VBox>
+            </left>
+
+            <!-- Zone de droite pour les options -->
+            <right>
+                <VBox spacing="5" style="-fx-padding: 10;">
+                    <CheckBox fx:id="traceCheckbox" text="Trace"/>
+                    <CheckBox fx:id="loadNamedCheckbox" text="Load Named"/>
+
+                    <!-- Section RDFS -->
+                    <TitledPane text="RDFS" expanded="true">
+                        <VBox spacing="5">
+                            <CheckBox fx:id="rdfsSubsetCheckbox" text="RDFS Subset"/>
+                            <CheckBox fx:id="rdfsRLCheckbox" text="RDFS RL"/>
+                        </VBox>
+                    </TitledPane>
+
+                    <!-- Section OWL -->
+                    <TitledPane text="OWL" expanded="true">
+                        <VBox spacing="5">
+                            <CheckBox fx:id="owlRLCheckbox" text="OWL RL"/>
+                            <CheckBox fx:id="owlRLExtendedCheckbox" text="OWL RL Extended"/>
+                            <CheckBox fx:id="owlRLTestCheckbox" text="OWL RL Test"/>
+                            <CheckBox fx:id="owlCleanCheckbox" text="OWL Clean"/>
+                        </VBox>
+                    </TitledPane>
+
+                    <CheckBox fx:id="graphIndexCheckbox" text="Graph index"/>
+
+                    <Separator/>
+
+                    <HBox spacing="5" alignment="CENTER_LEFT">
+                        <CheckBox fx:id="myRuleFileCheckbox" text="My rule file"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="loadRuleFileButton" text="Load rule file"/>
+                    </HBox>
+                </VBox>
+            </right>
+
+            <!-- Zone du bas pour les statistiques -->
+            <bottom>
+                <VBox style="-fx-padding: 10; -fx-background-color: white;">
+                    <Label fx:id="semanticElementsLabel" text="Number of semantic elements loaded: 720"/>
+                    <Label fx:id="tripletLabel" text="Number of triplet: 400"/>
+                    <Label fx:id="graphLabel" text="Number of graph: 12"/>
+                    <Label fx:id="rulesLoadedLabel" text="Number of rules loaded: 15"/>
+                </VBox>
+            </bottom>
+        </BorderPane>
+    </center>
+
+</BorderPane>
