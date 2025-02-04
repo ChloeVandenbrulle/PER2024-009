@@ -35,16 +35,18 @@
             </top>
 
             <center>
-                <SplitPane dividerPositions="0.2">
-                    <items>
-                        <!-- L'arborescence des fichiers -->
-                        <TreeView fx:id="fileTreeView" minWidth="120"/>
+                <HBox>
+                    <SplitPane dividerPositions="0.2" HBox.hgrow="ALWAYS">
+                        <items>
+                            <!-- L'arborescence des fichiers -->
+                            <TreeView fx:id="fileTreeView" minWidth="120"/>
 
-                        <!-- Le conteneur de l'éditeur -->
-                        <CodeMirrorView fx:id="editorContainer"/>
-                        <VBox fx:id="iconButtonContainer" maxWidth="50" minWidth="50"/>
-                    </items>
-                </SplitPane>
+                            <!-- Le conteneur de l'éditeur -->
+                            <CodeMirrorView fx:id="editorContainer"/>
+                        </items>
+                    </SplitPane>
+                    <VBox fx:id="iconButtonContainer" minWidth="45"/>
+                </HBox>
             </center>
         </BorderPane>
     </center>
