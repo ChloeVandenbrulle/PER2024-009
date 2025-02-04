@@ -1,5 +1,7 @@
 package fr.inria.corese.demo.controller;
 
+import fr.inria.corese.demo.enums.IconButtonBarType;
+import fr.inria.corese.demo.factory.IconButtonBarFactory;
 import fr.inria.corese.demo.model.CodeEditorModel;
 import fr.inria.corese.demo.view.CodeMirrorView;
 import fr.inria.corese.demo.view.IconButtonBarView;
@@ -84,12 +86,9 @@ public class ValidationViewController {
 
 
     private void initializeIconButtonBar() {
-        iconButtonBarController = new IconButtonBarController();
-        iconButtonBarController.setValidationViewController(this);
-        // Spécifier "validation" comme page pour l'IconButtonBarView
-        IconButtonBarView iconButtonView = iconButtonBarController.getView();
-        iconButtonView.setPage("validation");
-        iconButtonContainer.getChildren().add(iconButtonView);    }
+        iconButtonBarController = IconButtonBarFactory.create(IconButtonBarType.RDF_EDITOR);
+        iconButtonContainer.getChildren().add(iconButtonBarController.getView());
+    }
 
     private void setupFileTree() {
         TreeItem<String> root = new TreeItem<>("Project");
