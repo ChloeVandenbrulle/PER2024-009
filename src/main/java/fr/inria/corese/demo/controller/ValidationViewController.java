@@ -2,11 +2,13 @@ package fr.inria.corese.demo.controller;
 
 import fr.inria.corese.demo.model.CodeEditorModel;
 import fr.inria.corese.demo.view.CodeMirrorView;
+import fr.inria.corese.demo.view.IconButtonBarView;
 import fr.inria.corese.demo.view.NavigationBarView;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import atlantafx.base.theme.Styles;
 import java.io.File;
@@ -14,13 +16,14 @@ import java.nio.file.Files;
 
 public class ValidationViewController {
 
+    @FXML private VBox navigationContainer;
+    @FXML private VBox iconButtonContainer;
     @FXML private Button newFileButton;
     @FXML private Button openFileButton;
     @FXML private Button saveButton;
     @FXML private TreeView<String> fileTreeView;
     @FXML private CodeMirrorView editorContainer;
     @FXML private BorderPane mainContainer;
-    @FXML private NavigationBarView navigationBarView;
     private ValidationResultController validationResultController;
     private ValidationPageController validationPageController;
     private CodeEditorModel codeEditorModel;
@@ -29,10 +32,12 @@ public class ValidationViewController {
 
     @FXML
     public void initialize() {
-        navigationBarController = new NavigationBarController(mainContainer);
         codeEditorModel = new CodeEditorModel();
         validationPageController = new ValidationPageController();
         validationResultController = new ValidationResultController();
+
+        initializeNavigationBar();
+        initializeIconButtonBar();
 
         setupFileTree();
         setupButtons();
@@ -72,9 +77,19 @@ public class ValidationViewController {
         });
     }
 
+    private void initializeNavigationBar() {
+        navigationBarController = new NavigationBarController(mainContainer);
+        navigationContainer.getChildren().add(navigationBarController.getView());
+    }
+
+
     private void initializeIconButtonBar() {
         iconButtonBarController = new IconButtonBarController();
-    }
+        iconButtonBarController.setValidationViewController(this);
+        // Spécifier "validation" comme page pour l'IconButtonBarView
+        IconButtonBarView iconButtonView = iconButtonBarController.getView();
+        iconButtonView.setPage("validation");
+        iconButtonContainer.getChildren().add(iconButtonView);    }
 
     private void setupFileTree() {
         TreeItem<String> root = new TreeItem<>("Project");

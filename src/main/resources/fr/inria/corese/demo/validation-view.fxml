@@ -18,7 +18,7 @@
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
 
-            <NavigationBarView/>
+            <VBox fx:id="navigationContainer"/>
         </VBox>
     </left>
 
@@ -42,7 +42,7 @@
 
                         <!-- Le conteneur de l'éditeur -->
                         <CodeMirrorView fx:id="editorContainer"/>
-                        <IconButtonBarView page="validation" maxWidth="40" minWidth="40"/>
+                        <VBox fx:id="iconButtonContainer" maxWidth="50" minWidth="50"/>
                     </items>
                 </SplitPane>
             </center>

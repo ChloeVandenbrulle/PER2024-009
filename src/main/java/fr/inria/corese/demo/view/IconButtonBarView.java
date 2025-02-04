@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.Ikon;
@@ -45,6 +46,7 @@ public class IconButtonBarView extends VBox {
     public IconButtonBarView(String page) {
         setSpacing(10); // Ajoute un espacement entre les boutons
         setPadding(new Insets(15, 0, 0, 0));
+        setAlignment(Pos.TOP_CENTER);
 
         saveButton = createIconButton(MaterialDesignC.CONTENT_SAVE_OUTLINE);
         openFilesButton = createIconButton(MaterialDesignF.FOLDER_OPEN);

@@ -9,15 +9,18 @@ import java.nio.file.Files;
 
 public class IconButtonBarController {
     private IconButtonBarView view;
+    private ValidationViewController validationViewController;
 
     public IconButtonBarController() {
         this.view = new IconButtonBarView();
         initializeButtons();
     }
 
+    public void setValidationViewController(ValidationViewController validationViewController) {
+        this.validationViewController = validationViewController;
+    }
+
     private void initializeButtons() {
-        System.out.println("Initializing icon button bar buttons");
-        System.out.println("Save button: " + view.getSaveButton());
         view.getSaveButton().setOnAction(event -> onSaveButtonClick());
         view.getOpenFilesButton().setOnAction(event -> onOpenFilesButtonClick());
         view.getImportButton().setOnAction(event -> onImportButtonClick());
@@ -29,6 +32,10 @@ public class IconButtonBarController {
         view.getZoomInButton().setOnAction(event -> onZoomInButtonClick());
         view.getZoomOutButton().setOnAction(event -> onZoomOutButtonClick());
         view.getFullScreenButton().setOnAction(event -> onFullScreenButtonClick());
+    }
+
+    public IconButtonBarView getView() {
+        return view;
     }
 
     private void onSaveButtonClick() {
