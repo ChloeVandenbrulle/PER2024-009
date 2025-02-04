@@ -16,6 +16,8 @@ public class IconButtonBarController {
     }
 
     private void initializeButtons() {
+        System.out.println("Initializing icon button bar buttons");
+        System.out.println("Save button: " + view.getSaveButton());
         view.getSaveButton().setOnAction(event -> onSaveButtonClick());
         view.getOpenFilesButton().setOnAction(event -> onOpenFilesButtonClick());
         view.getImportButton().setOnAction(event -> onImportButtonClick());

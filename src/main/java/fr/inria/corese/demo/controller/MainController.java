@@ -23,6 +23,7 @@ public class MainController {
     private ValidationResultController validationResultController;
     private ValidationPageController validationPageController;
     private CodeEditorModel codeEditorModel;
+    private IconButtonBarController iconButtonBarController;
 
     @FXML
     public void initialize() {
@@ -65,6 +66,10 @@ public class MainController {
     private void initializeNavigationBar() {
         navigationBarView =  new NavigationBarView();
         navigationBarController = new NavigationBarController();
+    }
+
+    private void initializeIconButtonBar() {
+        iconButtonBarController = new IconButtonBarController();
     }
 
     private void setupFileTree() {

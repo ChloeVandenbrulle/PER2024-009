@@ -38,13 +38,11 @@
                 <SplitPane dividerPositions="0.2">
                     <items>
                         <!-- L'arborescence des fichiers -->
-                        <TreeView fx:id="fileTreeView" minWidth="200"/>
+                        <TreeView fx:id="fileTreeView" minWidth="120"/>
 
                         <!-- Le conteneur de l'éditeur -->
-                        <StackPane>
-                            <CodeMirrorView fx:id="editorContainer" />
-                            <IconButtonBarView alignment="TOP_RIGHT" page="validation"/>
-                        </StackPane>
+                        <CodeMirrorView fx:id="editorContainer"/>
+                        <IconButtonBarView page="validation" maxWidth="40" minWidth="40"/>
                     </items>
                 </SplitPane>
             </center>
