@@ -1,25 +1,23 @@
 package fr.inria.corese.demo;
 
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import fr.inria.corese.demo.controller.NavigationBarController;
 
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            // Créer le contrôleur de navigation
-            NavigationBarController navigationController = new NavigationBarController();
+            // Charger validation-view.fxml
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fr/inria/corese/demo/validation-view.fxml"));
+            Parent root = loader.load();
 
-            // Créer la scène avec la vue de navigation
-            Scene scene = new Scene(navigationController.getView(), 200, 400);
-
-            // Configurer la fenêtre principale
-            primaryStage.setTitle("Navigation");
+            Scene scene = new Scene(root);
+            primaryStage.setTitle("Validation Page");
             primaryStage.setScene(scene);
             primaryStage.show();
-
         } catch(Exception e) {
             e.printStackTrace();
         }

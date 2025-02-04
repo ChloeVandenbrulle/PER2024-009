@@ -11,11 +11,43 @@ public class NavigationBarView extends VBox {
     private final Button queryButton;
     private final Button settingsButton;
 
+    private static final String BUTTON_STYLE_NORMAL = """
+            -fx-background-color: white;
+            -fx-text-fill: #2196F3;
+            -fx-border-color: #2196F3;
+            -fx-border-radius: 20;
+            -fx-background-radius: 20;
+            -fx-min-height: 35;
+            -fx-max-width: infinity;
+            -fx-font-size: 14;
+            """;
+
+    private static final String BUTTON_STYLE_SELECTED = """
+            -fx-background-color: #2196F3;
+            -fx-text-fill: white;
+            -fx-border-color: #2196F3;
+            -fx-border-radius: 20;
+            -fx-background-radius: 20;
+            -fx-min-height: 35;
+            -fx-max-width: infinity;
+            -fx-font-size: 14;
+            """;
+
+    private static final String BUTTON_STYLE_HOVER = """
+            -fx-background-color: #E3F2FD;
+            -fx-text-fill: #2196F3;
+            -fx-border-color: #2196F3;
+            -fx-border-radius: 20;
+            -fx-background-radius: 20;
+            -fx-min-height: 35;
+            -fx-max-width: infinity;
+            -fx-font-size: 14;
+            """;
+
     public NavigationBarView() {
         setSpacing(8);
         setPadding(new Insets(10));
 
-        // Création des boutons
         dataButton = createNavigationButton("Data");
         rdfEditorButton = createNavigationButton("RDF Editor");
         validationButton = createNavigationButton("Validation");
@@ -27,57 +59,31 @@ public class NavigationBarView extends VBox {
 
     private Button createNavigationButton(String text) {
         Button button = new Button(text);
+        button.setStyle(BUTTON_STYLE_NORMAL);
 
-        // Style de base : bleu clair avec bordures arrondies
-        button.setStyle("""
-            -fx-background-color: white;
-            -fx-text-fill: #2196F3;
-            -fx-border-color: #2196F3;
-            -fx-border-radius: 20;
-            -fx-background-radius: 20;
-            -fx-min-height: 35;
-            -fx-max-width: infinity;
-            -fx-font-size: 14;
-            """);
+        button.setOnMouseEntered(e -> {
+            if (!button.getStyle().equals(BUTTON_STYLE_SELECTED)) {
+                button.setStyle(BUTTON_STYLE_HOVER);
+            }
+        });
 
-        // Effet de survol : légèrement plus foncé
-        button.setOnMouseEntered(e -> button.setStyle("""
-            -fx-background-color: #E3F2FD;
-            -fx-text-fill: #2196F3;
-            -fx-border-color: #2196F3;
-            -fx-border-radius: 20;
-            -fx-background-radius: 20;
-            -fx-min-height: 35;
-            -fx-max-width: infinity;
-            -fx-font-size: 14;
-            """));
-
-        // Retour à l'état normal
-        button.setOnMouseExited(e -> button.setStyle("""
-            -fx-background-color: white;
-            -fx-text-fill: #2196F3;
-            -fx-border-color: #2196F3;
-            -fx-border-radius: 20;
-            -fx-background-radius: 20;
-            -fx-min-height: 35;
-            -fx-max-width: infinity;
-            -fx-font-size: 14;
-            """));
-
-        // Effet de clic
-        button.setOnMousePressed(e -> button.setStyle("""
-            -fx-background-color: #BBDEFB;
-            -fx-text-fill: #2196F3;
-            -fx-border-color: #2196F3;
-            -fx-border-radius: 20;
-            -fx-background-radius: 20;
-            -fx-min-height: 35;
-            -fx-max-width: infinity;
-            -fx-font-size: 14;
-            """));
+        button.setOnMouseExited(e -> {
+            if (!button.getStyle().equals(BUTTON_STYLE_SELECTED)) {
+                button.setStyle(BUTTON_STYLE_NORMAL);
+            }
+        });
 
         button.setPrefWidth(150);
         return button;
+    }
+
+    public void setButtonSelected(Button selectedButton) {
+        // Réinitialiser tous les boutons
+        for (Button button : new Button[]{dataButton, rdfEditorButton, validationButton, queryButton, settingsButton}) {
+            button.setStyle(BUTTON_STYLE_NORMAL);
+        }
+        // Définir le style sélectionné pour le bouton actif
+        selectedButton.setStyle(BUTTON_STYLE_SELECTED);
     }
 
     // Getters

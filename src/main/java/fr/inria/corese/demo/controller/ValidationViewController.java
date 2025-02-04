@@ -6,27 +6,30 @@ import fr.inria.corese.demo.view.NavigationBarView;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import atlantafx.base.theme.Styles;
 import java.io.File;
 import java.nio.file.Files;
 
-public class MainController {
+public class ValidationViewController {
 
-    @FXML private NavigationBarView navigationBarView;
     @FXML private Button newFileButton;
     @FXML private Button openFileButton;
     @FXML private Button saveButton;
     @FXML private TreeView<String> fileTreeView;
     @FXML private CodeMirrorView editorContainer;
-    private NavigationBarController navigationBarController;
+    @FXML private BorderPane mainContainer;
+    @FXML private NavigationBarView navigationBarView;
     private ValidationResultController validationResultController;
     private ValidationPageController validationPageController;
     private CodeEditorModel codeEditorModel;
     private IconButtonBarController iconButtonBarController;
+    private NavigationBarController navigationBarController;
 
     @FXML
     public void initialize() {
+        navigationBarController = new NavigationBarController(mainContainer);
         codeEditorModel = new CodeEditorModel();
         validationPageController = new ValidationPageController();
         validationResultController = new ValidationResultController();
@@ -34,10 +37,16 @@ public class MainController {
         setupFileTree();
         setupButtons();
         initializeEditor();
-        initializeNavigationBar();
 
         validationPageController.setModel(codeEditorModel);
         validationResultController.setModel(codeEditorModel);
+
+        navigationBarController.getView().getValidationButton().setOnAction(e -> {
+            navigationBarController.selectView("validation-view");
+            navigationBarController.getView().setButtonSelected(
+                    navigationBarController.getView().getValidationButton()
+            );
+        });
     }
 
     private void initializeEditor() {
@@ -61,11 +70,6 @@ public class MainController {
                 codeEditorModel.setContent(newVal);
             });
         });
-    }
-
-    private void initializeNavigationBar() {
-        navigationBarView =  new NavigationBarView();
-        navigationBarController = new NavigationBarController();
     }
 
     private void initializeIconButtonBar() {
