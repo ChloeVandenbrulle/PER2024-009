@@ -21,6 +21,8 @@ public class DataViewController {
     private HBox topButtonBox;
     @FXML
     private HBox fileActionBox;
+    @FXML
+    private HBox configActionBox;
 
     public DataViewController() {
         this.view = new DataView();
@@ -51,6 +53,10 @@ public class DataViewController {
                 buttonManager.getButton(ButtonType.CLEAR_GRAPH),
                 buttonManager.getButton(ButtonType.RELOAD_FILES),
                 buttonManager.getButton(ButtonType.LOAD_FILES)
+        );
+
+        configActionBox.getChildren().addAll(
+                buttonManager.getButton(ButtonType.LOAD_RULE_FILE)
         );
 
         topButtonBox.sceneProperty().addListener((obs, oldScene, newScene) -> {

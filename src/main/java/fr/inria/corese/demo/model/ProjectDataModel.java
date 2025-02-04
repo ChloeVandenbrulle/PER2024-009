@@ -46,6 +46,10 @@ public class ProjectDataModel {
         // Implémenter le chargement d'un fichier de règles
     }
 
+    public void uploadRuleFile(File file) {
+        // Implémenter le téléchargement d'un fichier de règles
+    }
+
     public void addLogEntry(String entry) {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         logEntries.add(timestamp + " - " + entry);

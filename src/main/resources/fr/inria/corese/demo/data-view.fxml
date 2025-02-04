@@ -33,7 +33,7 @@
                     <ListView fx:id="fileList" VBox.vgrow="ALWAYS"/>
 
                     <!-- Container pour les boutons de fichier -->
-                    <HBox fx:id="fileActionBox" spacing="10" styleClass="button-container">
+                    <HBox fx:id="fileActionBox" spacing="10">
                         <!-- Les boutons seront ajoutés dynamiquement ici -->
                     </HBox>
                 </VBox>
@@ -73,6 +73,11 @@
                     <!-- Rule file section -->
                     <HBox spacing="5" alignment="CENTER_LEFT">
                         <CheckBox fx:id="myRuleFileCheckbox" text="My rule file"/>
+                    </HBox>
+
+                    <!-- Container pour les boutons de configuration -->
+                    <HBox fx:id="configActionBox" spacing="10" alignment="BOTTOM_RIGHT">
+                        <!-- Les boutons seront ajoutés dynamiquement ici -->
                     </HBox>
                 </VBox>
             </right>

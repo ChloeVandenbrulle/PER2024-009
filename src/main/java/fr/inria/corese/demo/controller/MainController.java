@@ -21,6 +21,6 @@ public class MainController {
         navigationContainer.getChildren().add(navigationBarController.getView());
 
         // Charger la vue validation par défaut
-        navigationBarController.selectView("validation-view");
+        navigationBarController.selectView("data-view");
     }
 }

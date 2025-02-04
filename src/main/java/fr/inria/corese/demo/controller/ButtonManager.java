@@ -33,6 +33,9 @@ public class ButtonManager {
         createFileButton(ButtonType.RELOAD_FILES);
         createFileButton(ButtonType.LOAD_FILES);
 
+        // Add more buttons here
+        createFileButton(ButtonType.LOAD_RULE_FILE);
+
         Button showLogsButton = new Button("Show Logs");
         showLogsButton.setOnAction(event -> {
             System.out.println("Show logs button clicked"); // Debug print
@@ -97,6 +100,11 @@ public class ButtonManager {
                 FileChooser chooser = new FileChooser();
                 File file = chooser.showOpenDialog(button.getScene().getWindow());
                 if (file != null) model.loadFile(file);
+            }
+            case LOAD_RULE_FILE -> {
+                FileChooser chooser = new FileChooser();
+                File file = chooser.showOpenDialog(button.getScene().getWindow());
+                if (file != null) model.uploadRuleFile(file);
             }
         }
     }

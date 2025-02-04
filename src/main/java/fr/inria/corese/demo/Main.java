@@ -26,7 +26,7 @@ public class Main extends Application {
             System.out.println("Main view loaded successfully");
 
             Scene scene = new Scene(root);
-            primaryStage.setTitle("RDF Editor");
+            primaryStage.setTitle("Corese");
             primaryStage.setScene(scene);
             primaryStage.show();
 
