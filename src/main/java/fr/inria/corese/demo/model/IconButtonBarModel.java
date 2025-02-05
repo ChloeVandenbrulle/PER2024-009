@@ -27,4 +27,12 @@ public class IconButtonBarModel {
     public boolean isButtonEnabled(IconButtonType type) {
         return buttonStates.getOrDefault(type, false);
     }
+
+    public void setCodeEditorModel(CodeEditorModel codeEditorModel) {
+        this.codeEditorModel = codeEditorModel;
+    }
+
+    public CodeEditorModel getCodeEditorModel() {
+        return codeEditorModel;
+    }
 }

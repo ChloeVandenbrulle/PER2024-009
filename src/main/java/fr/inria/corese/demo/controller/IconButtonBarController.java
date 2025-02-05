@@ -5,6 +5,7 @@ import fr.inria.corese.demo.model.CodeEditorModel;
 import fr.inria.corese.demo.model.IconButtonBarModel;
 import fr.inria.corese.demo.view.IconButtonBarView;
 import fr.inria.corese.demo.view.NavigationBarView;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
 
@@ -55,30 +56,117 @@ public class IconButtonBarController {
 
     private void onSaveButtonClick() {
         System.out.println("Save button clicked");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save File");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Turtle Files", "*.ttl"),
+                new FileChooser.ExtensionFilter("RDF/XML Files", "*.rdf"),
+                new FileChooser.ExtensionFilter("N3 Files", "*.n3")
+        );
+
+        File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            try {
+                Files.writeString(file.toPath(), model.getCodeEditorModel().getContent());
+            } catch (Exception e) {
+                showError("Error Saving File", "Could not save the file: " + e.getMessage());
+            }
+        }
     }
 
     private void onOpenFilesButtonClick() {
         System.out.println("Open files button clicked");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open File");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("RDF Files", "*.ttl", "*.rdf", "*.n3"),
+                new FileChooser.ExtensionFilter("All Files", "*.*")
+        );
+
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            try {
+                String content = Files.readString(file.toPath());
+                model.getCodeEditorModel().setContent(content);
+            } catch (Exception e) {
+                showError("Error Opening File", "Could not open the file: " + e.getMessage());
+            }
+        }
     }
 
     private void onImportButtonClick() {
-        System.out.println("Import button clicked");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Import File");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Text Files", "*.txt")
+        );
+
+        File file = fileChooser.showOpenDialog(view.getScene().getWindow());
+        if (file != null) {
+            try {
+                String content = Files.readString(file.toPath());
+                model.getCodeEditorModel().setContent(content);
+            } catch (Exception e) {
+                showError("Error Importing File", "Could not import the file: " + e.getMessage());
+            }
+        }
     }
 
     private void onExportButtonClick() {
-        System.out.println("Export button clicked");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Export File");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Text Files", "*.txt")
+        );
+
+        File file = fileChooser.showSaveDialog(view.getScene().getWindow());
+        if (file != null) {
+            // Ensure the file has the correct extension
+            if (!file.getName().endsWith(".txt")) {
+                file = new File(file.getAbsolutePath() + ".txt");
+            }
+            try {
+                Files.writeString(file.toPath(), model.getCodeEditorModel().getContent());
+            } catch (Exception e) {
+                showError("Error Exporting File", "Could not export the file: " + e.getMessage());
+            }
+        }
     }
 
     private void onClearButtonClick() {
         System.out.println("Clear button clicked");
+        model.getCodeEditorModel().setContent("");
+    }
+
+    private void updateUndoRedoButtons() {
+        CodeEditorModel editorModel = model.getCodeEditorModel();
+        view.getButton(IconButtonType.UNDO).setDisable(!editorModel.canUndo());
+        view.getButton(IconButtonType.REDO).setDisable(!editorModel.canRedo());
     }
 
     private void onUndoButtonClick() {
         System.out.println("Undo button clicked");
+        CodeEditorModel editorModel = model.getCodeEditorModel();
+        System.out.println("can undo : "+editorModel.canUndo());
+        if (editorModel.canUndo()) {
+            System.out.println("undo stack before undo: "+editorModel.getUndoStack().toString());
+            System.out.println("can undo before undo: "+editorModel.canUndo());
+            editorModel.undo();
+            System.out.println("undo stack after undo: "+editorModel.getUndoStack().toString());
+            System.out.println("can undo before undo: "+editorModel.canUndo());
+            updateUndoRedoButtons();
+        }
+
     }
 
     private void onRedoButtonClick() {
         System.out.println("Redo button clicked");
+        CodeEditorModel editorModel = model.getCodeEditorModel();
+        if (editorModel.canRedo()) {
+            editorModel.redo();
+            updateUndoRedoButtons();
+        }
+
     }
 
     private void onDocumentationButtonClick() {
@@ -96,4 +184,13 @@ public class IconButtonBarController {
     private void onFullScreenButtonClick() {
         System.out.println("Full screen button clicked");
     }
+
+    private void showError(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
 }

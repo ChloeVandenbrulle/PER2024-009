@@ -26,6 +26,9 @@ public class ValidationViewController {
     private CodeEditorModel codeEditorModel;
     private IconButtonBarController iconButtonBarController;
 
+    private boolean isUpdatingContent = false;
+
+
     @FXML
     public void initialize() {
         checkFXMLInjections();
@@ -72,10 +75,14 @@ public class ValidationViewController {
                 if (codeEditorModel != null) {
                     codeEditorModel.setContent(initialContent);
 
-                    // Écouter les changements
+                    // Écouter les changements de la vue
                     editorContainer.contentProperty().addListener((obs, oldVal, newVal) -> {
                         System.out.println("Contenu modifié");
-                        codeEditorModel.setContent(newVal);
+                        System.out.println("Undo stack before recordCurrentChange: " + codeEditorModel.getUndoStack());
+                        codeEditorModel.recordCurrentChange(newVal);
+                        System.out.println("Undo stack after recordCurrentChange: " + codeEditorModel.getUndoStack());
+                        System.out.println("contenu : "+ codeEditorModel.getContent());
+
                     });
                 } else {
                     System.err.println("CodeEditorModel is null!");
@@ -84,12 +91,27 @@ public class ValidationViewController {
                 System.err.println("Error initializing editor:");
                 e.printStackTrace();
             }
+
+            // Écouter les changements du modèle
+            codeEditorModel.contentProperty().addListener((obs, oldVal, newVal) -> {
+                if (!isUpdatingContent) {
+                    isUpdatingContent = true;
+                    try {
+                        System.out.println("Modèle -> Vue : Contenu modifié");
+                        editorContainer.setContent(newVal);
+                    } finally {
+                        isUpdatingContent = false;
+                    }
+                }
+            });
         });
     }
+
 
     private void initializeIconButtonBar() {
         iconButtonBarController = IconButtonBarFactory.create(IconButtonBarType.RDF_EDITOR);
         iconButtonContainer.getChildren().add(iconButtonBarController.getView());
+        iconButtonBarController.getModel().setCodeEditorModel(codeEditorModel);
     }
 
     private void setupFileTree() {
@@ -134,6 +156,8 @@ public class ValidationViewController {
             System.err.println("Missing FXML injections: " + missingInjections);
         }
     }
+
+
 
     private void createNewFile() {
         if (editorContainer != null) {
