@@ -15,38 +15,34 @@ public class NavigationBarView extends VBox {
             -fx-background-color: white;
             -fx-text-fill: #2196F3;
             -fx-border-color: #2196F3;
-            -fx-border-radius: 20;
-            -fx-background-radius: 20;
+            -fx-border-width: 0 0 1 0;
             -fx-min-height: 35;
-            -fx-max-width: infinity;
             -fx-font-size: 14;
+            -fx-min-width: 160;
             """;
 
     private static final String BUTTON_STYLE_SELECTED = """
-            -fx-background-color: #2196F3;
-            -fx-text-fill: white;
+            -fx-background-color: #E3F2FD;
+            -fx-text-fill: #2196F3;
             -fx-border-color: #2196F3;
-            -fx-border-radius: 20;
-            -fx-background-radius: 20;
+            -fx-border-width: 0 0 1 3;
             -fx-min-height: 35;
-            -fx-max-width: infinity;
             -fx-font-size: 14;
+            -fx-min-width: 160;
             """;
+
 
     private static final String BUTTON_STYLE_HOVER = """
             -fx-background-color: #E3F2FD;
             -fx-text-fill: #2196F3;
             -fx-border-color: #2196F3;
-            -fx-border-radius: 20;
-            -fx-background-radius: 20;
+            -fx-border-width: 0 0 1 0;
             -fx-min-height: 35;
-            -fx-max-width: infinity;
             -fx-font-size: 14;
+            -fx-min-width: 160;
             """;
 
     public NavigationBarView() {
-        setSpacing(8);
-        setPadding(new Insets(10));
 
         dataButton = createNavigationButton("Data");
         rdfEditorButton = createNavigationButton("RDF Editor");
@@ -73,7 +69,7 @@ public class NavigationBarView extends VBox {
             }
         });
 
-        button.setPrefWidth(150);
+        button.setPrefWidth(160);
         return button;
     }
 

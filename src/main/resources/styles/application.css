@@ -33,20 +33,17 @@
     -fx-background-color: -color-bg-subtle;
     -fx-border-color: -color-border-subtle;
     -fx-border-width: 0 1 0 0;
-    -fx-padding: 7;
-    -fx-spacing: 8;
 }
 
 /* Navigation */
 .nav-container {
     -fx-spacing: 12;
-    -fx-padding: 16;
 }
 
 .nav-button {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
-    -fx-min-height: 40;
+    -fx-min-height: 50;
     -fx-pref-width: 160;
     -fx-font-size: 14;
     -fx-text-fill: -color-text-default;
