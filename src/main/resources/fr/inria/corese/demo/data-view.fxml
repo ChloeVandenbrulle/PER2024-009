@@ -10,11 +10,10 @@
             stylesheets="@../../../../styles/buttons.css">
 
     <top>
-        <HBox fx:id="topButtonBox" spacing="10" styleClass="button-container">
+        <HBox fx:id="topButtonBox" styleClass="button-container">
             <padding>
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
-            <Region HBox.hgrow="ALWAYS"/>
         </HBox>
     </top>
 
