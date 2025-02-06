@@ -4,13 +4,15 @@
 .button-container {
     -fx-alignment: center-left;
     -fx-background-color: rgba(150,173,177,1);
+    -fx-spacing: 0; /* Réduire l'espacement par défaut */
+    -fx-padding: 15;
 }
 
 .section-container {
     -fx-background-color: rgba(150,173,177,1);
-  }
+}
 
-.file-container{
+.file-container {
     -fx-background-color: white;
 }
 
@@ -22,15 +24,17 @@
 
 /* Styles de base pour les boutons personnalisés */
 .custom-button {
-    -fx-padding: 6 12;
+    -fx-padding: 8 16;
     -fx-background-radius: 4;
     -fx-cursor: hand;
+    -fx-font-size: 13px;
 }
 
 /* Styles spécifiques pour les types de boutons */
 .project-button {
     -fx-background-color: #007bff;
     -fx-text-fill: white;
+    -fx-min-width: 100px;
 }
 
 .project-button:hover {
@@ -40,6 +44,7 @@
 .file-button {
     -fx-background-color: #6c757d;
     -fx-text-fill: white;
+    -fx-min-width: 100px;
 }
 
 .file-button:hover {
@@ -49,6 +54,7 @@
 .log-button {
     -fx-background-color: #28a745;
     -fx-text-fill: white;
+    -fx-min-width: 100px;
 }
 
 .log-button:hover {
@@ -58,6 +64,7 @@
 .log-button-special {
     -fx-background-color: #17a2b8;
     -fx-text-fill: white;
+    -fx-min-width: 100px;
 }
 
 .log-button-special:hover {
@@ -77,7 +84,7 @@
 
 .delete-icon {
     -fx-shape: "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z";
-    -fx-background-color: #000000;  /* Au lieu de currentColor */
+    -fx-background-color: #000000;
     -fx-min-width: 16;
     -fx-min-height: 16;
     -fx-max-width: 16;

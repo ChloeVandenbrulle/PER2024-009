@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -50,12 +51,9 @@ public class DataViewController {
             fileListContainer.getChildren().add(fileListView);
             VBox.setVgrow(fileListView, Priority.ALWAYS);
 
-            // Setup file list event handlers
             fileListView.getClearButton().setOnAction(e -> handleClearGraph());
             fileListView.getReloadButton().setOnAction(e -> handleReloadFiles());
             fileListView.getLoadButton().setOnAction(e -> handleLoadFiles());
-        } else {
-            System.err.println("Warning: fileListContainer not injected");
         }
 
         Button showLogsButton = buttonManager.getButton(ButtonType.SHOW_LOGS);
@@ -64,10 +62,22 @@ public class DataViewController {
             handleShowLogs();
         });
 
-        // Ajout des boutons à la vue
-        topButtonBox.getChildren().addAll(
+        // Créer une Region pour l'espacement
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        // Créer un HBox pour les boutons de gauche avec un petit espacement
+        HBox leftButtons = new HBox(5); // 5 pixels d'espacement
+        leftButtons.getChildren().addAll(
                 buttonManager.getButton(ButtonType.OPEN_PROJECT),
-                buttonManager.getButton(ButtonType.SAVE_AS),
+                buttonManager.getButton(ButtonType.SAVE_AS)
+        );
+
+        // Ajouter tous les éléments dans l'ordre
+        topButtonBox.getChildren().clear(); // Pour s'assurer qu'il n'y a pas de boutons existants
+        topButtonBox.getChildren().addAll(
+                leftButtons,  // Les boutons de gauche groupés
+                spacer,       // Le spacer qui pousse le dernier bouton à droite
                 showLogsButton
         );
 
@@ -75,6 +85,7 @@ public class DataViewController {
                 buttonManager.getButton(ButtonType.LOAD_RULE_FILE)
         );
 
+        // Initialisation des styles
         topButtonBox.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 String cssPath = getClass().getResource("/styles/buttons.css").toExternalForm();
