@@ -11,5 +11,8 @@ public enum IconButtonType {
     DOCUMENTATION,
     ZOOM_IN,
     ZOOM_OUT,
-    FULL_SCREEN
+    FULL_SCREEN,
+    NEW_FILE,
+    NEW_FOLDER,
+    CLOSE_FILE_EXPLORER
 }
