@@ -16,10 +16,11 @@ public class ProjectDataModel {
     private int rulesLoadedCount;
     private boolean myRuleFileEnabled;
     private final List<String> logEntries = new ArrayList<>();
-
+    private final FileListModel fileListModel;
 
     public ProjectDataModel() {
         fileList = FXCollections.observableArrayList();
+        fileListModel = new FileListModel();
     }
 
     public void loadProject(File directory) {
@@ -53,6 +54,18 @@ public class ProjectDataModel {
     public void addLogEntry(String entry) {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         logEntries.add(timestamp + " - " + entry);
+    }
+
+    public FileListModel getFileListModel() {
+        return fileListModel;
+    }
+
+    public void addFile(String name) {
+        fileListModel.addFile(name);
+    }
+
+    public void clearFiles() {
+        fileListModel.clearFiles();
     }
 
     public String getLogs() {

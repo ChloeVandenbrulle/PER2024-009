@@ -15,7 +15,9 @@ module fr.inria.corese.demo {
     exports fr.inria.corese.demo;
     exports fr.inria.corese.demo.controller;
     exports fr.inria.corese.demo.view;
+    exports fr.inria.corese.demo.model;
 
     opens fr.inria.corese.demo.controller to javafx.fxml;
     opens fr.inria.corese.demo.view to javafx.fxml;
+    opens fr.inria.corese.demo.model to javafx.fxml;
 }

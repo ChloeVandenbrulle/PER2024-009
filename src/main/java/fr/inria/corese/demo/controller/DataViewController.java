@@ -3,10 +3,13 @@ package fr.inria.corese.demo.controller;
 import fr.inria.corese.demo.model.ButtonType;
 import fr.inria.corese.demo.view.DataView;
 import fr.inria.corese.demo.model.ProjectDataModel;
+import fr.inria.corese.demo.view.FileListView;
 import fr.inria.corese.demo.view.popup.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import java.io.File;
@@ -23,22 +26,41 @@ public class DataViewController {
     private HBox fileActionBox;
     @FXML
     private HBox configActionBox;
+    @FXML
+    private VBox fileListContainer;  // Au lieu de FileListView
+
+    private FileListView fileListView;  // Ajoutez ce champ
 
     public DataViewController() {
-        this.view = new DataView();
         this.model = new ProjectDataModel();
         this.popupFactory = PopupFactory.getInstance(model);
-        initializeEventHandlers();
     }
 
     @FXML
     public void initialize() {
         System.out.println("Initializing DataViewController");
-        buttonManager = new ButtonManager(new ProjectDataModel());
+        buttonManager = new ButtonManager(model);
+
+        // Créer et configurer FileListView
+        fileListView = new FileListView();
+        fileListView.setModel(model.getFileListModel());
+
+        // Ajouter FileListView au conteneur
+        if (fileListContainer != null) {
+            fileListContainer.getChildren().add(fileListView);
+            VBox.setVgrow(fileListView, Priority.ALWAYS);
+
+            // Setup file list event handlers
+            fileListView.getClearButton().setOnAction(e -> handleClearGraph());
+            fileListView.getReloadButton().setOnAction(e -> handleReloadFiles());
+            fileListView.getLoadButton().setOnAction(e -> handleLoadFiles());
+        } else {
+            System.err.println("Warning: fileListContainer not injected");
+        }
 
         Button showLogsButton = buttonManager.getButton(ButtonType.SHOW_LOGS);
         showLogsButton.setOnAction(e -> {
-            System.out.println("Log button clicked directly"); // Debug print
+            System.out.println("Log button clicked directly");
             handleShowLogs();
         });
 
@@ -47,12 +69,6 @@ public class DataViewController {
                 buttonManager.getButton(ButtonType.OPEN_PROJECT),
                 buttonManager.getButton(ButtonType.SAVE_AS),
                 showLogsButton
-        );
-
-        fileActionBox.getChildren().addAll(
-                buttonManager.getButton(ButtonType.CLEAR_GRAPH),
-                buttonManager.getButton(ButtonType.RELOAD_FILES),
-                buttonManager.getButton(ButtonType.LOAD_FILES)
         );
 
         configActionBox.getChildren().addAll(
@@ -72,10 +88,10 @@ public class DataViewController {
         view.getSaveAsButton().setOnAction(e -> handleSaveAs());
         view.getShowLogsButton().setOnAction(e -> handleShowLogs());
 
-        // File list handlers
-        view.getFileListView().getClearGraphButton().setOnAction(e -> handleClearGraph());
-        view.getFileListView().getReloadFilesButton().setOnAction(e -> handleReloadFiles());
-        view.getFileListView().getLoadFilesButton().setOnAction(e -> handleLoadFiles());
+        // File action handlers
+        view.getFileListView().getClearButton().setOnAction(e -> handleClearGraph());
+        view.getFileListView().getReloadButton().setOnAction(e -> handleReloadFiles());
+        view.getFileListView().getLoadButton().setOnAction(e -> handleLoadFiles());
 
         // Rule config handlers
         view.getRuleConfigView().getLoadRuleFileButton().setOnAction(e -> handleLoadRuleFile());
@@ -101,6 +117,7 @@ public class DataViewController {
 
     private void handleClearGraph() {
         model.clearGraph();
+        model.clearFiles();
         updateView();
     }
 
@@ -128,11 +145,16 @@ public class DataViewController {
 
     private void handleLoadFiles() {
         FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("TTL files", "*.ttl")
+        );
+
         File file = fileChooser.showOpenDialog(null);
         if (file != null) {
             try {
                 model.addLogEntry("Starting to load file: " + file.getName());
                 model.loadFile(file);
+                model.addFile(file.getName());  // Ajoute le fichier à la liste
                 model.addLogEntry("File loaded successfully: " + file.getName());
 
                 // Afficher les informations du fichier
@@ -143,7 +165,6 @@ public class DataViewController {
                 String errorMessage = "Error loading file: " + e.getMessage();
                 model.addLogEntry("ERROR: " + errorMessage);
 
-                // Afficher un avertissement en cas d'erreur
                 IPopup warningPopup = popupFactory.createPopup(PopupFactory.WARNING_POPUP);
                 warningPopup.setMessage(errorMessage);
                 ((WarningPopup) warningPopup).showAndWait();
@@ -151,6 +172,7 @@ public class DataViewController {
             updateView();
         }
     }
+
 
     private void handleLoadRuleFile() {
         FileChooser fileChooser = new FileChooser();
@@ -175,9 +197,6 @@ public class DataViewController {
                 model.getGraphCount(),
                 model.getRulesLoadedCount()
         );
-
-        // Mettre à jour la liste des fichiers
-        view.getFileListView().getFileList().setItems(model.getFileList());
     }
 
     public DataView getView() {

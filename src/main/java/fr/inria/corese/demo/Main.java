@@ -5,10 +5,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import atlantafx.base.theme.NordLight;
 
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
+        Application.setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
+
         try {
             System.out.println("Starting application...");
 

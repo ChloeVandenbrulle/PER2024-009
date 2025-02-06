@@ -1,6 +1,5 @@
 package fr.inria.corese.demo.controller;
 
-import com.sun.javafx.event.EventUtil;
 import fr.inria.corese.demo.model.ButtonType;
 import fr.inria.corese.demo.model.ProjectDataModel;
 import fr.inria.corese.demo.view.CustomButton;
@@ -23,25 +22,18 @@ public class ButtonManager {
     }
 
     private void initializeButtons() {
-        // Project buttons
         createProjectButton(ButtonType.OPEN_PROJECT);
         createProjectButton(ButtonType.SAVE_AS);
         createLogButton(ButtonType.SHOW_LOGS);
-
-        // File buttons
         createFileButton(ButtonType.CLEAR_GRAPH);
         createFileButton(ButtonType.RELOAD_FILES);
         createFileButton(ButtonType.LOAD_FILES);
-
-        // Add more buttons here
         createFileButton(ButtonType.LOAD_RULE_FILE);
 
         Button showLogsButton = new Button("Show Logs");
         showLogsButton.setOnAction(event -> {
-            System.out.println("Show logs button clicked"); // Debug print
-            if (event.getSource() instanceof Button) {
-                EventUtil.fireEvent(new ActionEvent());
-            }
+            System.out.println("Show logs button clicked");
+            showLogsButton.fireEvent(new ActionEvent());
         });
     }
 
@@ -50,7 +42,6 @@ public class ButtonManager {
                 .withTooltip("Click to " + type.getLabel().toLowerCase())
                 .withOnClick(this::handleProjectAction)
                 .build();
-
         buttons.put(type, button);
     }
 
@@ -60,7 +51,6 @@ public class ButtonManager {
                 .withTooltip("View application logs")
                 .withOnClick(this::handleLogAction)
                 .build();
-
         buttons.put(type, button);
     }
 
@@ -69,7 +59,6 @@ public class ButtonManager {
                 .withTooltip("File operation: " + type.getLabel())
                 .withOnClick(this::handleFileAction)
                 .build();
-
         buttons.put(type, button);
     }
 
@@ -89,7 +78,7 @@ public class ButtonManager {
     }
 
     private void handleLogAction(CustomButton button) {
-        // Logique d'affichage des logs
+        // Log display logic
     }
 
     private void handleFileAction(CustomButton button) {

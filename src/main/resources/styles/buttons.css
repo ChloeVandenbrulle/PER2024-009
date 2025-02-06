@@ -3,13 +3,15 @@
 /* Conteneurs */
 .button-container {
     -fx-alignment: center-left;
+    -fx-background-color: rgba(150,173,177,1);
 }
 
 .section-container {
-    -fx-background-color: #f5f5f5;
-    -fx-border-color: #ddd;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
+    -fx-background-color: rgba(150,173,177,1);
+  }
+
+.file-container{
+    -fx-background-color: white;
 }
 
 .stats-container {
@@ -66,4 +68,71 @@
 .custom-button:disabled {
     -fx-opacity: 0.65;
     -fx-cursor: default;
+}
+
+.rules-container{
+    -fx-background-color: white;
+    -fx-margin: 20px;
+}
+
+.delete-icon {
+    -fx-shape: "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z";
+    -fx-background-color: #000000;  /* Au lieu de currentColor */
+    -fx-min-width: 16;
+    -fx-min-height: 16;
+    -fx-max-width: 16;
+    -fx-max-height: 16;
+    -fx-pref-width: 16;
+    -fx-pref-height: 16;
+}
+
+.refresh-icon {
+    -fx-shape: "M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z";
+    -fx-background-color: #000000;
+    -fx-min-width: 16;
+    -fx-min-height: 16;
+    -fx-max-width: 16;
+    -fx-max-height: 16;
+    -fx-pref-width: 16;
+    -fx-pref-height: 16;
+}
+
+.folder-plus-icon {
+    -fx-shape: "M20 6h-8l-2-2H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-1 8h-3v3h-2v-3h-3v-2h3V9h2v3h3v2z";
+    -fx-background-color: #000000;
+    -fx-min-width: 16;
+    -fx-min-height: 16;
+    -fx-max-width: 16;
+    -fx-max-height: 16;
+    -fx-pref-width: 16;
+    -fx-pref-height: 16;
+}
+
+/* Style pour les boutons */
+.action-button {
+    -fx-padding: 5 10;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.action-button:hover {
+    -fx-background-color: #f0f0f0;
+}
+
+.action-button:pressed {
+    -fx-background-color: #e0e0e0;
+}
+
+/* Style pour le bouton de suppression dans la liste */
+.delete-button {
+    -fx-background-color: transparent;
+    -fx-padding: 2;
+}
+
+.delete-button:hover {
+    -fx-background-color: #ffebee;
+}
+
+.delete-button:pressed {
+    -fx-background-color: #ffcdd2;
 }
