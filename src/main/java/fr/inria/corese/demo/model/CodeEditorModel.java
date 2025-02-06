@@ -67,8 +67,6 @@ public class CodeEditorModel {
     public void undo() {
         if (canUndo()) {
             CodeEditorChange change = undoStack.pop();
-            System.out.println("Undoing change (previous content): " + change.getPreviousContent());
-            System.out.println("Undoing change (new content): " + change.getNewContent());
             redoStack.push(change);
             setContent(change.getPreviousContent());
         }

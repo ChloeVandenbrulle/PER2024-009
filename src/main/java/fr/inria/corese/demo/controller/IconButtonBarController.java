@@ -147,13 +147,8 @@ public class IconButtonBarController {
     private void onUndoButtonClick() {
         System.out.println("Undo button clicked");
         CodeEditorModel editorModel = model.getCodeEditorModel();
-        System.out.println("can undo : "+editorModel.canUndo());
         if (editorModel.canUndo()) {
-            System.out.println("undo stack before undo: "+editorModel.getUndoStack().toString());
-            System.out.println("can undo before undo: "+editorModel.canUndo());
             editorModel.undo();
-            System.out.println("undo stack after undo: "+editorModel.getUndoStack().toString());
-            System.out.println("can undo before undo: "+editorModel.canUndo());
             updateUndoRedoButtons();
         }
 

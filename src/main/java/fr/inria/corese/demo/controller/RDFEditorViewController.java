@@ -4,14 +4,13 @@ import fr.inria.corese.demo.enums.IconButtonBarType;
 import fr.inria.corese.demo.factory.IconButtonBarFactory;
 import fr.inria.corese.demo.model.CodeEditorModel;
 import fr.inria.corese.demo.view.CodeMirrorView;
-import fr.inria.corese.demo.view.IconButtonBarView;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.*;
 
-public class ValidationViewController {
+public class RDFEditorViewController {
     @FXML private BorderPane mainContainer;
     @FXML private BorderPane contentContainer;
     @FXML private Button newFileButton;
@@ -21,8 +20,6 @@ public class ValidationViewController {
     @FXML private CodeMirrorView editorContainer;
     @FXML private VBox iconButtonContainer;
 
-    private ValidationResultController validationResultController;
-    private ValidationPageController validationPageController;
     private CodeEditorModel codeEditorModel;
     private IconButtonBarController iconButtonBarController;
 
@@ -34,7 +31,7 @@ public class ValidationViewController {
         checkFXMLInjections();
 
         try {
-            System.out.println("Initializing ValidationViewController");
+            System.out.println("Initializing RDFEditorViewController");
 
             // Initialize the model first
             codeEditorModel = new CodeEditorModel();
@@ -45,7 +42,7 @@ public class ValidationViewController {
             initializeEditor();
             initializeIconButtonBar();
 
-            System.out.println("ValidationViewController initialization complete");
+            System.out.println("RDFEditorViewController initialization complete");
         } catch (Exception e) {
             System.err.println("Error during initialization:");
             e.printStackTrace();
@@ -78,17 +75,12 @@ public class ValidationViewController {
                     // Écouter les changements de la vue
                     editorContainer.contentProperty().addListener((obs, oldVal, newVal) -> {
                         System.out.println("Contenu modifié");
-                        System.out.println("Undo stack before recordCurrentChange: " + codeEditorModel.getUndoStack());
                         codeEditorModel.recordCurrentChange(newVal);
-                        System.out.println("Undo stack after recordCurrentChange: " + codeEditorModel.getUndoStack());
-                        System.out.println("contenu : "+ codeEditorModel.getContent());
-
                     });
                 } else {
                     System.err.println("CodeEditorModel is null!");
                 }
             } catch (Exception e) {
-                System.err.println("Error initializing editor:");
                 e.printStackTrace();
             }
 
@@ -97,7 +89,6 @@ public class ValidationViewController {
                 if (!isUpdatingContent) {
                     isUpdatingContent = true;
                     try {
-                        System.out.println("Modèle -> Vue : Contenu modifié");
                         editorContainer.setContent(newVal);
                     } finally {
                         isUpdatingContent = false;
