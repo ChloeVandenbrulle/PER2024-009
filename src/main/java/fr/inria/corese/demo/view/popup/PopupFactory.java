@@ -10,6 +10,7 @@ public class PopupFactory {
     public static final String WARNING_POPUP = "warning";
     public static final String FILE_INFO_POPUP = "fileInfo";
     public static final String LOG_POPUP = "log";
+    public static final String NEW_FILE_POPUP = "newFile";
 
     private static PopupFactory instance;
     private final Map<String, IPopup> popupCache = new HashMap<>();
@@ -45,6 +46,7 @@ public class PopupFactory {
                 System.out.println("Creating new LogDialog"); // Debug print
                 yield new LogDialog(model);
             }
+            case NEW_FILE_POPUP -> new NewFilePopup();
             default -> throw new IllegalArgumentException("Unknown popup type: " + type);
         };
 
