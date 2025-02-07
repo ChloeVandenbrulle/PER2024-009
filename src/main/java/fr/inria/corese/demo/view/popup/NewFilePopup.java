@@ -13,6 +13,8 @@ public class NewFilePopup extends BasePopup{
     private Button confirmButton;
     private Button cancelButton;
     private TextField fileNameField;
+    private Runnable onConfirm;
+
     public NewFilePopup() {
         setTitle("New File");
 
@@ -21,9 +23,14 @@ public class NewFilePopup extends BasePopup{
         messageLabel.textProperty().bind(new SimpleStringProperty(message));
 
         confirmButton = new Button("Confirm");
-        cancelButton = new Button("Cancel");
+        confirmButton.setOnAction(e -> {
+            if (onConfirm != null) {
+                onConfirm.run();
+            }
+            closePopup();
+        });
 
-        confirmButton.setOnAction(e -> { confirmFileName(); });
+        cancelButton = new Button("Cancel");
 
         fileNameField = new TextField();
 
@@ -38,11 +45,28 @@ public class NewFilePopup extends BasePopup{
         getDialogPane().setContent(contentPane);
     }
 
-    private void confirmFileName() {
-        if (fileNameField.getText().isEmpty()) {
-            setMessage("Please enter a file name");
+    public Button getConfirmButton() {
+        return confirmButton;
+    }
+
+    public Button getCancelButton() {
+        return cancelButton;
+    }
+
+    public String getFileName() {
+        return fileNameField.getText();
+    }
+
+    public void setOnConfirm(Runnable callback) {
+        this.onConfirm = callback;
+    }
+
+    private void confirm() {
+        if (fileNameField.getText() == null || fileNameField.getText().isEmpty()) {
+            message = "Please enter a file name";
             return;
         }
+        System.out.println(fileNameField.getText());
         closePopup();
     }
 }

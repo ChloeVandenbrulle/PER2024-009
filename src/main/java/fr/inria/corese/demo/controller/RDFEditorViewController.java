@@ -3,6 +3,7 @@ package fr.inria.corese.demo.controller;
 import fr.inria.corese.demo.enums.IconButtonBarType;
 import fr.inria.corese.demo.factory.IconButtonBarFactory;
 import fr.inria.corese.demo.model.CodeEditorModel;
+import fr.inria.corese.demo.model.FileExplorerModel;
 import fr.inria.corese.demo.view.CodeMirrorView;
 import fr.inria.corese.demo.view.FileExplorerView;
 import javafx.application.Platform;
@@ -14,13 +15,13 @@ import javafx.scene.control.*;
 public class RDFEditorViewController {
     @FXML private BorderPane mainContainer;
     @FXML private BorderPane contentContainer;
-    @FXML private FileExplorerView fileTreeView;
+    @FXML private VBox fileExplorerContainer;
     @FXML private CodeMirrorView editorContainer;
     @FXML private VBox iconButtonContainer;
 
     private CodeEditorModel codeEditorModel;
     private IconButtonBarController iconButtonBarController;
-
+    private FileExplorerController fileExplorerController;
     private boolean isUpdatingContent = false;
 
 
@@ -102,17 +103,8 @@ public class RDFEditorViewController {
     }
 
     private void setupFileTree() {
-        if (fileTreeView.getTreeView() != null) {
-            TreeItem<String> root = new TreeItem<>("Project");
-            root.setExpanded(true);
-            TreeItem<String> src = new TreeItem<>("src");
-            TreeItem<String> resources = new TreeItem<>("resources");
-            root.getChildren().addAll(src, resources);
-            fileTreeView.getTreeView().setRoot(root);
-            System.out.println("File tree initialized");
-        } else {
-            System.err.println("fileTreeView is null!");
-        }
+        fileExplorerController = new FileExplorerController();
+        fileExplorerContainer.getChildren().add(fileExplorerController.getView());
     }
 
 
@@ -120,7 +112,7 @@ public class RDFEditorViewController {
         StringBuilder missingInjections = new StringBuilder();
         if (mainContainer == null) missingInjections.append("mainContainer, ");
         if (contentContainer == null) missingInjections.append("contentContainer, ");
-        if (fileTreeView == null) missingInjections.append("fileTreeView, ");
+        if (fileExplorerContainer == null) missingInjections.append("fileTreeView, ");
         if (editorContainer == null) missingInjections.append("editorContainer, ");
         if (iconButtonContainer == null) missingInjections.append("iconButtonContainer, ");
 

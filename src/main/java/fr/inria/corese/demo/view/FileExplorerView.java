@@ -1,12 +1,17 @@
 package fr.inria.corese.demo.view;
 
 import fr.inria.corese.demo.enums.IconButtonType;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.TreeCell;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.*;
@@ -18,6 +23,7 @@ public class FileExplorerView extends HBox {
     private IconButtonView closeFileExplorerButton;
     private HBox buttonBar;
     private VBox mainContent;
+    VBox buttonContainer;
 
     public FileExplorerView() {
         this.setSpacing(0);
@@ -25,16 +31,55 @@ public class FileExplorerView extends HBox {
         initializeComponents();
         initializeButtonBar();
         initializeMainContent();
+        initializeButtonContainer();
 
-        getChildren().addAll(mainContent, closeFileExplorerButton);
-        closeFileExplorerButton.alignmentProperty().setValue(Pos.CENTER_RIGHT);
+        getChildren().addAll(mainContent, buttonContainer);
+        StackPane.setAlignment(buttonContainer, Pos.CENTER);
     }
 
     private void initializeComponents() {
         treeView = new TreeView<>();
+
+        treeView.setCellFactory(tv -> new TreeCell<String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    setText(item);
+
+                    FontIcon folderIcon = new FontIcon(MaterialDesignF.FOLDER_OUTLINE);
+                    folderIcon.setIconSize(20);
+
+                    if (!getTreeItem().isLeaf()) {
+                        setDisclosureNode(folderIcon);
+                    }
+
+                    if (getTreeItem().getGraphic() != null) {
+                        setGraphic(getTreeItem().getGraphic());
+                    }
+                }
+            }
+        });
+
         treeView.setStyle(
                 "-fx-background-color: transparent;" +
                         "-fx-border-color: transparent;"
+        );
+        treeView.setOnMouseEntered(e ->
+                treeView.setStyle(
+                        "-fx-background-color: #f0f0f0;" +
+                                "-fx-border-color: #f0f0f0;"
+                )
+        );
+        treeView.setOnMouseExited(e ->
+                treeView.setStyle(
+                        "-fx-background-color: transparent;" +
+                                "-fx-border-color: transparent;"
+                )
         );
         treeView.setMinWidth(120);
 
@@ -56,9 +101,20 @@ public class FileExplorerView extends HBox {
         mainContent.getChildren().addAll(buttonBar, treeView);
     }
 
+    private void initializeButtonContainer() {
+        buttonContainer = new VBox();
+        buttonContainer.setAlignment(Pos.CENTER);
+        buttonContainer.getChildren().add(closeFileExplorerButton);
+    }
+
     public TreeView<String> getTreeView() {
         return treeView;
     }
+
+    public void setTreeView(TreeView<String> treeView) {
+        this.treeView = treeView;
+    }
+
 
     public Button getNewFileButton() {
         return newFileButton;
@@ -71,4 +127,18 @@ public class FileExplorerView extends HBox {
     public Button getCloseFileExplorerButton() {
         return closeFileExplorerButton;
     }
+
+    public void openView() {
+        mainContent.setVisible(true);
+        mainContent.setManaged(true);
+        closeFileExplorerButton.setGraphic(new FontIcon(MaterialDesignL.LESS_THAN));
+    }
+
+    public void closeView() {
+        mainContent.setVisible(false);
+        mainContent.setManaged(false);
+        closeFileExplorerButton.setGraphic(new FontIcon(MaterialDesignG.GREATER_THAN));
+        buttonContainer.setAlignment(Pos.CENTER_RIGHT);
+    }
+
 }

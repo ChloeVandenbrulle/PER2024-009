@@ -37,18 +37,16 @@ public class IconButtonView extends Button{
 
     private void createIconButton(Ikon icon, String tooltipText) {
         FontIcon fontIcon = new FontIcon(icon);
+        Tooltip tooltip = new Tooltip(tooltipText);
+        Tooltip.install(this, tooltip);
+
         fontIcon.setIconSize(22);  // Taille de l'icône en pixels
-        setGraphic(fontIcon);
         setStyle(
                 "-fx-background-color: transparent;" +
                         "-fx-pref-width: 6;" +
                         "-fx-pref-height: 6;"+
                         "-fx-border-color: transparent;"
         );
-
-        Tooltip tooltip = new Tooltip(tooltipText);
-
-        Tooltip.install(this, tooltip);
 
         setOnMouseEntered(e -> {
             setStyle(
@@ -72,5 +70,7 @@ public class IconButtonView extends Button{
             );
             fontIcon.setIconColor(Color.BLACK);
         });
+
+        setGraphic(fontIcon);
     }
 }
