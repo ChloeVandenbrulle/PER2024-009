@@ -2,14 +2,11 @@ package fr.inria.corese.demo.view.popup;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
-public class NewFilePopup extends BasePopup{
+public class NewFilePopup extends BasePopup {
     private Button confirmButton;
     private Button cancelButton;
     private TextField fileNameField;
@@ -31,6 +28,7 @@ public class NewFilePopup extends BasePopup{
         });
 
         cancelButton = new Button("Cancel");
+        cancelButton.setOnAction(e -> closePopup());
 
         fileNameField = new TextField();
 
@@ -43,6 +41,8 @@ public class NewFilePopup extends BasePopup{
         contentPane.setBottom(buttonBox);
 
         getDialogPane().setContent(contentPane);
+        getDialogPane().getButtonTypes().addAll(ButtonType.CLOSE);
+        setOnCloseRequest(event -> closePopup());
     }
 
     public Button getConfirmButton() {
@@ -61,12 +61,4 @@ public class NewFilePopup extends BasePopup{
         this.onConfirm = callback;
     }
 
-    private void confirm() {
-        if (fileNameField.getText() == null || fileNameField.getText().isEmpty()) {
-            message = "Please enter a file name";
-            return;
-        }
-        System.out.println(fileNameField.getText());
-        closePopup();
-    }
 }

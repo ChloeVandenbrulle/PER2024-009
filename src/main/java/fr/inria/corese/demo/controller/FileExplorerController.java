@@ -3,17 +3,8 @@ package fr.inria.corese.demo.controller;
 import fr.inria.corese.demo.model.FileExplorerModel;
 import fr.inria.corese.demo.model.FileItem;
 import fr.inria.corese.demo.view.FileExplorerView;
-import fr.inria.corese.demo.view.popup.LogDialog;
 import fr.inria.corese.demo.view.popup.NewFilePopup;
-import fr.inria.corese.demo.view.popup.PopupFactory;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TreeItem;
-import javafx.stage.Stage;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
-
-import java.nio.file.Files;
 
 public class FileExplorerController {
     private FileExplorerModel model;
