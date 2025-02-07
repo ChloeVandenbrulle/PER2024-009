@@ -4,6 +4,7 @@ import fr.inria.corese.demo.model.FileItem;
 import fr.inria.corese.demo.model.FileListModel;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import java.io.IOException;
@@ -55,12 +56,24 @@ public class FileListView extends VBox {
     }
 
     // Getters pour le controller
-    public Button getClearButton() { return clearButton; }
-    public Button getReloadButton() { return reloadButton; }
-    public Button getLoadButton() { return loadButton; }
-    public ListView<FileItem> getFileList() { return fileList; }
+    public Button getClearButton() {
+        return clearButton;
+    }
+
+    public Button getReloadButton() {
+        return reloadButton;
+    }
+
+    public Button getLoadButton() {
+        return loadButton;
+    }
+
+    public ListView<FileItem> getFileList() {
+        return fileList;
+    }
 
     // Custom cell pour les fichiers
+    // Modifiez la classe FileListCell :
     private static class FileListCell extends ListCell<FileItem> {
         @Override
         protected void updateItem(FileItem item, boolean empty) {
@@ -70,21 +83,26 @@ public class FileListView extends VBox {
                 setText(null);
                 setGraphic(null);
             } else {
-                HBox cell = new HBox(10);
-                Label nameLabel = new Label(item.getName());
+                HBox cell = new HBox();
+                cell.setAlignment(Pos.CENTER_LEFT);
 
-                Button deleteButton = new Button();
-                Region deleteIcon = new Region();
-                deleteIcon.getStyleClass().add("delete-icon");
-                deleteButton.setGraphic(deleteIcon);
+                Label nameLabel = new Label(item.getName());
+                Region spacer = new Region();
+                HBox.setHgrow(spacer, Priority.ALWAYS);
+
+                Button deleteButton = new Button("x️");
                 deleteButton.getStyleClass().add("delete-button");
+                deleteButton.setOnAction(e -> {
+                    ListView<FileItem> listView = getListView();
+                    listView.getItems().remove(item);
+                });
 
                 if (item.isLoading()) {
                     ProgressIndicator progress = new ProgressIndicator();
                     progress.setMaxSize(16, 16);
-                    cell.getChildren().addAll(nameLabel, progress);
+                    cell.getChildren().addAll(nameLabel, spacer, progress);
                 } else {
-                    cell.getChildren().addAll(nameLabel, deleteButton);
+                    cell.getChildren().addAll(nameLabel, spacer, deleteButton);
                 }
 
                 setGraphic(cell);

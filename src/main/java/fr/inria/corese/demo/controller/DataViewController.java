@@ -1,12 +1,15 @@
 package fr.inria.corese.demo.controller;
 
 import fr.inria.corese.demo.model.ButtonType;
+import fr.inria.corese.demo.model.RuleModel;
 import fr.inria.corese.demo.view.DataView;
 import fr.inria.corese.demo.model.ProjectDataModel;
 import fr.inria.corese.demo.view.FileListView;
 import fr.inria.corese.demo.view.popup.*;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -14,12 +17,18 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
 
 public class DataViewController {
     private DataView view;
     private ProjectDataModel model;
     private ButtonManager buttonManager;
     private PopupFactory popupFactory;
+    private RuleViewController ruleViewController;
+    private RuleModel ruleModel;
+    private final LogDialog logDialog;
+    private FileListView fileListView;
 
     @FXML
     private HBox topButtonBox;
@@ -28,12 +37,20 @@ public class DataViewController {
     @FXML
     private HBox configActionBox;
     @FXML
-    private VBox fileListContainer;  // Au lieu de FileListView
+    private VBox fileListContainer;
+    @FXML
+    private Label semanticElementsLabel;
+    @FXML
+    private Label tripletLabel;
+    @FXML
+    private Label graphLabel;
+    @FXML
+    private Label rulesLoadedLabel;
 
-    private FileListView fileListView;  // Ajoutez ce champ
 
     public DataViewController() {
         this.model = new ProjectDataModel();
+        this.logDialog = new LogDialog(model);
         this.popupFactory = PopupFactory.getInstance(model);
     }
 
@@ -92,6 +109,11 @@ public class DataViewController {
                 newScene.getStylesheets().add(cssPath);
             }
         });
+
+        ruleModel = new RuleModel();
+        ruleViewController = new RuleViewController(ruleModel);
+        ruleViewController.initialize();
+
     }
 
     private void initializeEventHandlers() {
@@ -138,20 +160,7 @@ public class DataViewController {
     }
 
     private void handleShowLogs() {
-        System.out.println("handleShowLogs called"); // Debug print
-        try {
-            LogDialog logDialog = (LogDialog) popupFactory.createPopup(PopupFactory.LOG_POPUP);
-            System.out.println("LogDialog created"); // Debug print
-            if (logDialog != null) {
-                logDialog.displayPopup();
-                System.out.println("LogDialog displayed"); // Debug print
-            } else {
-                System.out.println("LogDialog is null"); // Debug print
-            }
-        } catch (Exception e) {
-            System.err.println("Error showing logs: " + e.getMessage());
-            e.printStackTrace();
-        }
+        logDialog.displayPopup();
     }
 
     private void handleLoadFiles() {
@@ -164,21 +173,24 @@ public class DataViewController {
         if (file != null) {
             try {
                 model.addLogEntry("Starting to load file: " + file.getName());
-                model.loadFile(file);
-                model.addFile(file.getName());  // Ajoute le fichier à la liste
-                model.addLogEntry("File loaded successfully: " + file.getName());
 
-                // Afficher les informations du fichier
-                IPopup fileInfoPopup = popupFactory.createPopup(PopupFactory.FILE_INFO_POPUP);
-                ((FileInfoPopup) fileInfoPopup).show(file);
+                // Warn user about graph reset
+                IPopup warningPopup = popupFactory.createPopup(PopupFactory.WARNING_POPUP);
+                warningPopup.setMessage("Loading this file will reset the current graph. Do you want to continue?");
+                boolean result = ((WarningPopup) warningPopup).getResult();
 
+                if (result) {
+                    model.loadFile(file);
+                    model.addFile(file.getName());
+                    model.addLogEntry("File loaded successfully: " + file.getName());
+                }
             } catch (Exception e) {
                 String errorMessage = "Error loading file: " + e.getMessage();
                 model.addLogEntry("ERROR: " + errorMessage);
 
-                IPopup warningPopup = popupFactory.createPopup(PopupFactory.WARNING_POPUP);
-                warningPopup.setMessage(errorMessage);
-                ((WarningPopup) warningPopup).showAndWait();
+                IPopup errorPopup = popupFactory.createPopup(PopupFactory.WARNING_POPUP);
+                errorPopup.setMessage(errorMessage);
+                ((WarningPopup) errorPopup).getResult();
             }
             updateView();
         }
@@ -201,13 +213,17 @@ public class DataViewController {
     }
 
     private void updateView() {
-        // Mettre à jour les statistiques
-        view.getProjectStatisticsView().updateStatistics(
-                model.getSemanticElementsCount(),
-                model.getTripletCount(),
-                model.getGraphCount(),
-                model.getRulesLoadedCount()
-        );
+        if (ruleViewController != null) {
+            ruleViewController.updateView();
+        }
+
+        // Update statistics labels
+        if (semanticElementsLabel != null) {
+            semanticElementsLabel.setText("Number of semantic elements loaded: " + model.getSemanticElementsCount());
+            tripletLabel.setText("Number of triplet: " + model.getTripletCount());
+            graphLabel.setText("Number of graph: " + model.getGraphCount());
+            rulesLoadedLabel.setText("Number of rules loaded: " + model.getRulesLoadedCount());
+        }
     }
 
     public DataView getView() {
