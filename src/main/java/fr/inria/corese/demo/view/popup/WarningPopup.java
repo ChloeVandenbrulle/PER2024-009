@@ -1,45 +1,96 @@
 package fr.inria.corese.demo.view.popup;
 
-import javafx.beans.property.SimpleStringProperty;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import java.util.Optional;
 
-public class WarningPopup extends BasePopup {
-    private final Button confirmButton;
-    private final Button cancelButton;
+public class WarningPopup extends Stage implements IPopup {
+    private Label messageLabel;
+    private Button closeButton;
+    private Button continueButton;
+    private VBox layout;
+    private boolean result;
 
     public WarningPopup() {
-        setTitle("Warning");
+        initModality(Modality.APPLICATION_MODAL);
+        initStyle(StageStyle.UNDECORATED);
 
-        BorderPane contentPane = new BorderPane();
-        Label messageLabel = new Label();
-        messageLabel.textProperty().bind(new SimpleStringProperty(message));
+        // Header with warning icon
+        Label warningIconLabel = new Label("⚠");
+        warningIconLabel.setStyle("-fx-text-fill: #c04139; -fx-font-size: 24px;");
+        Label headerLabel = new Label("WARNING");
+        headerLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #c04139;");
 
-        confirmButton = new Button("Confirm");
-        cancelButton = new Button("Cancel");
+        HBox header = new HBox(10, warningIconLabel, headerLabel);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setStyle("-fx-background-color: #fff; -fx-padding: 10; -fx-border-width: 0 0 1 0; -fx-border-color: #c0413980;");
 
-        confirmButton.setOnAction(e -> onConfirmClick());
-        cancelButton.setOnAction(e -> onCancelClick());
+        // Message
+        messageLabel = new Label();
+        messageLabel.setWrapText(true);
+        messageLabel.setMaxWidth(400);
+        messageLabel.setStyle("-fx-padding: 15;");
 
-        HBox buttonBox = new HBox(10);
+        // Buttons
+        closeButton = new Button("Cancel");
+        closeButton.setStyle("-fx-background-color: #E0E0E0; -fx-background-radius: 3;");
+        closeButton.setOnAction(e -> {
+            result = false;
+            closePopup();
+        });
+
+        continueButton = new Button("Continue");
+        continueButton.setStyle("-fx-background-color: #c04139; -fx-text-fill: white; -fx-background-radius: 3;");
+        continueButton.setOnAction(e -> {
+            result = true;
+            closePopup();
+        });
+
+        HBox buttonBox = new HBox(10, closeButton, continueButton);
         buttonBox.setAlignment(Pos.CENTER_RIGHT);
-        buttonBox.getChildren().addAll(cancelButton, confirmButton);
+        buttonBox.setStyle("-fx-padding: 10; -fx-background-color: #FAFAFA; -fx-border-width: 1 0 0 0; -fx-border-color: #E0E0E0;");
 
-        contentPane.setCenter(messageLabel);
-        contentPane.setBottom(buttonBox);
+        layout = new VBox();
+        layout.getChildren().addAll(header, messageLabel, buttonBox);
+        layout.setStyle("-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0); -fx-border-color: #c04139; -fx-border-width: 1;");
 
-        getDialogPane().setContent(contentPane);
+        Scene scene = new Scene(layout);
+        scene.setFill(null);
+        setScene(scene);
     }
 
-    protected void onConfirmClick() {
-        // À implémenter dans les sous-classes si nécessaire
-        hide();
+    @Override
+    public void setMessage(String message) {
+        messageLabel.setText(message);
     }
 
-    protected void onCancelClick() {
-        hide();
+    @Override
+    public void closePopup() {
+        close();
+    }
+
+    @Override
+    public void displayPopup() {
+        show();
+    }
+
+    @Override
+    public String getPopupTitle() {
+        return "Warning";
+    }
+
+    public boolean getResult() {
+        super.showAndWait();
+        return result;
     }
 }

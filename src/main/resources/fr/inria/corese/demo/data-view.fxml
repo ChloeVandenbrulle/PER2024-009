@@ -35,31 +35,11 @@
                 </VBox>
             </VBox>
 
-            <VBox spacing="10" styleClass="section-container, rules-container">
+            <VBox spacing="10" styleClass="section-container">
                 <padding>
                     <Insets top="10" right="10" bottom="10" left="10"/>
                 </padding>
-                <CheckBox fx:id="traceCheckbox" text="Trace"/>
-                <CheckBox fx:id="loadNamedCheckbox" text="Load Named"/>
-                <TitledPane text="RDFS" expanded="true">
-                    <VBox spacing="5">
-                        <CheckBox fx:id="rdfsSubsetCheckbox" text="RDFS Subset"/>
-                        <CheckBox fx:id="rdfsRLCheckbox" text="RDFS RL"/>
-                    </VBox>
-                </TitledPane>
-                <TitledPane text="OWL" expanded="true">
-                    <VBox spacing="5">
-                        <CheckBox fx:id="owlRLCheckbox" text="OWL RL"/>
-                        <CheckBox fx:id="owlRLExtendedCheckbox" text="OWL RL Extended"/>
-                        <CheckBox fx:id="owlRLTestCheckbox" text="OWL RL Test"/>
-                        <CheckBox fx:id="owlCleanCheckbox" text="OWL Clean"/>
-                    </VBox>
-                </TitledPane>
-                <CheckBox fx:id="graphIndexCheckbox" text="Graph index"/>
-                <Separator/>
-                <HBox spacing="5" alignment="CENTER_LEFT">
-                    <CheckBox fx:id="myRuleFileCheckbox" text="My rule file"/>
-                </HBox>
+                <fx:include source="rule-view.fxml"/>
                 <HBox fx:id="configActionBox" spacing="10" alignment="BOTTOM_RIGHT"/>
             </VBox>
         </HBox>

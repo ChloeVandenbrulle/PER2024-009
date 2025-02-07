@@ -163,3 +163,11 @@
 .nav-button, .rounded-button, .menu-button {
     -fx-transition: -transition-default;
 }
+
+.titled-pane > .title > .text {
+    -fx-font-size: 13px;
+}
+
+.titled-pane > .content {
+    -fx-padding: 0 0 10px 10px;
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="fr.inria.corese.demo.controller.RuleViewController"
+      spacing="10" styleClass="section-container, rules-container"
+      stylesheets="@../../../../styles/application.css">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <TitledPane text="RDFS" expanded="true">
+        <VBox spacing="5">
+            <CheckBox fx:id="rdfsSubsetCheckbox" text="RDFS Subset"/>
+            <CheckBox fx:id="rdfsRLCheckbox" text="RDFS RL"/>
+        </VBox>
+    </TitledPane>
+
+    <TitledPane text="OWL" expanded="true">
+        <VBox spacing="5">
+            <CheckBox fx:id="owlRLCheckbox" text="OWL RL"/>
+            <CheckBox fx:id="owlRLExtendedCheckbox" text="OWL RL Extended"/>
+            <CheckBox fx:id="owlRLTestCheckbox" text="OWL RL Test"/>
+            <CheckBox fx:id="owlCleanCheckbox" text="OWL Clean"/>
+        </VBox>
+    </TitledPane>
+
+    <ListView fx:id="loadedRulesListView" VBox.vgrow="ALWAYS"/>
+</VBox>
