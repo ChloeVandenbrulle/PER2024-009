@@ -17,7 +17,7 @@
 
             <center>
                 <SplitPane fx:id="splitPane" dividerPositions="0.0">
-                    <VBox fx:id="fileExplorerContainer" styleClass="tree-view" minWidth="40" prefWidth="155"/>
+                    <VBox fx:id="fileExplorerContainer" styleClass="tree-view" prefWidth="155"/>
                     <CodeMirrorView fx:id="editorContainer"/>
                 </SplitPane>
             </center>
