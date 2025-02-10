@@ -1,8 +1,12 @@
 package fr.inria.corese.demo.model;
 
 import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.rule.Rule;
 import fr.inria.corese.core.rule.RuleEngine;
 import fr.inria.corese.core.load.Load;
+
+import java.io.File;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -25,9 +29,13 @@ public class RuleModel {
 
     public void loadRDFSSubset() {
         if (isRDFSSubsetEnabled) {
-            Load.create(graph).load(String.valueOf(Load.RULE_FORMAT));
-            if (!loadedRules.contains("RDFS Subset")) {
-                loadedRules.add("RDFS Subset");
+            try {
+                Load.create(graph).loadWE("rule/rdfs.rul");
+                if (!loadedRules.contains("RDFS Subset")) {
+                    loadedRules.add("RDFS Subset");
+                }
+            } catch (Exception e) {
+                System.err.println("Error loading RDFS Subset: " + e.getMessage());
             }
         } else {
             loadedRules.remove("RDFS Subset");
@@ -37,9 +45,13 @@ public class RuleModel {
 
     public void loadRDFSRL() {
         if (isRDFSRLEnabled) {
-            Load.create(graph).load(String.valueOf(Load.RULE_FORMAT));
-            if (!loadedRules.contains("RDFS RL")) {
-                loadedRules.add("RDFS RL");
+            try {
+                Load.create(graph).loadWE("rule/rdfsrl.rul");
+                if (!loadedRules.contains("RDFS RL")) {
+                    loadedRules.add("RDFS RL");
+                }
+            } catch (Exception e) {
+                System.err.println("Error loading RDFS RL: " + e.getMessage());
             }
         } else {
             loadedRules.remove("RDFS RL");
@@ -49,9 +61,13 @@ public class RuleModel {
 
     public void loadOWLRL() {
         if (isOWLRLEnabled) {
-            Load.create(graph).load(String.valueOf(Load.RULE_FORMAT));
-            if (!loadedRules.contains("OWL RL")) {
-                loadedRules.add("OWL RL");
+            try {
+                Load.create(graph).loadWE("rule/owlrl.rul");
+                if (!loadedRules.contains("OWL RL")) {
+                    loadedRules.add("OWL RL");
+                }
+            } catch (Exception e) {
+                System.err.println("Error loading OWL RL: " + e.getMessage());
             }
         } else {
             loadedRules.remove("OWL RL");
@@ -61,9 +77,13 @@ public class RuleModel {
 
     public void loadOWLRLExtended() {
         if (isOWLRLExtendedEnabled) {
-            Load.create(graph).load(String.valueOf(Load.RULE_FORMAT));
-            if (!loadedRules.contains("OWL RL Extended")) {
-                loadedRules.add("OWL RL Extended");
+            try {
+                Load.create(graph).loadWE("rule/owlrl-ext.rul");
+                if (!loadedRules.contains("OWL RL Extended")) {
+                    loadedRules.add("OWL RL Extended");
+                }
+            } catch (Exception e) {
+                System.err.println("Error loading OWL RL Extended: " + e.getMessage());
             }
         } else {
             loadedRules.remove("OWL RL Extended");
@@ -74,10 +94,22 @@ public class RuleModel {
     private void reloadRules() {
         graph = Graph.create();
         ruleEngine = new RuleEngine();
-        if (isRDFSSubsetEnabled) Load.create(graph).load(String.valueOf(Load.RULE_FORMAT));
-        if (isRDFSRLEnabled) Load.create(graph).load(String.valueOf(Load.RULE_FORMAT));
-        if (isOWLRLEnabled) Load.create(graph).load(String.valueOf(Load.RULE_FORMAT));
-        if (isOWLRLExtendedEnabled) Load.create(graph).load(String.valueOf(Load.RULE_FORMAT));
+        if (isRDFSSubsetEnabled) loadRDFSSubset();
+        if (isRDFSRLEnabled) loadRDFSRL();
+        if (isOWLRLEnabled) loadOWLRL();
+        if (isOWLRLExtendedEnabled) loadOWLRLExtended();
+    }
+
+    public void loadRuleFile(File file) {
+        try {
+            Load.create(graph).load(file.getPath());
+            String ruleName = file.getName();
+            if (!loadedRules.contains(ruleName)) {
+                loadedRules.add(ruleName);
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading rule file: " + e.getMessage());
+        }
     }
 
     public List<String> getLoadedRules() {
@@ -137,4 +169,11 @@ public class RuleModel {
     public void setOWLRLExtendedChecked(boolean selected) {
         this.isOWLRLExtendedEnabled = selected;
     }
+
+    public RuleEngine duplicateRule(String ruleName) {
+        // TODO: Implement the logic to duplicate a rule
+        // This will depend on how rules are stored and managed in corese-core
+        return new RuleEngine();
+    }
+
 }

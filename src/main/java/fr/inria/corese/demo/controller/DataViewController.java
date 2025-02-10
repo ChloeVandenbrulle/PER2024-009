@@ -56,15 +56,11 @@ public class DataViewController {
 
     @FXML
     public void initialize() {
-        System.out.println("Initializing DataViewController");
         buttonManager = new ButtonManager(model);
 
-        // Créer et configurer FileListView
-        fileListView = new FileListView();
-        fileListView.setModel(model.getFileListModel());
-
-        // Ajouter FileListView au conteneur
         if (fileListContainer != null) {
+            fileListView = new FileListView();
+            fileListView.setModel(model.getFileListModel());
             fileListContainer.getChildren().add(fileListView);
             VBox.setVgrow(fileListView, Priority.ALWAYS);
 
@@ -73,47 +69,58 @@ public class DataViewController {
             fileListView.getLoadButton().setOnAction(e -> handleLoadFiles());
         }
 
-        Button showLogsButton = buttonManager.getButton(ButtonType.SHOW_LOGS);
-        showLogsButton.setOnAction(e -> {
-            System.out.println("Log button clicked directly");
-            handleShowLogs();
-        });
+        setupTopButtons();
+        setupConfigButtons();
+        setupStylesheets();
 
-        // Créer une Region pour l'espacement
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fr/inria/corese/demo/rule-view.fxml"));
+            VBox ruleView = loader.load();
+            ruleViewController = loader.getController();
+            ruleModel = new RuleModel();
+            ruleViewController.injectDependencies(model, ruleModel);
+            ruleViewController.initializeRules();
+
+            // Add the loaded view to your layout
+            if (configActionBox != null && configActionBox.getParent() instanceof VBox) {
+                VBox parent = (VBox) configActionBox.getParent();
+                parent.getChildren().add(0, ruleView);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setupTopButtons() {
+        Button showLogsButton = buttonManager.getButton(ButtonType.SHOW_LOGS);
+        showLogsButton.setOnAction(e -> handleShowLogs());
+
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Créer un HBox pour les boutons de gauche avec un petit espacement
-        HBox leftButtons = new HBox(5); // 5 pixels d'espacement
+        HBox leftButtons = new HBox(5);
         leftButtons.getChildren().addAll(
                 buttonManager.getButton(ButtonType.OPEN_PROJECT),
                 buttonManager.getButton(ButtonType.SAVE_AS)
         );
 
-        // Ajouter tous les éléments dans l'ordre
-        topButtonBox.getChildren().clear(); // Pour s'assurer qu'il n'y a pas de boutons existants
-        topButtonBox.getChildren().addAll(
-                leftButtons,  // Les boutons de gauche groupés
-                spacer,       // Le spacer qui pousse le dernier bouton à droite
-                showLogsButton
-        );
+        topButtonBox.getChildren().clear();
+        topButtonBox.getChildren().addAll(leftButtons, spacer, showLogsButton);
+    }
 
+    private void setupConfigButtons() {
         configActionBox.getChildren().addAll(
                 buttonManager.getButton(ButtonType.LOAD_RULE_FILE)
         );
+    }
 
-        // Initialisation des styles
+    private void setupStylesheets() {
         topButtonBox.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 String cssPath = getClass().getResource("/styles/buttons.css").toExternalForm();
                 newScene.getStylesheets().add(cssPath);
             }
         });
-
-        ruleModel = new RuleModel();
-        ruleViewController = new RuleViewController(ruleModel);
-        ruleViewController.initialize();
-
     }
 
     private void initializeEventHandlers() {

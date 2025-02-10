@@ -144,3 +144,14 @@
 .delete-button:pressed {
     -fx-background-color: #ffcdd2;
 }
+
+.rule-file-button {
+    -fx-background-color: #f0f0f0;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 3px;
+    -fx-padding: 5px 10px;
+}
+
+.rule-file-button:hover {
+    -fx-background-color: #e0e0e0;
+}

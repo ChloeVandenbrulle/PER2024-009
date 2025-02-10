@@ -1,6 +1,4 @@
 module fr.inria.corese.demo {
-    requires javafx.controls;
-    requires javafx.fxml;
     requires javafx.web;
     requires static lombok;
     requires org.kordamp.ikonli.javafx;
@@ -10,9 +8,9 @@ module fr.inria.corese.demo {
     requires org.kordamp.ikonli.materialdesign;
     requires org.kordamp.ikonli.materialdesign2;
     requires org.kordamp.ikonli.core;
-    requires java.desktop;
     requires fr.inria.corese.corese_core;
     requires fr.inria.corese.compiler;
+    requires MaterialFX;
 
     exports fr.inria.corese.demo;
     exports fr.inria.corese.demo.controller;
