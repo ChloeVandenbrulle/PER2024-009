@@ -42,7 +42,6 @@ public class CodeEditorModel {
         isModified = modified;
     }
 
-    //
     public void recordCurrentChange(String newContent) {
         String oldContent = getContent();
 
