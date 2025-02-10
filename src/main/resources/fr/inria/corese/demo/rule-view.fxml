@@ -14,19 +14,15 @@
 
     <TitledPane text="RDFS" expanded="true">
         <VBox spacing="5">
-            <CheckBox fx:id="rdfsSubsetCheckbox" text="RDFS Subset"/>
-            <CheckBox fx:id="rdfsRLCheckbox" text="RDFS RL"/>
+            <VBox fx:id="rdfsRulesContainer" spacing="5"/>
         </VBox>
     </TitledPane>
 
     <TitledPane text="OWL" expanded="true">
         <VBox spacing="5">
-            <CheckBox fx:id="owlRLCheckbox" text="OWL RL"/>
-            <CheckBox fx:id="owlRLExtendedCheckbox" text="OWL RL Extended"/>
-            <CheckBox fx:id="owlRLTestCheckbox" text="OWL RL Test"/>
-            <CheckBox fx:id="owlCleanCheckbox" text="OWL Clean"/>
+            <VBox fx:id="owlRulesContainer" spacing="5"/>
         </VBox>
     </TitledPane>
 
-    <ListView fx:id="loadedRulesListView" VBox.vgrow="ALWAYS"/>
+    <VBox fx:id="rulesContainer" VBox.vgrow="ALWAYS"/>
 </VBox>

@@ -11,46 +11,34 @@ public class PopupFactory {
     public static final String FILE_INFO_POPUP = "fileInfo";
     public static final String LOG_POPUP = "log";
     public static final String NEW_FILE_POPUP = "newFile";
+    public static final String RULE_INFO_POPUP = "ruleInfo";
 
-    private static PopupFactory instance;
     private final Map<String, IPopup> popupCache = new HashMap<>();
     private final ProjectDataModel model;
 
-    private PopupFactory(ProjectDataModel model) {
+    public PopupFactory(ProjectDataModel model) {
         this.model = model;
     }
 
     public static PopupFactory getInstance(ProjectDataModel model) {
-        if (instance == null) {
-            instance = new PopupFactory(model);
-        }
-        return instance;
+        return new PopupFactory(model);
     }
 
     public IPopup createPopup(String type) {
-        System.out.println("Creating popup of type: " + type); // Debug print
-
-        // Réutiliser une instance existante si disponible
         if (popupCache.containsKey(type)) {
-            System.out.println("Returning cached popup"); // Debug print
             return popupCache.get(type);
         }
 
-        // Créer une nouvelle instance
-        System.out.println("Creating new popup instance"); // Debug print
-        IPopup popup = switch (type.toLowerCase()) {
+        IPopup popup = switch (type) {
             case ALERT_POPUP -> new AlertPopup();
             case WARNING_POPUP -> new WarningPopup();
             case FILE_INFO_POPUP -> new FileInfoPopup();
-            case LOG_POPUP -> {
-                System.out.println("Creating new LogDialog"); // Debug print
-                yield new LogDialog(model);
-            }
+            case LOG_POPUP -> new LogDialog(model);
             case NEW_FILE_POPUP -> new NewFilePopup();
+            case RULE_INFO_POPUP -> new RuleInfoPopup();
             default -> throw new IllegalArgumentException("Unknown popup type: " + type);
         };
 
-        // Mettre en cache pour réutilisation
         popupCache.put(type, popup);
         return popup;
     }

@@ -40,6 +40,13 @@
             <version>2.0.1</version>
         </dependency>
 
+        <!-- Material FX - Optional but recommended for better buttons -->
+        <dependency>
+            <groupId>io.github.palexdev</groupId>
+            <artifactId>materialfx</artifactId>
+            <version>11.17.0</version>
+        </dependency>
+
         <!-- RichTextFX pour l'éditeur de code -->
         <dependency>
             <groupId>org.fxmisc.richtext</groupId>
