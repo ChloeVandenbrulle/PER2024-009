@@ -5,6 +5,8 @@ import fr.inria.corese.demo.model.CodeEditorModel;
 import fr.inria.corese.demo.model.IconButtonBarModel;
 import fr.inria.corese.demo.view.IconButtonBarView;
 import fr.inria.corese.demo.view.NavigationBarView;
+import fr.inria.corese.demo.view.popup.DocumentationPopup;
+import fr.inria.corese.demo.view.popup.NewFilePopup;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
@@ -166,6 +168,8 @@ public class IconButtonBarController {
 
     private void onDocumentationButtonClick() {
         System.out.println("Documentation button clicked");
+        DocumentationPopup documentationPopup = new DocumentationPopup();
+        documentationPopup.displayPopup();
     }
 
     private void onZoomInButtonClick() {
