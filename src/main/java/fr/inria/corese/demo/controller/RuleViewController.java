@@ -4,19 +4,9 @@ import fr.inria.corese.demo.model.ProjectDataModel;
 import fr.inria.corese.demo.model.RuleModel;
 import fr.inria.corese.demo.view.RuleItem;
 import fr.inria.corese.demo.view.RuleView;
-import fr.inria.corese.demo.view.popup.IPopup;
-import fr.inria.corese.demo.view.popup.PopupFactory;
-import fr.inria.corese.demo.view.popup.RuleInfoPopup;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
-
-import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.Map;
-
-import java.io.File;
 import java.util.Map;
 
 public class RuleViewController {
@@ -24,7 +14,6 @@ public class RuleViewController {
     private ProjectDataModel projectDataModel;
     private RuleView view;
     private Map<String, RuleItem> ruleItems;
-    private PopupFactory popupFactory;
 
     @FXML
     private VBox rdfsRulesContainer;
@@ -44,7 +33,6 @@ public class RuleViewController {
     public void injectDependencies(ProjectDataModel projectDataModel, RuleModel ruleModel) {
         this.projectDataModel = projectDataModel;
         this.ruleModel = ruleModel;
-        this.popupFactory = PopupFactory.getInstance(projectDataModel);
     }
 
     @FXML
@@ -75,7 +63,6 @@ public class RuleViewController {
         RuleItem ruleItem = new RuleItem(ruleName);
         ruleItems.put(ruleName, ruleItem);
 
-        ruleItem.getDuplicateButton().setOnAction(e -> handleDuplicateRule(ruleName));
         ruleItem.getDocumentationButton().setOnAction(e -> handleShowDocumentation(ruleName));
         ruleItem.getCheckBox().setOnAction(e -> handleRuleToggle(ruleName, ruleItem.getCheckBox().isSelected()));
 
@@ -83,15 +70,7 @@ public class RuleViewController {
     }
 
     private void handleShowDocumentation(String ruleName) {
-        if (popupFactory == null || projectDataModel == null) {
-            System.err.println("PopupFactory or ProjectDataModel not initialized");
-            return;
-        }
-
-        IPopup popup = popupFactory.createPopup(PopupFactory.RULE_INFO_POPUP);
-        if (popup instanceof RuleInfoPopup) {
-            popup.displayPopup();
-        }
+        //external link to documentation
     }
 
     void updateView() {

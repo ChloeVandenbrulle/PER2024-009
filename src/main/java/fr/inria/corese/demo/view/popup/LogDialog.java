@@ -30,7 +30,6 @@ public class LogDialog extends BasePopup {
         logTextArea.setPrefRowCount(20);
         logTextArea.setPrefColumnCount(50);
 
-        graph.setDebug(true);
         exec.setDebug(true);
 
         setupUI();

@@ -14,5 +14,6 @@ public enum IconButtonType {
     FULL_SCREEN,
     NEW_FILE,
     NEW_FOLDER,
-    CLOSE_FILE_EXPLORER
+    CLOSE_FILE_EXPLORER,
+    RELOAD
 }

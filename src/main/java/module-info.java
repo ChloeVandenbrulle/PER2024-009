@@ -9,7 +9,6 @@ module fr.inria.corese.demo {
     requires org.kordamp.ikonli.materialdesign2;
     requires org.kordamp.ikonli.core;
     requires fr.inria.corese.corese_core;
-    requires fr.inria.corese.compiler;
     requires MaterialFX;
 
     exports fr.inria.corese.demo;

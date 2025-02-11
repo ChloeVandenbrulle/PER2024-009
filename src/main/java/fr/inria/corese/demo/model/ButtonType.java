@@ -8,9 +8,9 @@ public enum ButtonType {
     SHOW_LOGS("Show logs", "log-button"),
 
     // File Buttons
-    CLEAR_GRAPH("Clear graph", "file-button"),
-    RELOAD_FILES("Reload files", "file-button"),
-    LOAD_FILES("Load files", "file-button"),
+    CLEAR_GRAPH("", "file-button"),
+    RELOAD_FILES("", "file-button"),
+    LOAD_FILES("", "file-button"),
     LOAD_RULE_FILE( "Load rule file", "file-button");
 
     private final String label;
