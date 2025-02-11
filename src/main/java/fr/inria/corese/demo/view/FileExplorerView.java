@@ -1,13 +1,10 @@
 package fr.inria.corese.demo.view;
 
 import fr.inria.corese.demo.enums.IconButtonType;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TreeCell;
-import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -51,16 +48,27 @@ public class FileExplorerView extends HBox {
                 } else {
                     setText(item);
 
-                    FontIcon folderIcon = new FontIcon(MaterialDesignF.FOLDER_OUTLINE);
-                    folderIcon.setIconSize(20);
-
-                    if (!getTreeItem().isLeaf()) {
-                        setDisclosureNode(folderIcon);
-                    }
-
                     if (getTreeItem().getGraphic() != null) {
                         setGraphic(getTreeItem().getGraphic());
                     }
+
+                    setOnMouseEntered(e ->
+                            setStyle("-fx-background-color: #CCE8FF;")
+                    );
+
+                    setOnMouseExited(e -> {
+                        if (!isSelected()) {
+                            setStyle("");
+                        }
+                    });
+
+                    selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+                        if (isNowSelected) {
+                            setStyle("-fx-background-color: #CCE8FF;");
+                        } else {
+                            setStyle("");
+                        }
+                    });
                 }
             }
         });
@@ -69,18 +77,7 @@ public class FileExplorerView extends HBox {
                 "-fx-background-color: transparent;" +
                         "-fx-border-color: transparent;"
         );
-        treeView.setOnMouseEntered(e ->
-                treeView.setStyle(
-                        "-fx-background-color: #f0f0f0;" +
-                                "-fx-border-color: #f0f0f0;"
-                )
-        );
-        treeView.setOnMouseExited(e ->
-                treeView.setStyle(
-                        "-fx-background-color: transparent;" +
-                                "-fx-border-color: transparent;"
-                )
-        );
+
         treeView.setMinWidth(120);
 
         newFileButton = new IconButtonView(IconButtonType.NEW_FILE);
@@ -132,6 +129,7 @@ public class FileExplorerView extends HBox {
         mainContent.setVisible(true);
         mainContent.setManaged(true);
         closeFileExplorerButton.setGraphic(new FontIcon(MaterialDesignL.LESS_THAN));
+        setMaxWidth(200);
     }
 
     public void closeView() {
@@ -139,6 +137,7 @@ public class FileExplorerView extends HBox {
         mainContent.setManaged(false);
         closeFileExplorerButton.setGraphic(new FontIcon(MaterialDesignG.GREATER_THAN));
         buttonContainer.setAlignment(Pos.CENTER_RIGHT);
+        setMaxWidth(30);
     }
 
 }

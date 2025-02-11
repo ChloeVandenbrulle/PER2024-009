@@ -1,14 +1,8 @@
 package fr.inria.corese.demo.view;
 
 import fr.inria.corese.demo.enums.IconButtonType;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.Ikon;
-import org.kordamp.ikonli.materialdesign2.*;
 import javafx.scene.control.Button;
 import java.util.LinkedHashMap;
 import java.util.List;

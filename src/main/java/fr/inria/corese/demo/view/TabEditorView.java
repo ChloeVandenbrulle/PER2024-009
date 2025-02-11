@@ -1,6 +1,5 @@
 package fr.inria.corese.demo.view;
 
-import javafx.collections.ListChangeListener;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -33,7 +32,6 @@ public class TabEditorView extends TabPane {
         codeEditorView.setMaxHeight(Double.MAX_VALUE);
         tab.setContent(codeEditorView);
 
-        // Insérer le nouvel onglet avant le bouton +
         getTabs().add(getTabs().size() - 1, tab);
         getSelectionModel().select(tab);
         return tab;

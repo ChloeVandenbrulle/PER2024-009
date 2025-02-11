@@ -40,7 +40,7 @@ public class IconButtonView extends Button{
         Tooltip tooltip = new Tooltip(tooltipText);
         Tooltip.install(this, tooltip);
 
-        fontIcon.setIconSize(22);  // Taille de l'icône en pixels
+        fontIcon.setIconSize(25);  // Taille de l'icône en pixels
         setStyle(
                 "-fx-background-color: transparent;" +
                         "-fx-pref-width: 6;" +

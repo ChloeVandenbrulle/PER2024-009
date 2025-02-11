@@ -9,6 +9,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -17,15 +18,9 @@ public class RDFEditorViewController {
     @FXML private BorderPane contentContainer;
     @FXML private VBox fileExplorerContainer;
     @FXML private StackPane editorContainer;
-    @FXML private SplitPane splitPane;
-//    @FXML private CodeMirrorView editorContainer;
-//    @FXML private VBox iconButtonBarContainer;
 
-    private IconButtonBarController iconButtonBarController;
     private FileExplorerController fileExplorerController;
     private TabEditorController tabEditorController;
-
-    private boolean isUpdatingContent = false;
 
     @FXML
     public void initialize() {
@@ -64,8 +59,7 @@ public class RDFEditorViewController {
         if (mainContainer == null) missingInjections.append("mainContainer, ");
         if (contentContainer == null) missingInjections.append("contentContainer, ");
         if (fileExplorerContainer == null) missingInjections.append("fileTreeView, ");
-//        if (editorContainer == null) missingInjections.append("editorContainer, ");
-//        if (iconButtonBarContainer == null) missingInjections.append("iconButtonContainer, ");
+        if (editorContainer == null) missingInjections.append("editorContainer, ");
 
         if (missingInjections.length() > 0) {
             System.err.println("Missing FXML injections: " + missingInjections);
