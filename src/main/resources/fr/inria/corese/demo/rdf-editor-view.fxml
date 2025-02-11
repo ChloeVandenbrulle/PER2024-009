@@ -15,10 +15,10 @@
     <center>
         <BorderPane fx:id="contentContainer">
             <center>
-                <HBox fx:id="hBox">
-                    <VBox fx:id="fileExplorerContainer" styleClass="tree-view" minWidth="30" maxWidth="200"/>
+                <SplitPane fx:id="splitPane" dividerPositions="0.2">
+                    <VBox fx:id="fileExplorerContainer" styleClass="tree-view" minWidth="0"/>
                     <StackPane fx:id="editorContainer" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"/>
-                </HBox>
+                </SplitPane>
             </center>
         </BorderPane>
     </center>

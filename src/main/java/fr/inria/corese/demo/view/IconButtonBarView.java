@@ -14,6 +14,7 @@ public class IconButtonBarView extends VBox {
     public IconButtonBarView() {
         setSpacing(10);
         setAlignment(Pos.TOP_CENTER);
+        setStyle("-fx-background-color: transparent;");
     }
 
     public void initializeButtons(List<IconButtonType> buttonTypes) {
@@ -23,6 +24,7 @@ public class IconButtonBarView extends VBox {
             buttons.put(type, button);
         });
         getChildren().addAll(buttons.values());
+        setHeight(50);
     }
 
 

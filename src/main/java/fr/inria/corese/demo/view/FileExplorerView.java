@@ -4,6 +4,7 @@ import fr.inria.corese.demo.enums.IconButtonType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.HBox;
@@ -17,11 +18,9 @@ public class FileExplorerView extends HBox {
     private TreeView<String> treeView;
     private IconButtonView newFileButton;
     private IconButtonView newFolderButton;
-    private Button openFolderButton;
-    private IconButtonView closeFileExplorerButton;
+    private IconButtonView openFolderButton;
     private HBox buttonBar;
     private VBox mainContent;
-    VBox buttonContainer;
 
     public FileExplorerView() {
         this.setSpacing(0);
@@ -29,10 +28,10 @@ public class FileExplorerView extends HBox {
         initializeComponents();
         initializeButtonBar();
         initializeMainContent();
-        initializeButtonContainer();
 
-        getChildren().addAll(mainContent, buttonContainer);
-        StackPane.setAlignment(buttonContainer, Pos.CENTER);
+        VBox.setVgrow(this, Priority.ALWAYS);
+
+        getChildren().addAll(mainContent);
     }
 
     private void initializeComponents() {
@@ -83,28 +82,28 @@ public class FileExplorerView extends HBox {
 
         newFileButton = new IconButtonView(IconButtonType.NEW_FILE);
         newFolderButton = new IconButtonView(IconButtonType.NEW_FOLDER);
-        closeFileExplorerButton = new IconButtonView(IconButtonType.CLOSE_FILE_EXPLORER);
-        openFolderButton = new Button("Open Folder");
+        openFolderButton = new IconButtonView(IconButtonType.OPEN_FOLDER);
     }
 
     private void initializeButtonBar() {
         buttonBar = new HBox(5);
         buttonBar.setPadding(new Insets(5));
-        buttonBar.getChildren().addAll(newFileButton, newFolderButton);
+        buttonBar.getChildren().addAll(openFolderButton, newFileButton, newFolderButton);
     }
 
     private void initializeMainContent() {
         mainContent = new VBox(5);
         mainContent.setPadding(new Insets(0, 0, 5, 0));
-        VBox.setVgrow(treeView, Priority.ALWAYS);
-        openFolderButton.setAlignment(Pos.CENTER);
-        mainContent.getChildren().addAll(openFolderButton, buttonBar, treeView);
-    }
 
-    private void initializeButtonContainer() {
-        buttonContainer = new VBox();
-        buttonContainer.setAlignment(Pos.CENTER);
-        buttonContainer.getChildren().add(closeFileExplorerButton);
+        mainContent.setMaxHeight(Double.MAX_VALUE);
+        HBox.setHgrow(mainContent, Priority.ALWAYS);
+        VBox.setVgrow(mainContent, Priority.ALWAYS);
+
+        VBox.setVgrow(treeView, Priority.ALWAYS);
+        treeView.setMaxHeight(Double.MAX_VALUE);
+
+        openFolderButton.setAlignment(Pos.CENTER);
+        mainContent.getChildren().addAll(buttonBar, treeView);
     }
 
     public TreeView<String> getTreeView() {
@@ -124,27 +123,8 @@ public class FileExplorerView extends HBox {
         return newFolderButton;
     }
 
-    public Button getCloseFileExplorerButton() {
-        return closeFileExplorerButton;
-    }
 
     public Button getOpenFolderButton() {
         return openFolderButton;
     }
-
-    public void openView() {
-        mainContent.setVisible(true);
-        mainContent.setManaged(true);
-        closeFileExplorerButton.setGraphic(new FontIcon(MaterialDesignL.LESS_THAN));
-        setMaxWidth(200);
-    }
-
-    public void closeView() {
-        mainContent.setVisible(false);
-        mainContent.setManaged(false);
-        closeFileExplorerButton.setGraphic(new FontIcon(MaterialDesignG.GREATER_THAN));
-        buttonContainer.setAlignment(Pos.CENTER_RIGHT);
-        setMaxWidth(30);
-    }
-
 }

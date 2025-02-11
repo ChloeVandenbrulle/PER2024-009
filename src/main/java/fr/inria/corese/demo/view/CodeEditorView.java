@@ -1,10 +1,13 @@
 package fr.inria.corese.demo.view;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 
-public class CodeEditorView extends HBox {
+public class CodeEditorView extends AnchorPane {
     private final CodeMirrorView codeMirrorView;
     private final IconButtonBarView iconButtonBarView;
 
@@ -12,14 +15,16 @@ public class CodeEditorView extends HBox {
         this.codeMirrorView = new CodeMirrorView();
         this.iconButtonBarView = new IconButtonBarView();
 
-        // Définir HBox.hgrow pour que CodeMirror prenne l'espace disponible
-        HBox.setHgrow(codeMirrorView, Priority.ALWAYS);
+        // CodeMirror prend tout l'espace
+        setTopAnchor(codeMirrorView, 0.0);
+        setRightAnchor(codeMirrorView, 0.0);
+        setBottomAnchor(codeMirrorView, 0.0);
+        setLeftAnchor(codeMirrorView, 0.0);
 
-        // S'assurer que CodeMirror utilise tout l'espace disponible
-        codeMirrorView.setMaxWidth(Double.MAX_VALUE);
-        codeMirrorView.setMaxHeight(Double.MAX_VALUE);
+        // IconButtonBar en haut à droite
+        setTopAnchor(iconButtonBarView, 5.0);
+        setRightAnchor(iconButtonBarView, 5.0);
 
-        iconButtonBarView.setAlignment(Pos.TOP_RIGHT);
         getChildren().addAll(codeMirrorView, iconButtonBarView);
     }
 

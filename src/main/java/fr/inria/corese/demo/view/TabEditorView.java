@@ -3,6 +3,9 @@ package fr.inria.corese.demo.view;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
 
 public class TabEditorView extends TabPane {
     private Tab addTab;
@@ -11,15 +14,24 @@ public class TabEditorView extends TabPane {
     public TabEditorView() {
         setTabClosingPolicy(TabClosingPolicy.ALL_TABS);
 
-        addTabButton = new Button("+");
+        addTabButton = new Button();
+        FontIcon addIcon = new FontIcon(MaterialDesignP.PLUS);
+        addIcon.setIconSize(12);
+        addTabButton.setGraphic(addIcon);
         addTabButton.setStyle("""
-            -fx-background-color: transparent;
-            -fx-border-radius: 20;
-            -fx-background-radius: 20;
-            -fx-min-height: 10;
-            -fx-max-width: 10;
-            """);
+        -fx-background-color: transparent;
+        -fx-min-height: 30;
+        -fx-max-height: 30;
+        """);
+
         addTab = new Tab();
+        addTab.setStyle("""
+        -fx-background-color: transparent;
+        -fx-border-color: #E0E0E0;
+        -fx-border-radius: 5 5 0 0;
+        -fx-border-width: 1 1 0 1;
+        -fx-padding: 0;
+        """);
         addTab.setGraphic(addTabButton);
         addTab.setClosable(false);
 
@@ -28,6 +40,24 @@ public class TabEditorView extends TabPane {
 
     public Tab addNewEditorTab(String title, CodeEditorView codeEditorView) {
         Tab tab = new Tab(title);
+        tab.setStyle("""
+            -fx-background-color: transparent;
+            -fx-border-color: #E0E0E0;
+            -fx-border-width: 0 1 0 1;
+        """);
+        tab.setOnSelectionChanged(e -> {
+            if (tab.isSelected()) {
+                tab.setStyle("""
+                    -fx-border-color: #2196F3;
+                    -fx-border-width: 0 0 1 0;
+                """);
+            } else {
+                tab.setStyle("""
+                    -fx-border-color: #E0E0E0;
+                    -fx-border-width: 0 1 0 1;
+                """);
+            }
+        });
         codeEditorView.setMaxWidth(Double.MAX_VALUE);
         codeEditorView.setMaxHeight(Double.MAX_VALUE);
         tab.setContent(codeEditorView);

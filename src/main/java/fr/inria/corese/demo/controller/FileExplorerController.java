@@ -56,8 +56,6 @@ public class FileExplorerController {
 
         view.getNewFolderButton().setOnAction(e -> addFolder());
 
-        view.getCloseFileExplorerButton().setOnAction(e -> toggleView());
-
         view.getOpenFolderButton().setOnAction(e -> openProject());
 
         System.out.println("All button handlers initialized");
@@ -70,16 +68,6 @@ public class FileExplorerController {
                 System.out.println("Selected: " + selectedItem.getValue());
             }
         });
-    }
-
-    public void toggleView() {
-        model.setIsOpen(!model.getIsOpen());
-
-        if (model.getIsOpen()) {
-            view.openView();
-        } else {
-            view.closeView();
-        }
     }
 
     public FileExplorerModel getModel() {
