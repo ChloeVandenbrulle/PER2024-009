@@ -4,7 +4,9 @@ import fr.inria.corese.demo.model.FileExplorerModel;
 import fr.inria.corese.demo.model.FileItem;
 import fr.inria.corese.demo.view.FileExplorerView;
 import fr.inria.corese.demo.view.popup.NewFilePopup;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TreeItem;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
@@ -55,6 +57,8 @@ public class FileExplorerController {
         view.getNewFolderButton().setOnAction(e -> addFolder());
 
         view.getCloseFileExplorerButton().setOnAction(e -> toggleView());
+
+        view.getOpenFolderButton().setOnAction(e -> openProject());
 
         System.out.println("All button handlers initialized");
     }
@@ -124,11 +128,11 @@ public class FileExplorerController {
 
 
     private void openProject() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Project");
-        File selectedDirectory = fileChooser.showOpenDialog(view.getScene().getWindow());
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Open Project Directory");
+        File selectedDirectory = directoryChooser.showDialog(view.getScene().getWindow());
 
-        if (selectedDirectory != null) {
+        if (selectedDirectory != null && selectedDirectory.isDirectory()) {
             loadProjectStructure(selectedDirectory);
         }
     }
@@ -137,18 +141,37 @@ public class FileExplorerController {
         TreeItem<String> root = new TreeItem<>(directory.getName());
         root.setExpanded(true);
 
+        // Ajouter l'icône de dossier à la racine
+        FontIcon rootFolderIcon = new FontIcon(MaterialDesignF.FOLDER_OUTLINE);
+        rootFolderIcon.setIconSize(20);
+        root.setGraphic(rootFolderIcon);
+
         try {
             populateTreeItems(root, directory);
         } catch (IOException e) {
             e.printStackTrace();
+            // Optionnel : Ajouter une alerte pour informer l'utilisateur
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error Loading Project");
+            alert.setContentText("Failed to load project structure: " + e.getMessage());
+            alert.showAndWait();
         }
 
         view.getTreeView().setRoot(root);
     }
 
     private void populateTreeItems(TreeItem<String> parentItem, File parent) throws IOException {
-        Files.list(parent.toPath()).forEach(path -> {
-            File file = path.toFile();
+        if (!parent.isDirectory()) {
+            return;
+        }
+
+        File[] files = parent.listFiles();
+        if (files == null) {
+            return;
+        }
+
+        for (File file : files) {
             TreeItem<String> item = new TreeItem<>(file.getName());
 
             FontIcon icon;
@@ -156,11 +179,7 @@ public class FileExplorerController {
                 icon = new FontIcon(MaterialDesignF.FOLDER_OUTLINE);
                 icon.setIconSize(20);
                 item.setGraphic(icon);
-                try {
-                    populateTreeItems(item, file);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                populateTreeItems(item, file);
             } else {
                 icon = new FontIcon(MaterialDesignF.FILE_OUTLINE);
                 icon.setIconSize(20);
@@ -168,6 +187,6 @@ public class FileExplorerController {
             }
 
             parentItem.getChildren().add(item);
-        });
+        }
     }
 }

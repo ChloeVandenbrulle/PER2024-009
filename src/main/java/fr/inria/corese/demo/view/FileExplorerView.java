@@ -17,6 +17,7 @@ public class FileExplorerView extends HBox {
     private TreeView<String> treeView;
     private IconButtonView newFileButton;
     private IconButtonView newFolderButton;
+    private Button openFolderButton;
     private IconButtonView closeFileExplorerButton;
     private HBox buttonBar;
     private VBox mainContent;
@@ -83,6 +84,7 @@ public class FileExplorerView extends HBox {
         newFileButton = new IconButtonView(IconButtonType.NEW_FILE);
         newFolderButton = new IconButtonView(IconButtonType.NEW_FOLDER);
         closeFileExplorerButton = new IconButtonView(IconButtonType.CLOSE_FILE_EXPLORER);
+        openFolderButton = new Button("Open Folder");
     }
 
     private void initializeButtonBar() {
@@ -95,7 +97,8 @@ public class FileExplorerView extends HBox {
         mainContent = new VBox(5);
         mainContent.setPadding(new Insets(0, 0, 5, 0));
         VBox.setVgrow(treeView, Priority.ALWAYS);
-        mainContent.getChildren().addAll(buttonBar, treeView);
+        openFolderButton.setAlignment(Pos.CENTER);
+        mainContent.getChildren().addAll(openFolderButton, buttonBar, treeView);
     }
 
     private void initializeButtonContainer() {
@@ -123,6 +126,10 @@ public class FileExplorerView extends HBox {
 
     public Button getCloseFileExplorerButton() {
         return closeFileExplorerButton;
+    }
+
+    public Button getOpenFolderButton() {
+        return openFolderButton;
     }
 
     public void openView() {
