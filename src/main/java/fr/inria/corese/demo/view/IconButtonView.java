@@ -25,13 +25,17 @@ public class IconButtonView extends Button{
             case CLEAR -> createIconButton(MaterialDesignB.BROOM, "Clear");
             case UNDO -> createIconButton(MaterialDesignU.UNDO, "Undo");
             case REDO -> createIconButton(MaterialDesignR.REDO, "Redo");
-            case DOCUMENTATION -> createIconButton(MaterialDesignB.BOOK_OPEN_VARIANT, "Documentation");
+            case DOCUMENTATION -> createIconButton(MaterialDesignO.OPEN_IN_NEW, "Documentation");
             case ZOOM_IN -> createIconButton(MaterialDesignM.MAGNIFY_PLUS_OUTLINE, "Zoom in");
             case ZOOM_OUT -> createIconButton(MaterialDesignM.MAGNIFY_MINUS_OUTLINE, "Zoom out");
             case FULL_SCREEN -> createIconButton(MaterialDesignF.FULLSCREEN, "Full screen");
             case NEW_FILE -> createIconButton(MaterialDesignF.FILE_PLUS_OUTLINE, "New file");
             case NEW_FOLDER -> createIconButton(MaterialDesignF.FOLDER_PLUS_OUTLINE, "New folder");
             case OPEN_FOLDER -> createIconButton(MaterialDesignF.FOLDER_OPEN_OUTLINE, "Open folder");
+            case CLOSE_FILE_EXPLORER -> createIconButton(MaterialDesignF.FOLDER_OUTLINE, "Close file explorer");
+            case RELOAD -> createIconButton(MaterialDesignR.REFRESH, "Reload files");
+            case LOGS -> createIconButton(MaterialDesignB.BOOK_OPEN_VARIANT, "Show logs");
+            case DELETE -> createIconButton(MaterialDesignT.TRASH_CAN, "Clear graph");
         };
     }
 

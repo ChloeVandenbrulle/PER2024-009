@@ -47,24 +47,18 @@ public class FileListView extends VBox {
         }
     }
 
-    private void setupIconButtons() {
-        // Créer les boutons avec icônes
-        clearButton = IconButtonBarFactory.createSingleButton(IconButtonType.CLEAR);
-        reloadButton = IconButtonBarFactory.createSingleButton(IconButtonType.RELOAD);
-        loadButton = IconButtonBarFactory.createSingleButton(IconButtonType.IMPORT);
 
-        // Configurer les tooltips
-        clearButton.setTooltip(new Tooltip("Clear graph"));
-        reloadButton.setTooltip(new Tooltip("Reload files"));
-        loadButton.setTooltip(new Tooltip("Load files"));
+    private void setupIconButtons() {
+        // Créer les boutons avec IconButtonView
+        clearButton = new IconButtonView(IconButtonType.DELETE);
+        reloadButton = new IconButtonView(IconButtonType.RELOAD);
+        loadButton = new IconButtonView(IconButtonType.IMPORT);
 
         // Ajouter les boutons au conteneur
         buttonContainer.getChildren().clear();
         buttonContainer.getChildren().addAll(clearButton, reloadButton, loadButton);
         buttonContainer.setAlignment(Pos.CENTER_LEFT);
-        buttonContainer.setSpacing(10);
     }
-
 
     @FXML
     private void initialize() {
@@ -139,13 +133,13 @@ public class FileListView extends VBox {
             } else {
                 HBox cell = new HBox();
                 cell.setAlignment(Pos.CENTER_LEFT);
-                cell.setSpacing(10); // Ajouter un espacement entre les éléments
+                cell.setSpacing(5);
 
                 Label nameLabel = new Label(item.getName());
                 Region spacer = new Region();
                 HBox.setHgrow(spacer, Priority.ALWAYS);
 
-                Button deleteButton = IconButtonBarFactory.createSingleButton(IconButtonType.CLOSE_FILE_EXPLORER);
+                IconButtonView deleteButton = new IconButtonView(IconButtonType.DELETE);
                 deleteButton.setOnAction(e -> {
                     if (parentView.confirmDelete(item)) {
                         ListView<FileItem> listView = getListView();

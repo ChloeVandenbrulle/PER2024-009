@@ -1,0 +1,17 @@
+.top-bar {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 5;
+    -fx-spacing: 0;
+    -fx-alignment: center-left;
+}
+
+.top-bar .button {
+    -fx-padding: 5 10;
+    -fx-background-radius: 3;
+}
+
+.top-bar HBox {
+    -fx-alignment: center;
+}
