@@ -25,7 +25,6 @@ public class RuleView extends VBox {
             RuleItem ruleItem = new RuleItem(ruleName);
 
             // Configure buttons actions
-            ruleItem.getDuplicateButton().setOnAction(e -> handleDuplicateRule(ruleName));
             ruleItem.getDocumentationButton().setOnAction(e -> handleShowDocumentation(ruleName));
 
             ruleItems.add(ruleItem);

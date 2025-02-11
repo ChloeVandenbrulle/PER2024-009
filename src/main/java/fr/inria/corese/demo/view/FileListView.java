@@ -2,6 +2,13 @@ package fr.inria.corese.demo.view;
 
 import fr.inria.corese.demo.model.FileItem;
 import fr.inria.corese.demo.model.FileListModel;
+import fr.inria.corese.demo.view.popup.IPopup;
+import fr.inria.corese.demo.view.popup.PopupFactory;
+import fr.inria.corese.demo.view.popup.WarningPopup;
+import fr.inria.corese.demo.model.ProjectDataModel;
+import fr.inria.corese.demo.factory.IconButtonBarFactory;
+import fr.inria.corese.demo.enums.IconButtonType;
+import fr.inria.corese.demo.controller.IconButtonBarController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -11,18 +18,21 @@ import java.io.IOException;
 
 public class FileListView extends VBox {
     private FileListModel model;
+    private ProjectDataModel projectDataModel;
+    private PopupFactory popupFactory;
 
     @FXML
     private ListView<FileItem> fileList;
-    @FXML
     private Button clearButton;
-    @FXML
     private Button reloadButton;
-    @FXML
     private Button loadButton;
+
+    @FXML
+    private HBox buttonContainer;
 
     public FileListView() {
         loadFxml();
+        setupIconButtons();
     }
 
     private void loadFxml() {
@@ -37,6 +47,25 @@ public class FileListView extends VBox {
         }
     }
 
+    private void setupIconButtons() {
+        // Créer les boutons avec icônes
+        clearButton = IconButtonBarFactory.createSingleButton(IconButtonType.CLEAR);
+        reloadButton = IconButtonBarFactory.createSingleButton(IconButtonType.RELOAD);
+        loadButton = IconButtonBarFactory.createSingleButton(IconButtonType.IMPORT);
+
+        // Configurer les tooltips
+        clearButton.setTooltip(new Tooltip("Clear graph"));
+        reloadButton.setTooltip(new Tooltip("Reload files"));
+        loadButton.setTooltip(new Tooltip("Load files"));
+
+        // Ajouter les boutons au conteneur
+        buttonContainer.getChildren().clear();
+        buttonContainer.getChildren().addAll(clearButton, reloadButton, loadButton);
+        buttonContainer.setAlignment(Pos.CENTER_LEFT);
+        buttonContainer.setSpacing(10);
+    }
+
+
     @FXML
     private void initialize() {
         setupListView();
@@ -44,7 +73,7 @@ public class FileListView extends VBox {
 
     private void setupListView() {
         if (fileList != null) {
-            fileList.setCellFactory(lv -> new FileListCell());
+            fileList.setCellFactory(lv -> new FileListCell(this));
         }
     }
 
@@ -55,7 +84,11 @@ public class FileListView extends VBox {
         }
     }
 
-    // Getters pour le controller
+    public void setProjectDataModel(ProjectDataModel projectDataModel) {
+        this.projectDataModel = projectDataModel;
+        this.popupFactory = PopupFactory.getInstance(projectDataModel);
+    }
+
     public Button getClearButton() {
         return clearButton;
     }
@@ -72,9 +105,30 @@ public class FileListView extends VBox {
         return fileList;
     }
 
-    // Custom cell pour les fichiers
-    // Modifiez la classe FileListCell :
+    private boolean showWarningPopup(String message) {
+        if (popupFactory != null) {
+            IPopup warningPopup = popupFactory.createPopup(PopupFactory.WARNING_POPUP);
+            warningPopup.setMessage(message);
+            return ((WarningPopup) warningPopup).getResult();
+        }
+        return true;
+    }
+
+    public boolean confirmReload() {
+        return showWarningPopup("Reloading files will reset the current graph. Do you want to continue?");
+    }
+
+    public boolean confirmDelete(FileItem item) {
+        return showWarningPopup("Removing this file will reset the current graph. Do you want to continue?");
+    }
+
     private static class FileListCell extends ListCell<FileItem> {
+        private final FileListView parentView;
+
+        public FileListCell(FileListView parentView) {
+            this.parentView = parentView;
+        }
+
         @Override
         protected void updateItem(FileItem item, boolean empty) {
             super.updateItem(item, empty);
@@ -85,16 +139,18 @@ public class FileListView extends VBox {
             } else {
                 HBox cell = new HBox();
                 cell.setAlignment(Pos.CENTER_LEFT);
+                cell.setSpacing(10); // Ajouter un espacement entre les éléments
 
                 Label nameLabel = new Label(item.getName());
                 Region spacer = new Region();
                 HBox.setHgrow(spacer, Priority.ALWAYS);
 
-                Button deleteButton = new Button("x️");
-                deleteButton.getStyleClass().add("delete-button");
+                Button deleteButton = IconButtonBarFactory.createSingleButton(IconButtonType.CLOSE_FILE_EXPLORER);
                 deleteButton.setOnAction(e -> {
-                    ListView<FileItem> listView = getListView();
-                    listView.getItems().remove(item);
+                    if (parentView.confirmDelete(item)) {
+                        ListView<FileItem> listView = getListView();
+                        listView.getItems().remove(item);
+                    }
                 });
 
                 if (item.isLoading()) {

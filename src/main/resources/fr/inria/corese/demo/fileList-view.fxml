@@ -2,44 +2,14 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 
 <fx:root type="VBox" xmlns="http://javafx.com/javafx"
-         xmlns:fx="http://javafx.com/fxml"
-         spacing="10">
+         xmlns:fx="http://javafx.com/fxml">
 
     <ListView fx:id="fileList" VBox.vgrow="ALWAYS"/>
 
-    <HBox spacing="10" alignment="CENTER_LEFT">
-        <Button fx:id="clearButton" styleClass="action-button">
-            <graphic>
-                <Region styleClass="delete-icon"/>
-            </graphic>
-            <tooltip>
-                <Tooltip text="Clear graph"/>
-            </tooltip>
-            <text>Clear graph</text>
-        </Button>
-
-        <Button fx:id="reloadButton" styleClass="action-button">
-            <graphic>
-                <Region styleClass="refresh-icon"/>
-            </graphic>
-            <tooltip>
-                <Tooltip text="Reload files"/>
-            </tooltip>
-            <text>Reload files</text>
-        </Button>
-
-        <Button fx:id="loadButton" styleClass="action-button">
-            <graphic>
-                <Region styleClass="folder-plus-icon"/>
-            </graphic>
-            <tooltip>
-                <Tooltip text="Load files"/>
-            </tooltip>
-            <text>Load files</text>
-        </Button>
+    <HBox fx:id="buttonContainer" spacing="5" alignment="CENTER_LEFT">
+        <!-- Les boutons seront ajoutés dynamiquement dans le code Java -->
     </HBox>
 
 </fx:root>

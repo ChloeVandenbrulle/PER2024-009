@@ -61,6 +61,7 @@ public class DataViewController {
         if (fileListContainer != null) {
             fileListView = new FileListView();
             fileListView.setModel(model.getFileListModel());
+            fileListView.setProjectDataModel(model); // Nouvelle ligne
             fileListContainer.getChildren().add(fileListView);
             VBox.setVgrow(fileListView, Priority.ALWAYS);
 
@@ -162,8 +163,10 @@ public class DataViewController {
     }
 
     private void handleReloadFiles() {
-        model.reloadFiles();
-        updateView();
+        if (fileListView.confirmReload()) {
+            model.reloadFiles();
+            updateView();
+        }
     }
 
     private void handleShowLogs() {
@@ -181,16 +184,23 @@ public class DataViewController {
             try {
                 model.addLogEntry("Starting to load file: " + file.getName());
 
-                // Warn user about graph reset
-                IPopup warningPopup = popupFactory.createPopup(PopupFactory.WARNING_POPUP);
-                warningPopup.setMessage("Loading this file will reset the current graph. Do you want to continue?");
-                boolean result = ((WarningPopup) warningPopup).getResult();
+                // Check if there are already files loaded
+                if (!model.getFileListModel().getFiles().isEmpty()) {
+                    // Show warning popup before loading
+                    IPopup warningPopup = popupFactory.createPopup(PopupFactory.WARNING_POPUP);
+                    warningPopup.setMessage("Loading this file will reset the current graph. Do you want to continue?");
+                    boolean result = ((WarningPopup) warningPopup).getResult();
 
-                if (result) {
-                    model.loadFile(file);
-                    model.addFile(file.getName());
-                    model.addLogEntry("File loaded successfully: " + file.getName());
+                    if (!result) {
+                        model.addLogEntry("File loading cancelled by user: " + file.getName());
+                        return;
+                    }
                 }
+
+                model.loadFile(file);
+                model.addFile(file.getName());
+                model.addLogEntry("File loaded successfully: " + file.getName());
+
             } catch (Exception e) {
                 String errorMessage = "Error loading file: " + e.getMessage();
                 model.addLogEntry("ERROR: " + errorMessage);
@@ -202,7 +212,6 @@ public class DataViewController {
             updateView();
         }
     }
-
 
     private void handleLoadRuleFile() {
         FileChooser fileChooser = new FileChooser();
