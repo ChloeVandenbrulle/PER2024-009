@@ -52,8 +52,6 @@ public class NewFilePopup extends BasePopup {
         getDialogPane().setContent(contentPane);
         getDialogPane().getButtonTypes().addAll(ButtonType.CLOSE);
         setOnCloseRequest(event -> closePopup());
-
-        setupUI();
     }
 
     public Button getConfirmButton() {
@@ -70,10 +68,6 @@ public class NewFilePopup extends BasePopup {
 
     public void setOnConfirm(Runnable callback) {
         this.onConfirm = callback;
-    }
-
-    private void setupUI() {
-
     }
 
 }

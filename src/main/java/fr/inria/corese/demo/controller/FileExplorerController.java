@@ -4,6 +4,7 @@ import fr.inria.corese.demo.model.FileExplorerModel;
 import fr.inria.corese.demo.model.FileItem;
 import fr.inria.corese.demo.view.FileExplorerView;
 import fr.inria.corese.demo.view.popup.NewFilePopup;
+import fr.inria.corese.demo.view.popup.PopupFactory;
 import javafx.scene.control.TreeItem;
 import javafx.stage.DirectoryChooser;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -17,16 +18,16 @@ public class FileExplorerController {
     private FileExplorerModel model;
     private FileExplorerView view;
     private Consumer<File> onFileOpenRequest;
-
+    private ContextMenuController contextMenuController;
 
     public FileExplorerController() {
         this.model = new FileExplorerModel();
         this.view = new FileExplorerView();
+        this.contextMenuController = new ContextMenuController();
 
         initializeTreeView();
         initializeButtons();
         initializeTreeViewEvents();
-
     }
 
     private void initializeTreeView() {
@@ -52,10 +53,8 @@ public class FileExplorerController {
     }
 
     private void initializeButtons() {
-        view.getNewFileButton().setOnAction(e -> addFile());
-
-        view.getNewFolderButton().setOnAction(e -> addFolder());
-
+        view.getNewFileButton().setOnAction(e -> handleAddFile());
+        view.getNewFolderButton().setOnAction(e -> handleAddFolder());
         view.getOpenFolderButton().setOnAction(e -> openProject());
 
         System.out.println("All button handlers initialized");
@@ -78,6 +77,25 @@ public class FileExplorerController {
                 }
             }
         });
+
+        view.getTreeView().setOnContextMenuRequested(event -> {
+            TreeItem<String> selectedItem = view.getTreeView().getSelectionModel().getSelectedItem();
+            if (selectedItem != null) {
+                String path = buildPath(selectedItem);
+                File file = new File(path);
+
+                // Display the ContextMenu
+                contextMenuController.show(event.getScreenX(), event.getScreenY(), file, path, view.getTreeView());
+
+                contextMenuController.setOnItemDeleted(item -> {
+                    selectedItem.getParent().getChildren().remove(selectedItem);
+                });
+
+                contextMenuController.setOnItemRenamed(newItem -> {
+                    selectedItem.setValue(newItem.getValue());
+                });
+            }
+        });
     }
 
     private String buildPath(TreeItem<String> item) {
@@ -87,12 +105,13 @@ public class FileExplorerController {
             path.insert(0, File.separator).insert(0, parent.getValue());
             parent = parent.getParent();
         }
-        return model.getRootPath()+"\\"+path.toString();
+        return model.getRootPath()+"\\"+path;
     }
 
     public void setOnFileOpenRequest(Consumer<File> handler) {
         this.onFileOpenRequest = handler;
     }
+
 
     public FileExplorerModel getModel() {
         return model;
@@ -102,14 +121,15 @@ public class FileExplorerController {
         return view;
     }
 
-    private void addFile() {
+    private void handleAddFile() {
         System.out.println("Add file button clicked");
         TreeItem<String> selectedItem = view.getTreeView().getSelectionModel().getSelectedItem();
         if (selectedItem == null) {
             selectedItem = view.getTreeView().getRoot();
         }
 
-        NewFilePopup newFilePopup = new NewFilePopup();
+
+        NewFilePopup newFilePopup = (NewFilePopup) PopupFactory.getInstance(null).createPopup("newFile");
         TreeItem<String> finalSelectedItem = selectedItem;
         newFilePopup.setOnConfirm(() -> {
             String fileName = newFilePopup.getFileName();
@@ -120,14 +140,14 @@ public class FileExplorerController {
         newFilePopup.displayPopup();
     }
 
-    private void addFolder() {
+    private void handleAddFolder() {
         System.out.println("Add folder button clicked");
         TreeItem<String> selectedItem = view.getTreeView().getSelectionModel().getSelectedItem();
         if (selectedItem == null) {
             selectedItem = view.getTreeView().getRoot();
         }
 
-        NewFilePopup newFolderPopup = new NewFilePopup();
+        NewFilePopup newFolderPopup = (NewFilePopup) PopupFactory.getInstance(null).createPopup("newFile");
         TreeItem<String> finalSelectedItem = selectedItem;
         newFolderPopup.setOnConfirm(() -> {
             String folderName = newFolderPopup.getFileName();
@@ -146,7 +166,6 @@ public class FileExplorerController {
 
         if (selectedDirectory != null && selectedDirectory.isDirectory()) {
             loadProjectStructure(selectedDirectory);
-            System.out.println("selectedDirectory.getPath : " + selectedDirectory.getPath());
             model.setRootPath(selectedDirectory.getPath());
         }
     }
@@ -155,7 +174,6 @@ public class FileExplorerController {
         TreeItem<String> root = new TreeItem<>(directory.getName());
         root.setExpanded(true);
 
-        // Ajouter l'icône de dossier à la racine
         FontIcon rootFolderIcon = new FontIcon(MaterialDesignF.FOLDER_OUTLINE);
         rootFolderIcon.setIconSize(20);
         root.setGraphic(rootFolderIcon);
