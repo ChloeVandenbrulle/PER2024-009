@@ -3,6 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import fr.inria.corese.demo.view.TopBar?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -10,11 +11,7 @@
             stylesheets="@../../../../styles/buttons.css">
 
     <top>
-        <HBox fx:id="topButtonBox" styleClass="button-container">
-            <padding>
-                <Insets top="10" right="10" bottom="10" left="10"/>
-            </padding>
-        </HBox>
+        <TopBar fx:id="topBar"/>
     </top>
 
     <center>

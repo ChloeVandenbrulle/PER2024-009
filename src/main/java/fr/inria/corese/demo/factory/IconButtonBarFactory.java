@@ -5,10 +5,6 @@ import fr.inria.corese.demo.enums.IconButtonBarType;
 import fr.inria.corese.demo.enums.IconButtonType;
 import fr.inria.corese.demo.model.IconButtonBarModel;
 import fr.inria.corese.demo.view.IconButtonBarView;
-import javafx.scene.control.Button;
-import org.kordamp.ikonli.feather.Feather;
-import org.kordamp.ikonli.javafx.FontIcon;
-import atlantafx.base.theme.Styles;
 import java.util.List;
 
 public class IconButtonBarFactory {
@@ -62,44 +58,6 @@ public class IconButtonBarFactory {
                     IconButtonType.FULL_SCREEN
             );
         };
-    }
-
-    public static Button createSingleButton(IconButtonType type) {
-        Button button = new Button();
-        FontIcon icon = new FontIcon();
-        icon.getStyleClass().add(Styles.SMALL);
-
-        // Configurer le style et l'icône en fonction du type
-        switch (type) {
-            case CLEAR -> {
-                icon.setIconCode(Feather.TRASH_2);
-                button.getStyleClass().addAll(Styles.BUTTON_ICON, Styles.DANGER, Styles.SMALL);
-            }
-            case RELOAD -> {
-                icon.setIconCode(Feather.REFRESH_CW);
-                button.getStyleClass().addAll(Styles.BUTTON_ICON, Styles.SUCCESS, Styles.SMALL);
-            }
-            case IMPORT -> {
-                icon.setIconCode(Feather.FOLDER_PLUS);
-                button.getStyleClass().addAll(Styles.BUTTON_ICON, Styles.SUCCESS, Styles.SMALL);
-            }
-            case CLOSE_FILE_EXPLORER -> {
-                icon.setIconCode(Feather.X);
-                button.getStyleClass().addAll(Styles.BUTTON_ICON, Styles.DANGER, Styles.SMALL);
-            }
-            case DOCUMENTATION -> {
-                icon.setIconCode(Feather.EXTERNAL_LINK);
-                button.getStyleClass().addAll(Styles.BUTTON_ICON, Styles.SUCCESS, Styles.SMALL);
-            }
-            default -> {
-                icon.setIconCode(Feather.HELP_CIRCLE);
-                button.getStyleClass().add(Styles.BUTTON_ICON);
-            }
-        }
-
-        button.setGraphic(icon);
-        button.getStyleClass().add(Styles.FLAT);
-        return button;
     }
 
 }

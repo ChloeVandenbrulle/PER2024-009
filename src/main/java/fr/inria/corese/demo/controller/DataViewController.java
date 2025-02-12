@@ -1,10 +1,12 @@
 package fr.inria.corese.demo.controller;
 
+import fr.inria.corese.demo.enums.IconButtonType;
 import fr.inria.corese.demo.model.ButtonType;
 import fr.inria.corese.demo.model.RuleModel;
 import fr.inria.corese.demo.view.DataView;
 import fr.inria.corese.demo.model.ProjectDataModel;
 import fr.inria.corese.demo.view.FileListView;
+import fr.inria.corese.demo.view.TopBar;
 import fr.inria.corese.demo.view.popup.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,6 +20,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 public class DataViewController {
@@ -46,6 +49,8 @@ public class DataViewController {
     private Label graphLabel;
     @FXML
     private Label rulesLoadedLabel;
+    @FXML
+    private TopBar topBar;
 
 
     public DataViewController() {
@@ -56,12 +61,28 @@ public class DataViewController {
 
     @FXML
     public void initialize() {
+        // Configuration de la TopBar
+        topBar.addLeftButtons(List.of(
+                IconButtonType.OPEN_FILE,
+                IconButtonType.SAVE
+        ));
+
+        topBar.addRightButtons(List.of(
+                IconButtonType.LOGS
+        ));
+
+        // Configuration des handlers pour les boutons
+        topBar.setOnAction(IconButtonType.OPEN_FILE, this::handleOpenProject);
+        topBar.setOnAction(IconButtonType.SAVE, this::handleSaveAs);
+        topBar.setOnAction(IconButtonType.LOGS, this::handleShowLogs);
+
+        // Initialisation du ButtonManager
         buttonManager = new ButtonManager(model);
 
         if (fileListContainer != null) {
             fileListView = new FileListView();
             fileListView.setModel(model.getFileListModel());
-            fileListView.setProjectDataModel(model); // Nouvelle ligne
+            fileListView.setProjectDataModel(model);
             fileListContainer.getChildren().add(fileListView);
             VBox.setVgrow(fileListView, Priority.ALWAYS);
 
@@ -70,9 +91,7 @@ public class DataViewController {
             fileListView.getLoadButton().setOnAction(e -> handleLoadFiles());
         }
 
-        setupTopButtons();
         setupConfigButtons();
-        setupStylesheets();
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fr/inria/corese/demo/rule-view.fxml"));
@@ -82,7 +101,6 @@ public class DataViewController {
             ruleViewController.injectDependencies(model, ruleModel);
             ruleViewController.initializeRules();
 
-            // Add the loaded view to your layout
             if (configActionBox != null && configActionBox.getParent() instanceof VBox) {
                 VBox parent = (VBox) configActionBox.getParent();
                 parent.getChildren().add(0, ruleView);
