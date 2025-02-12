@@ -24,10 +24,6 @@ public class ContextMenuView {
         contextMenu.show(anchor, x, y);
     }
 
-    public void hide() {
-        contextMenu.hide();
-    }
-
     public MenuItem getRenameItem() {
         return renameItem;
     }

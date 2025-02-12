@@ -1,8 +1,11 @@
 package fr.inria.corese.demo.view;
 
+import javafx.animation.ScaleTransition;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
@@ -16,7 +19,25 @@ public class TabEditorView extends TabPane {
 
         addTabButton = new Button();
         FontIcon addIcon = new FontIcon(MaterialDesignP.PLUS);
-        addIcon.setIconSize(12);
+        addIcon.setIconSize(10);
+
+        ScaleTransition scaleIn = new ScaleTransition(Duration.millis(150), addIcon);
+        scaleIn.setToX(1.1);
+        scaleIn.setToY(1.1);
+
+        ScaleTransition scaleOut = new ScaleTransition(Duration.millis(150), addIcon);
+        scaleOut.setToX(1.0);
+        scaleOut.setToY(1.0);
+
+        addIcon.setOnMouseEntered(e -> {
+            addIcon.setCursor(Cursor.HAND);
+            scaleIn.playFromStart();
+        });
+
+        addIcon.setOnMouseExited(e -> {
+            addIcon.setCursor(Cursor.DEFAULT);
+            scaleOut.playFromStart();
+        });
         addTabButton.setGraphic(addIcon);
         addTabButton.setStyle("""
         -fx-background-color: transparent;

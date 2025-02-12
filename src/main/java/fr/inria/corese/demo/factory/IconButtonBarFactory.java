@@ -37,7 +37,6 @@ public class IconButtonBarFactory {
             case VALIDATION -> List.of(
                     IconButtonType.SAVE,
                     IconButtonType.OPEN_FILE,
-                    IconButtonType.IMPORT,
                     IconButtonType.EXPORT,
                     IconButtonType.CLEAR,
                     IconButtonType.UNDO,

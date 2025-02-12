@@ -18,7 +18,7 @@ public class IconButtonView extends Button{
 
     private void createIcon(IconButtonType type) {
         switch (type) {
-            case SAVE -> createIconButton(MaterialDesignC.CONTENT_SAVE_OUTLINE, "Save");
+            case SAVE -> createIconButton(MaterialDesignC.CONTENT_SAVE_OUTLINE, "Save as");
             case OPEN_FILE -> createIconButton(MaterialDesignF.FOLDER_OPEN, "Open file");
             case EXPORT -> createIconButton(MaterialDesignE.EXPORT, "Export");
             case IMPORT -> createIconButton(MaterialDesignI.IMPORT, "Import");
