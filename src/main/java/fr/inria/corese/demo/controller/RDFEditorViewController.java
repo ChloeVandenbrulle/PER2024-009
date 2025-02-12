@@ -30,6 +30,7 @@ public class RDFEditorViewController {
             setupFileTree();
             initializeTabEditor();
             initializeSplitPane();
+            setupComponentInteractions();
 
             System.out.println("RDFEditorViewController initialization complete");
         } catch (Exception e) {
@@ -45,10 +46,15 @@ public class RDFEditorViewController {
         editorContainer.getChildren().add(tabEditorController.getView());
     }
 
-
     private void setupFileTree() {
         fileExplorerController = new FileExplorerController();
         fileExplorerContainer.getChildren().add(fileExplorerController.getView());
+    }
+
+    private void setupComponentInteractions() {
+        fileExplorerController.setOnFileOpenRequest(file -> {
+            tabEditorController.openFile(file);
+        });
     }
 
     private void initializeSplitPane() {

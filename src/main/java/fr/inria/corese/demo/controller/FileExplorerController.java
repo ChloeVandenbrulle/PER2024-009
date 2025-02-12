@@ -4,20 +4,20 @@ import fr.inria.corese.demo.model.FileExplorerModel;
 import fr.inria.corese.demo.model.FileItem;
 import fr.inria.corese.demo.view.FileExplorerView;
 import fr.inria.corese.demo.view.popup.NewFilePopup;
-import javafx.scene.control.Alert;
 import javafx.scene.control.TreeItem;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.util.function.Consumer;
 
 public class FileExplorerController {
     private FileExplorerModel model;
     private FileExplorerView view;
+    private Consumer<File> onFileOpenRequest;
+
 
     public FileExplorerController() {
         this.model = new FileExplorerModel();
@@ -67,7 +67,31 @@ public class FileExplorerController {
             if (selectedItem != null) {
                 System.out.println("Selected: " + selectedItem.getValue());
             }
+            if (event.getClickCount() == 2) {
+                System.out.println("Double click detected");
+                if (selectedItem != null && selectedItem.getChildren().isEmpty()) {
+                    String path = buildPath(selectedItem);
+                    File file = new File(path);
+                    if (file.isFile() && onFileOpenRequest != null) {
+                        onFileOpenRequest.accept(file);
+                    }
+                }
+            }
         });
+    }
+
+    private String buildPath(TreeItem<String> item) {
+        StringBuilder path = new StringBuilder(item.getValue());
+        TreeItem<String> parent = item.getParent();
+        while (parent != null && parent.getParent() != null && parent.getValue() != null) {
+            path.insert(0, File.separator).insert(0, parent.getValue());
+            parent = parent.getParent();
+        }
+        return model.getRootPath()+"\\"+path.toString();
+    }
+
+    public void setOnFileOpenRequest(Consumer<File> handler) {
+        this.onFileOpenRequest = handler;
     }
 
     public FileExplorerModel getModel() {
@@ -122,6 +146,8 @@ public class FileExplorerController {
 
         if (selectedDirectory != null && selectedDirectory.isDirectory()) {
             loadProjectStructure(selectedDirectory);
+            System.out.println("selectedDirectory.getPath : " + selectedDirectory.getPath());
+            model.setRootPath(selectedDirectory.getPath());
         }
     }
 
@@ -138,12 +164,6 @@ public class FileExplorerController {
             populateTreeItems(root, directory);
         } catch (IOException e) {
             e.printStackTrace();
-            // Optionnel : Ajouter une alerte pour informer l'utilisateur
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Error Loading Project");
-            alert.setContentText("Failed to load project structure: " + e.getMessage());
-            alert.showAndWait();
         }
 
         view.getTreeView().setRoot(root);
@@ -165,12 +185,12 @@ public class FileExplorerController {
             FontIcon icon;
             if (file.isDirectory()) {
                 icon = new FontIcon(MaterialDesignF.FOLDER_OUTLINE);
-                icon.setIconSize(20);
+                icon.setIconSize(5);
                 item.setGraphic(icon);
                 populateTreeItems(item, file);
             } else {
                 icon = new FontIcon(MaterialDesignF.FILE_OUTLINE);
-                icon.setIconSize(20);
+                icon.setIconSize(5);
                 item.setGraphic(icon);
             }
 

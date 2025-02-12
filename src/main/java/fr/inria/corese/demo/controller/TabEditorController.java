@@ -7,6 +7,10 @@ import fr.inria.corese.demo.view.CodeEditorView;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.Tab;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+
 public class TabEditorController {
     private final TabEditorView view;
     private final TabEditorModel model;
@@ -32,7 +36,7 @@ public class TabEditorController {
         });
 
         view.getAddTabButton().setOnAction(e -> {
-            addNewTab("Untitled ");
+            addNewTab("Untitled");
         });
     }
 
@@ -42,7 +46,41 @@ public class TabEditorController {
         model.addTabModel(tab, codeEditorController);
     }
 
+    private void addNewTab(File file) {
+        try {
+            String content = Files.readString(file.toPath());
+            CodeEditorController codeEditorController = new CodeEditorController(type, content);
+            Tab tab = view.addNewEditorTab(file.getName(), codeEditorController.getView());
+            model.addTabModel(tab, codeEditorController);
+
+            System.out.println("content : "+ content);
+            // Définir le contenu de l'éditeur
+//            codeEditorController.getModel().setContent(content);
+            System.out.println("content dans model "+codeEditorController.getModel().getContent());
+            codeEditorController.getModel().setCurrentFile(file.getAbsolutePath());
+//            codeEditorController.getView().getCodeMirrorView().setContent(codeEditorController.getModel().getContent());
+            System.out.println("content dans view "+codeEditorController.getView().getCodeMirrorView().getContent());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void openFile(File file) {
+        for (Tab tab : view.getTabs()) {
+            if (tab != view.getAddTab() && file.getName().equals(tab.getText())) {
+                view.getSelectionModel().select(tab);
+                return;
+            }
+        }
+        addNewTab(file);
+    }
+
     public TabEditorView getView() {
         return view;
+    }
+
+    public TabEditorModel getModel() {
+        return model;
     }
 }

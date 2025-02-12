@@ -17,6 +17,7 @@ public class CodeEditorController {
     private final IconButtonBarController iconButtonBarController;
 
     private CodeMirrorView editorContainer;
+    private String content = "";
 
     public CodeEditorController(IconButtonBarType type) {
         this.view = new CodeEditorView();
@@ -27,7 +28,18 @@ public class CodeEditorController {
         this.editorContainer = view.getCodeMirrorView();
 
         initializeComponents();
-//        setupBindings();
+    }
+
+    public CodeEditorController(IconButtonBarType type, String content) {
+        this.view = new CodeEditorView();
+        this.model = new CodeEditorModel();
+        this.iconButtonBarController = IconButtonBarFactory.create(type);
+        System.out.println("Initializing CodeEditorController");
+        this.content = content;
+
+        this.editorContainer = view.getCodeMirrorView();
+
+        initializeComponents();
     }
 
     private void initializeComponents() {
@@ -56,12 +68,12 @@ public class CodeEditorController {
                     ex:resource1 rdf:type rdfs:Resource .
                     """;
 
-                editorContainer.setContent(initialContent);
-                view.setCodeMirrorViewContent(initialContent);
+                editorContainer.setContent(content);
+                view.setCodeMirrorViewContent(content);
                 System.out.println("CodeMirrorView content : "+ view.getCodeMirrorView().getContent());
 
                 if (model != null) {
-                    model.setContent(initialContent);
+                    model.setContent(content);
 
                     // Écouter les changements de la vue
                     editorContainer.contentProperty().addListener((obs, oldVal, newVal) -> {

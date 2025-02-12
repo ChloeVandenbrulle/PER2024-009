@@ -8,15 +8,16 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FileExplorerModel {
     private List<FileItem> files;
     private List<FileItem> folders;
+    private String rootPath;
 
     private BooleanProperty isOpen = new SimpleBooleanProperty(true);
-
 
     public FileExplorerModel() {
         this.files = new ArrayList<>();
@@ -41,6 +42,14 @@ public class FileExplorerModel {
 
     public List<FileItem> getFiles() {
         return files;
+    }
+
+    public String getRootPath() {
+        return rootPath;
+    }
+
+    public void setRootPath(String path) {
+        rootPath = path;
     }
 
     public void addFile(TreeItem node, FileItem file) {

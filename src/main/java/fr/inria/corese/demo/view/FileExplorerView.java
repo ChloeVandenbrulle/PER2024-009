@@ -4,15 +4,11 @@ import fr.inria.corese.demo.enums.IconButtonType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBase;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign2.*;
 
 public class FileExplorerView extends HBox {
     private TreeView<String> treeView;
@@ -47,18 +43,19 @@ public class FileExplorerView extends HBox {
                     setGraphic(null);
                 } else {
                     setText(item);
+                    setStyle("-fx-font-size: 12px;");
 
                     if (getTreeItem().getGraphic() != null) {
                         setGraphic(getTreeItem().getGraphic());
                     }
 
                     setOnMouseEntered(e ->
-                            setStyle("-fx-background-color: #CCE8FF;")
+                            setStyle("-fx-background-color: #CCE8FF; -fx-font-size: 12px")
                     );
 
                     setOnMouseExited(e -> {
                         if (!isSelected()) {
-                            setStyle("");
+                            setStyle("-fx-font-size: 12px");
                         }
                     });
 
