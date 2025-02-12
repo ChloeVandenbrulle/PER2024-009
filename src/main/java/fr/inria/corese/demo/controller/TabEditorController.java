@@ -3,9 +3,10 @@ package fr.inria.corese.demo.controller;
 import fr.inria.corese.demo.enums.IconButtonBarType;
 import fr.inria.corese.demo.model.TabEditorModel;
 import fr.inria.corese.demo.view.TabEditorView;
-import fr.inria.corese.demo.view.CodeEditorView;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.Tab;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.KeyCode;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,13 +15,15 @@ import java.nio.file.Files;
 public class TabEditorController {
     private final TabEditorView view;
     private final TabEditorModel model;
-    private IconButtonBarType type;
+    private final IconButtonBarType type;
 
     public TabEditorController(IconButtonBarType type) {
         this.view = new TabEditorView();
         this.model = new TabEditorModel();
         this.type = type;
+
         initializeFirstTab();
+        initializeKeyboardShortcuts();
     }
 
     private void initializeFirstTab() {
@@ -40,6 +43,29 @@ public class TabEditorController {
         });
     }
 
+    private void initializeKeyboardShortcuts(){
+        view.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+                    if (event.isControlDown() && event.getCode() == KeyCode.S) {
+                        handleSaveShortcut();
+                        event.consume();
+                    }
+                });
+            }
+        });
+    }
+
+    private void handleSaveShortcut() {
+        Tab selectedTab = view.getSelectionModel().getSelectedItem();
+        if (selectedTab != null && selectedTab != view.getAddTab()) {
+            CodeEditorController activeController = model.getControllerForTab(selectedTab);
+            if (activeController != null) {
+                activeController.saveFile();
+            }
+        }
+    }
+
     public void addNewTab(String title) {
         CodeEditorController codeEditorController = new CodeEditorController(type);
         Tab tab = view.addNewEditorTab(title, codeEditorController.getView());
@@ -53,13 +79,16 @@ public class TabEditorController {
             Tab tab = view.addNewEditorTab(file.getName(), codeEditorController.getView());
             model.addTabModel(tab, codeEditorController);
 
-            System.out.println("content : "+ content);
-            // Définir le contenu de l'éditeur
-//            codeEditorController.getModel().setContent(content);
-            System.out.println("content dans model "+codeEditorController.getModel().getContent());
-            codeEditorController.getModel().setCurrentFile(file.getAbsolutePath());
-//            codeEditorController.getView().getCodeMirrorView().setContent(codeEditorController.getModel().getContent());
-            System.out.println("content dans view "+codeEditorController.getView().getCodeMirrorView().getContent());
+            codeEditorController.getModel().setCurrentFile(file.getPath());
+
+            tab.setOnClosed(event -> {
+                CodeEditorController controller = model.getControllerForTab(tab);
+                if (controller != null && controller.getModel().isModified()) {
+                    // TODO: Ajouter une popup pour demander si l'utilisateur veut sauvegarder
+                    controller.saveFile();
+                }
+                model.getTabControllers().remove(tab);
+            });
 
         } catch (IOException e) {
             e.printStackTrace();

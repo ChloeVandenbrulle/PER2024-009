@@ -11,7 +11,7 @@ public class CodeEditorModel {
     private final Stack<CodeEditorChange> redoStack = new Stack<>();
     private String currentFile;
     private boolean isModified;
-    private static final int MAX_HISTORY = 500; // Limite la taille de l'historique
+    private static final int MAX_HISTORY = 500;
 
     public StringProperty contentProperty() {
         return content;

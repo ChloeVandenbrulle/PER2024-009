@@ -7,15 +7,14 @@ import fr.inria.corese.demo.model.CodeEditorModel;
 import fr.inria.corese.demo.view.CodeEditorView;
 import fr.inria.corese.demo.view.CodeMirrorView;
 import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.scene.layout.VBox;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class CodeEditorController {
     private final CodeEditorView view;
     private final CodeEditorModel model;
     private boolean isUpdatingContent = false;
     private final IconButtonBarController iconButtonBarController;
-
     private CodeMirrorView editorContainer;
     private String content = "";
 
@@ -43,7 +42,7 @@ public class CodeEditorController {
     }
 
     private void initializeComponents() {
-        // Initialise la barre de boutons
+        // Initialise the button bar
         view.getIconButtonBarView().getChildren().add(iconButtonBarController.getView());
         iconButtonBarController.getModel().setCodeEditorModel(model);
 
@@ -58,19 +57,8 @@ public class CodeEditorController {
 
         Platform.runLater(() -> {
             try {
-                // Contenu initial
-                String initialContent = """
-                    @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-                    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-                    @prefix ex: <http://example.org/> .
-
-                    # Exemple de triplet RDF
-                    ex:resource1 rdf:type rdfs:Resource .
-                    """;
-
                 editorContainer.setContent(content);
                 view.setCodeMirrorViewContent(content);
-                System.out.println("CodeMirrorView content : "+ view.getCodeMirrorView().getContent());
 
                 if (model != null) {
                     model.setContent(content);
@@ -100,6 +88,24 @@ public class CodeEditorController {
             });
         });
     }
+
+    public void saveFile() {
+        String currentFile = model.getCurrentFile();
+        System.out.println("Saving file: " + currentFile);
+
+        if (currentFile != null) {
+            // Save the file if it already exists
+            try (FileWriter writer = new FileWriter(currentFile)) {
+                writer.write(model.getContent());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            // Show Save As dialog if the file does not exist
+            iconButtonBarController.getView().getButton(IconButtonType.SAVE).fire();
+        }
+    }
+
 
     public CodeEditorModel getModel() {
         return model;
