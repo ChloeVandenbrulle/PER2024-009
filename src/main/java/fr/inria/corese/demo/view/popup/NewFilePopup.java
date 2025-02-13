@@ -1,73 +1,51 @@
 package fr.inria.corese.demo.view.popup;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.GridPane;
 
 public class NewFilePopup extends BasePopup {
-    private Button confirmButton;
-    private Button cancelButton;
     private TextField fileNameField;
     private Runnable onConfirm;
 
     public NewFilePopup() {
         setTitle("New File");
+        setHeaderText("Create new file");
 
-        BorderPane contentPane = new BorderPane();
-        Label messageLabel = new Label("New file:");
-        messageLabel.textProperty().bind(new SimpleStringProperty(message));
-
-        confirmButton = new Button("Confirm");
-        confirmButton.setOnAction(e -> {
-            if (onConfirm != null) {
-                onConfirm.run();
-            }
-            closePopup();
-        });
-
-        cancelButton = new Button("Cancel");
-        cancelButton.setOnAction(e -> closePopup());
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
 
         fileNameField = new TextField();
-        fileNameField.setAlignment(Pos.CENTER_LEFT);
-        fileNameField.setPromptText("Enter file name");
+        grid.add(new Label("File name:"), 0, 0);
+        grid.add(fileNameField, 1, 0);
 
-        contentPane.setPadding(new Insets(10));
+        getDialogPane().setContent(grid);
 
-        HBox buttonBox = new HBox(10);
-        buttonBox.setAlignment(Pos.CENTER_RIGHT);
-        buttonBox.setPadding(new Insets(20, 0, 0, 0));
-        buttonBox.getChildren().addAll(cancelButton, confirmButton);
+        ButtonType confirmButtonType = new ButtonType("Create", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        getDialogPane().getButtonTypes().addAll(confirmButtonType, cancelButtonType);
 
-        contentPane.setTop(messageLabel);
-        contentPane.setCenter(fileNameField);
-        contentPane.setBottom(buttonBox);
-
-        getDialogPane().setContent(contentPane);
-        getDialogPane().getButtonTypes().addAll(ButtonType.CLOSE);
-        setOnCloseRequest(event -> closePopup());
-    }
-
-    public Button getConfirmButton() {
-        return confirmButton;
-    }
-
-    public Button getCancelButton() {
-        return cancelButton;
+        setResultConverter(dialogButton -> {
+            if (dialogButton == confirmButtonType) {
+                if (onConfirm != null) {
+                    onConfirm.run();
+                }
+            }
+            return null;
+        });
     }
 
     public String getFileName() {
         return fileNameField.getText();
     }
 
+    public void setInitialName(String name) {
+        fileNameField.setText(name);
+    }
+
     public void setOnConfirm(Runnable callback) {
         this.onConfirm = callback;
     }
-
 }
