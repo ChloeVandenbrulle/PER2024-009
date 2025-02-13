@@ -11,7 +11,6 @@ public class DataView extends BorderPane {
     private Button saveAsButton;
     private Button showLogsButton;
     private FileListView fileListView;
-    private RuleConfigView ruleConfigView;
     private ProjectStatisticsView projectStatisticsView;
 
     public DataView() {
@@ -25,7 +24,6 @@ public class DataView extends BorderPane {
         showLogsButton = new Button("Show logs");
 
         fileListView = new FileListView();
-        ruleConfigView = new RuleConfigView();
         projectStatisticsView = new ProjectStatisticsView();
     }
 
@@ -42,7 +40,6 @@ public class DataView extends BorderPane {
         // Center content with files and rules
         BorderPane centerContent = new BorderPane();
         centerContent.setLeft(fileListView);
-        centerContent.setRight(ruleConfigView);
         centerContent.setBottom(projectStatisticsView);
 
         setTop(toolbar);
@@ -55,6 +52,5 @@ public class DataView extends BorderPane {
     public Button getSaveAsButton() { return saveAsButton; }
     public Button getShowLogsButton() { return showLogsButton; }
     public FileListView getFileListView() { return fileListView; }
-    public RuleConfigView getRuleConfigView() { return ruleConfigView; }
     public ProjectStatisticsView getProjectStatisticsView() { return projectStatisticsView; }
 }

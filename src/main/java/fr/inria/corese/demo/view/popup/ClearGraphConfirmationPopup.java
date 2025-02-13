@@ -12,6 +12,15 @@ public class ClearGraphConfirmationPopup implements IPopup {
         alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Clear Graph Confirmation");
         alert.setHeaderText(null);
+
+        // Définir le bouton OK comme bouton par défaut
+        ButtonType okButton = ButtonType.OK;
+        ButtonType cancelButton = ButtonType.CANCEL;
+        alert.getDialogPane().getButtonTypes().setAll(okButton, cancelButton);
+
+        // Obtenir le bouton physique et le définir comme bouton par défaut
+        alert.getDialogPane().lookupButton(okButton)
+                .setStyle("-fx-default-button: true;");
     }
 
     @Override

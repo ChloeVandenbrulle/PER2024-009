@@ -128,9 +128,10 @@ public class DataViewController {
     }
 
     private void setupConfigButtons() {
-        configActionBox.getChildren().addAll(
-                buttonManager.getButton(ButtonType.LOAD_RULE_FILE)
-        );
+        Button loadRuleFileButton = buttonManager.getButton(ButtonType.LOAD_RULE_FILE);
+        loadRuleFileButton.setOnAction(event -> handleLoadRuleFile());
+
+        configActionBox.getChildren().addAll(loadRuleFileButton);
     }
 
     private void handleOpenProject() {
@@ -225,17 +226,40 @@ public class DataViewController {
 
     private void handleLoadRuleFile() {
         FileChooser fileChooser = new FileChooser();
-        File file = fileChooser.showOpenDialog(null);
-        if (file != null) {
-            model.loadRuleFile(file);
-            updateView();
-        }
-    }
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Rule files (*.rul)", "*.rul")
+        );
 
-    private void handleMyRuleFileToggle() {
-        boolean selected = view.getRuleConfigView().getMyRuleFileCheckbox().isSelected();
-        model.setMyRuleFileEnabled(selected);
-        updateView();
+        File selectedFile = fileChooser.showOpenDialog(null);
+        if (selectedFile != null) {
+            try {
+                // Ajout d'un log pour suivre le chargement
+                model.addLogEntry("Starting to load rule file: " + selectedFile.getName());
+
+                // Chargement de la règle via le RuleModel
+                ruleModel.loadRuleFile(selectedFile);
+
+                // Message de succès dans les logs
+                model.addLogEntry("Rule file loaded successfully: " + selectedFile.getName());
+
+                // Afficher une notification de succès
+                IPopup successPopup = popupFactory.createPopup(PopupFactory.TOAST_NOTIFICATION);
+                successPopup.setMessage("Rule file '" + selectedFile.getName() + "' has been successfully loaded!");
+                successPopup.displayPopup();
+
+                // Mettre à jour l'affichage
+                updateView();
+
+            } catch (Exception e) {
+                String errorMessage = "Error loading rule file: " + e.getMessage();
+                model.addLogEntry("ERROR: " + errorMessage);
+
+                // Afficher une popup d'erreur
+                IPopup errorPopup = popupFactory.createPopup(PopupFactory.WARNING_POPUP);
+                errorPopup.setMessage(errorMessage);
+                ((WarningPopup) errorPopup).getResult();
+            }
+        }
     }
 
     private void updateView() {
