@@ -6,7 +6,9 @@ import fr.inria.corese.demo.model.IconButtonBarModel;
 import fr.inria.corese.demo.view.IconButtonBarView;
 import fr.inria.corese.demo.view.NavigationBarView;
 import fr.inria.corese.demo.view.popup.DocumentationPopup;
+import fr.inria.corese.demo.view.popup.IPopup;
 import fr.inria.corese.demo.view.popup.NewFilePopup;
+import fr.inria.corese.demo.view.popup.PopupFactory;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
@@ -17,10 +19,12 @@ import java.nio.file.Files;
 public class IconButtonBarController {
     private IconButtonBarView view;
     private IconButtonBarModel model;
+    private PopupFactory popupFactory;
 
     public IconButtonBarController(IconButtonBarModel model, IconButtonBarView view) {
         this.model = model;
         this.view = view;
+        this.popupFactory = new PopupFactory(null);
 
         view.initializeButtons(model.getAvailableButtons());
         initializeButtonHandlers();
@@ -70,6 +74,9 @@ public class IconButtonBarController {
         if (file != null) {
             try {
                 Files.writeString(file.toPath(), model.getCodeEditorModel().getContent());
+                IPopup successPopup = PopupFactory.getInstance(null).createPopup(PopupFactory.TOAST_NOTIFICATION);
+                successPopup.setMessage("File has been saved successfully!");
+                successPopup.displayPopup();
             } catch (Exception e) {
                 showError("Error Saving File", "Could not save the file: " + e.getMessage());
             }

@@ -6,6 +6,9 @@ import fr.inria.corese.demo.factory.IconButtonBarFactory;
 import fr.inria.corese.demo.model.CodeEditorModel;
 import fr.inria.corese.demo.view.CodeEditorView;
 import fr.inria.corese.demo.view.CodeMirrorView;
+import fr.inria.corese.demo.view.popup.DeleteConfirmationPopup;
+import fr.inria.corese.demo.view.popup.IPopup;
+import fr.inria.corese.demo.view.popup.PopupFactory;
 import javafx.application.Platform;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,6 +18,7 @@ public class CodeEditorController {
     private final CodeEditorModel model;
     private boolean isUpdatingContent = false;
     private final IconButtonBarController iconButtonBarController;
+    private PopupFactory popupFactory;
     private CodeMirrorView editorContainer;
     private String content = "";
 
@@ -22,6 +26,7 @@ public class CodeEditorController {
         this.view = new CodeEditorView();
         this.model = new CodeEditorModel();
         this.iconButtonBarController = IconButtonBarFactory.create(type);
+        this.popupFactory = new PopupFactory(null);
         System.out.println("Initializing CodeEditorController");
 
         this.editorContainer = view.getCodeMirrorView();
@@ -97,6 +102,9 @@ public class CodeEditorController {
             // Save the file if it already exists
             try (FileWriter writer = new FileWriter(currentFile)) {
                 writer.write(model.getContent());
+                IPopup successPopup = PopupFactory.getInstance(null).createPopup(PopupFactory.TOAST_NOTIFICATION);
+                successPopup.setMessage("File has been saved successfully!");
+                successPopup.displayPopup();
             } catch (IOException e) {
                 e.printStackTrace();
             }
