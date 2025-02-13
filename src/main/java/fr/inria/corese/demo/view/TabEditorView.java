@@ -16,6 +16,7 @@ public class TabEditorView extends TabPane {
 
     public TabEditorView() {
         setTabClosingPolicy(TabClosingPolicy.ALL_TABS);
+        setTabMaxWidth(150);
 
         addTabButton = new Button();
         FontIcon addIcon = new FontIcon(MaterialDesignP.PLUS);
@@ -61,6 +62,7 @@ public class TabEditorView extends TabPane {
 
     public Tab addNewEditorTab(String title, CodeEditorView codeEditorView) {
         Tab tab = new Tab(title);
+
         tab.setStyle("""
             -fx-background-color: transparent;
             -fx-border-color: #E0E0E0;
