@@ -36,7 +36,6 @@
                 <padding>
                     <Insets top="10" right="10" bottom="10" left="10"/>
                 </padding>
-                <fx:include source="rule-view.fxml"/>
                 <HBox fx:id="configActionBox" spacing="10" alignment="BOTTOM_RIGHT"/>
             </VBox>
         </HBox>

@@ -12,6 +12,7 @@
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
 
+    <!-- Un seul bloc de TitledPane -->
     <TitledPane text="RDFS" expanded="true">
         <VBox spacing="5">
             <VBox fx:id="rdfsRulesContainer" spacing="5"/>
@@ -24,5 +25,11 @@
         </VBox>
     </TitledPane>
 
-    <VBox fx:id="rulesContainer" VBox.vgrow="ALWAYS"/>
+    <TitledPane text="Global Options" expanded="true">
+        <VBox spacing="5" fx:id="globalOptionsContainer"/>
+    </TitledPane>
+
+    <TitledPane text="Active Rules" expanded="true">
+        <VBox spacing="5" fx:id="activeRulesContainer"/>
+    </TitledPane>
 </VBox>

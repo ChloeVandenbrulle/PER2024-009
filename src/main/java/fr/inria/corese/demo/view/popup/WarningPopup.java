@@ -67,6 +67,28 @@ public class WarningPopup extends Stage implements IPopup {
         Scene scene = new Scene(layout);
         scene.setFill(null);
         setScene(scene);
+
+        // Ajouter le raccourci Enter
+        scene.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                case ENTER:
+                    result = true;
+                    closePopup();
+                    break;
+                case ESCAPE:
+                    result = false;
+                    closePopup();
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        setScene(scene);
+
+        // Définir le bouton Continue comme bouton par défaut
+        continueButton.setDefaultButton(true);
+        closeButton.setCancelButton(true);
     }
 
     @Override
