@@ -1,6 +1,7 @@
 package fr.inria.corese.demo.model;
 
 import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.load.RuleLoad;
 import fr.inria.corese.core.rule.Rule;
 import fr.inria.corese.core.rule.RuleEngine;
 import fr.inria.corese.core.load.Load;
@@ -30,10 +31,13 @@ public class RuleModel {
     public void loadRDFSSubset() {
         if (isRDFSSubsetEnabled) {
             try {
-                Load.create(graph).loadWE("rule/rdfs.rul");
-                if (!loadedRules.contains("RDFS Subset")) {
-                    loadedRules.add("RDFS Subset");
-                }
+                Graph dataGraph = Graph.create();
+                RuleEngine ruleEngine = RuleEngine.create(dataGraph);
+                RuleLoad ruleLoader = RuleLoad.create(ruleEngine);
+                ruleLoader.parse("input rules file path.rul");
+
+                // Apply rules on graph
+                ruleEngine.process();
             } catch (Exception e) {
                 System.err.println("Error loading RDFS Subset: " + e.getMessage());
             }
