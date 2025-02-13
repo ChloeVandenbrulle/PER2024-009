@@ -99,13 +99,22 @@ public class FileExplorerController {
     }
 
     private String buildPath(TreeItem<String> item) {
-        StringBuilder path = new StringBuilder(item.getValue());
-        TreeItem<String> parent = item.getParent();
-        while (parent != null && parent.getParent() != null && parent.getValue() != null) {
-            path.insert(0, File.separator).insert(0, parent.getValue());
-            parent = parent.getParent();
+        System.out.println("buildPath");
+        if (model.getRootPath() == null) {
+            return "";
         }
-        return model.getRootPath()+"\\"+path;
+
+        StringBuilder path = new StringBuilder();
+        TreeItem<String> current = item;
+
+        while (current != null && current.getParent() != null) {
+            System.out.println(path);
+            path.insert(0, current.getValue());
+            path.insert(0, File.separator);
+            current = current.getParent();
+        }
+        System.out.println(model.getRootPath() + path.toString());
+        return model.getRootPath() + path.toString();
     }
 
     public void setOnFileOpenRequest(Consumer<File> handler) {
@@ -128,13 +137,24 @@ public class FileExplorerController {
             selectedItem = view.getTreeView().getRoot();
         }
 
-
         NewFilePopup newFilePopup = (NewFilePopup) PopupFactory.getInstance(null).createPopup("newFile");
         TreeItem<String> finalSelectedItem = selectedItem;
         newFilePopup.setOnConfirm(() -> {
             String fileName = newFilePopup.getFileName();
             if (fileName != null && !fileName.isEmpty()) {
-                model.addFile(finalSelectedItem, new FileItem(fileName));
+                try {
+                    String fullPath = buildPath(finalSelectedItem) + File.separator + fileName;
+                    System.out.println("fullPath : "+ fullPath);
+                    File newFile = new File(fullPath);
+
+                    if (newFile.createNewFile()) {
+                        model.addFile(finalSelectedItem, new FileItem(fileName));
+                    } else {
+                        System.err.println("Impossible de créer le fichier: " + fullPath);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
         newFilePopup.displayPopup();
@@ -152,7 +172,14 @@ public class FileExplorerController {
         newFolderPopup.setOnConfirm(() -> {
             String folderName = newFolderPopup.getFileName();
             if (folderName != null && !folderName.isEmpty()) {
-                model.addFolder(finalSelectedItem, new FileItem(folderName));
+                String fullPath = buildPath(finalSelectedItem) + File.separator + folderName;
+                System.out.println("fullPath : "+ fullPath);
+
+                if (new File(fullPath).mkdir()) {
+                    model.addFolder(finalSelectedItem, new FileItem(folderName));
+                } else {
+                    System.err.println("Impossible de créer le fichier: " + fullPath);
+                }
             }
         });
         newFolderPopup.displayPopup();
