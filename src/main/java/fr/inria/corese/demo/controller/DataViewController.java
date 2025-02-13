@@ -133,30 +133,6 @@ public class DataViewController {
         );
     }
 
-    private void setupStylesheets() {
-        topButtonBox.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene != null) {
-                String cssPath = getClass().getResource("/styles/buttons.css").toExternalForm();
-                newScene.getStylesheets().add(cssPath);
-            }
-        });
-    }
-
-    private void initializeEventHandlers() {
-        view.getOpenProjectButton().setOnAction(e -> handleOpenProject());
-        view.getSaveAsButton().setOnAction(e -> handleSaveAs());
-        view.getShowLogsButton().setOnAction(e -> handleShowLogs());
-
-        // File action handlers
-        view.getFileListView().getClearButton().setOnAction(e -> handleClearGraph());
-        view.getFileListView().getReloadButton().setOnAction(e -> handleReloadFiles());
-        view.getFileListView().getLoadButton().setOnAction(e -> handleLoadFiles());
-
-        // Rule config handlers
-        view.getRuleConfigView().getLoadRuleFileButton().setOnAction(e -> handleLoadRuleFile());
-        view.getRuleConfigView().getMyRuleFileCheckbox().setOnAction(e -> handleMyRuleFileToggle());
-    }
-
     private void handleOpenProject() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         File selectedDirectory = directoryChooser.showDialog(null);
@@ -175,9 +151,20 @@ public class DataViewController {
     }
 
     private void handleClearGraph() {
-        model.clearGraph();
-        model.clearFiles();
-        updateView();
+        IPopup confirmPopup = popupFactory.createPopup(PopupFactory.CLEAR_GRAPH_CONFIRMATION);
+        confirmPopup.setMessage("Are you sure you want to clear the graph? This action cannot be undone.");
+        confirmPopup.displayPopup();
+
+        if (((ClearGraphConfirmationPopup) confirmPopup).getResult()) {
+            model.clearGraph();
+            model.clearFiles();
+            updateView();
+
+            // Afficher une notification de succès
+            IPopup successPopup = popupFactory.createPopup(PopupFactory.TOAST_NOTIFICATION);
+            successPopup.setMessage("Graph has been cleared successfully!");
+            successPopup.displayPopup();
+        }
     }
 
     private void handleReloadFiles() {
@@ -218,6 +205,11 @@ public class DataViewController {
                 model.loadFile(file);
                 model.addFile(file.getName());
                 model.addLogEntry("File loaded successfully: " + file.getName());
+
+                // Dans handleLoadFiles après le chargement réussi
+                IPopup successPopup = popupFactory.createPopup(PopupFactory.TOAST_NOTIFICATION);
+                successPopup.setMessage("File '" + file.getName() + "' has been successfully loaded!");
+                successPopup.displayPopup();
 
             } catch (Exception e) {
                 String errorMessage = "Error loading file: " + e.getMessage();
