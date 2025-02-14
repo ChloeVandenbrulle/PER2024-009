@@ -76,10 +76,18 @@ public class CodeMirrorView extends StackPane {
                 .status-item {
                     margin-left: 15px;
                 }
+
+                .CodeMirror-linenumbers {
+                    padding: 0;
+                    min-width: 2px;
+                    max-width: 2px;
+                }
+                
                 .syntax-error {
                     background-color: rgba(255, 0, 0, 0.1);
                     border-bottom: 2px dotted #f00;
                 }
+                
                 .CodeMirror-lint-tooltip {
                     background-color: #ffd;
                     border: 1px solid #886;
@@ -96,10 +104,12 @@ public class CodeMirrorView extends StackPane {
                     z-index: 100;
                     box-shadow: 2px 3px 5px rgba(0,0,0,.2);
                 }
+                        
                 .CodeMirror-lint-mark {
                     background-position: left bottom;
                     background-repeat: repeat-x;
                 }
+                        
                 .CodeMirror-lint-mark-error {
                     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9sJDw4cOCW1/KIAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAHElEQVQI12NggIL/DAz/GdA5/xkY/qPKMDAwAADLZwf5rvm+LQAAAABJRU5ErkJggg==");
                 }
@@ -118,6 +128,7 @@ public class CodeMirrorView extends StackPane {
             <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/lint.js"></script>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/lint.css">
             <script src="https://cdn.jsdelivr.net/npm/n3@1.16.2/browser/n3.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/selection/undo.js"></script>
         </head>
         <body>
             <div class="editor-container">
@@ -132,6 +143,30 @@ public class CodeMirrorView extends StackPane {
                 </div>
             </div>
             <script>
+                function turtleLinter(text, callback) {
+                    var issues = [];
+                    try {
+                        const parser = new N3.Parser({format: 'Turtle'});
+                        parser.parse(text, (error, quad, prefixes) => {
+                            if (error) {
+                                issues.push({
+                                    message: error.message,
+                                    severity: 'error',
+                                    from: CodeMirror.Pos(error.line - 1, error.column),
+                                    to: CodeMirror.Pos(error.line - 1, error.column + 1)
+                                });
+                            }
+                        });
+                    } catch (e) {
+                        issues.push({
+                            message: e.message,
+                            severity: 'error',
+                            from: CodeMirror.Pos(0, 0),
+                            to: CodeMirror.Pos(0, 1)
+                        });
+                    }
+                    callback(issues);
+                }
                 var editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
                     mode: 'turtle',
                     theme: 'eclipse',
@@ -144,7 +179,13 @@ public class CodeMirrorView extends StackPane {
                     styleActiveLine: true,
                     scrollbarStyle: 'overlay',
                     foldGutter: true,
-                    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                    historyEventDelay: 350,
+                    undoDepth: 200,
+                    lint: {
+                        getAnnotations: turtleLinter,
+                        async: true
+                    },
+                    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
                     extraKeys: {
                         "Ctrl-S": function(cm) {
                             if (window.bridge) {
@@ -153,7 +194,9 @@ public class CodeMirrorView extends StackPane {
                         },
                         "Ctrl-F": "findPersistent",
                         "Ctrl-/": "toggleComment",
-                        "Ctrl-Space": "autocomplete"
+                        "Ctrl-Space": "autocomplete",
+                        "Ctrl-Z": function(cm) { cm.undo(); },
+                        "Ctrl-Y": function(cm) { cm.redo(); },
                     }
                 });
 
