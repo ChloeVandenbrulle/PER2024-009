@@ -128,6 +128,7 @@ public class CodeMirrorView extends StackPane {
             <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/lint.js"></script>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/lint.css">
             <script src="https://cdn.jsdelivr.net/npm/n3@1.16.2/browser/n3.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/@frogcat/rdf-validate@1.0.0/rdf-validate.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/selection/undo.js"></script>
         </head>
         <body>
@@ -143,30 +144,86 @@ public class CodeMirrorView extends StackPane {
                 </div>
             </div>
             <script>
+                window.onerror = function(message, source, lineno, colno, error) {
+                    if (window.bridge) {
+                        window.bridge.log("JS Error: " + message + " at " + source + ":" + lineno + ":" + colno);
+                    }
+                };
+                
+                console.log = function(message) {
+                    if (window.bridge) {
+                        window.bridge.log(message);
+                    }
+                };
+                        
+                console.error = function(message) {
+                    if (window.bridge) {
+                        window.bridge.log("Error: " + message);
+                    }
+                };
+                
+                function getRealPosition(text, globalColumn) {
+                    let lines = text.split("\\n");
+                    let charCount = 0;
+                        
+                    for (let i = 0; i < lines.length; i++) {
+                        if (charCount + lines[i].length >= globalColumn) {
+                            return { realLine: i, realColumn: globalColumn - charCount };
+                        }
+                        charCount += lines[i].length + 1; // +1 pour le "\\n"
+                    }
+                        
+                    // Si on dépasse la longueur du texte, on retourne la dernière position connue
+                    return { realLine: lines.length - 1, realColumn: lines[lines.length - 1].length };
+                }
+
                 function turtleLinter(text, callback) {
+                    console.log("Hello from turtleLinter!");
+                    
+                    console.log("Before N3.Parser initialization");     
+                    const parser = new N3.Parser({ format: 'Turtle' });
+                    console.log("After N3.Parser initialization");
+                         
                     var issues = [];
-                    try {
-                        const parser = new N3.Parser({format: 'Turtle'});
+                         
+                    new Promise((resolve) => {
                         parser.parse(text, (error, quad, prefixes) => {
                             if (error) {
+                                console.error("Parsing error detected:");
+                                console.error(`Message: ${error.message}`);
+                                console.error(`Line: ${error.line}, Column: ${error.column}`);
+                                
+                                let { realLine, realColumn } = getRealPosition(text, error.column);
+                                console.log(`Recalculated position -> Line: ${realLine}, Column: ${realColumn}`);
+                                    
                                 issues.push({
                                     message: error.message,
                                     severity: 'error',
-                                    from: CodeMirror.Pos(error.line - 1, error.column),
-                                    to: CodeMirror.Pos(error.line - 1, error.column + 1)
+                                    from: CodeMirror.Pos(realLine, realColumn),
+                                    to: CodeMirror.Pos(realLine, realColumn + 1)
                                 });
                             }
+                         
+                            // Quand le parsing est terminé, on résout la promesse
+                            resolve();
                         });
-                    } catch (e) {
+                    }).then(() => {
+                        callback(issues);
+                    }).catch((e) => {
+                        console.error("Catch block error:", e);
                         issues.push({
                             message: e.message,
                             severity: 'error',
                             from: CodeMirror.Pos(0, 0),
                             to: CodeMirror.Pos(0, 1)
                         });
-                    }
-                    callback(issues);
+                         
+                         callback(issues);
+                    });
                 }
+                
+                CodeMirror.registerHelper("lint", "turtle", turtleLinter);
+                
                 var editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
                     mode: 'turtle',
                     theme: 'eclipse',
@@ -275,6 +332,11 @@ public class CodeMirrorView extends StackPane {
                 isInternalUpdate = false;
             });
         }
+
+        public void log(String message) {
+            System.out.println("JS Log: " + message);
+        }
+
     }
 
     private void updateEditorContent(String content) {
