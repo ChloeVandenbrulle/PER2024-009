@@ -211,6 +211,7 @@ public class CodeMirrorView extends StackPane {
                     </div>
                 </div>
             </div>
+            
             <script>
                 window.onerror = function(message, source, lineno, colno, error) {
                     if (window.bridge) {
@@ -245,6 +246,14 @@ public class CodeMirrorView extends StackPane {
                     return { realLine: lines.length - 1, realColumn: lines[lines.length - 1].length };
                 }
                 
+                function extractLineNumber(message) {
+                    const lineMatch = message.match(/on line (\\d+)/);
+                        if (lineMatch) {
+                            return parseInt(lineMatch[1]) - 1; // -1 car CodeMirror commence à 0
+                        }
+                    return null;
+                }
+                
                 function updateErrorCounts(issues) {
                     const errorCount = issues.filter(i => i.severity === 'error').length;
                     const warningCount = issues.filter(i => i.severity === 'warning').length;
@@ -253,7 +262,7 @@ public class CodeMirrorView extends StackPane {
                     const warningCounter = document.getElementById('warning-count');
                     
                     if (errorCounter) {
-                    errorCounter.style.display = errorCount > 0 ? 'flex' : 'none';
+                    errorCounter.style.display = errorCount >= 0 ? 'flex' : 'none';
                         const countElement = errorCounter.querySelector('.count');
                         if (countElement) {
                             countElement.textContent = errorCount;
@@ -261,7 +270,7 @@ public class CodeMirrorView extends StackPane {
                     }
 
                     if (warningCounter) {
-                        warningCounter.style.display = warningCount > 0 ? 'flex' : 'none';
+                        warningCounter.style.display = warningCount >= 0 ? 'flex' : 'none';
                         const countElement = warningCounter.querySelector('.count');
                         if (countElement) {
                             countElement.textContent = warningCount;
@@ -270,25 +279,37 @@ public class CodeMirrorView extends StackPane {
                 }
 
                 function turtleLinter(text, callback) {
+                    console.log("Hello from turtleLinter!");
+
+                    console.log("Before N3.Parser initialization");
                     const parser = new N3.Parser({ format: 'Turtle' });
+                    console.log("After N3.Parser initialization");
+
                     var issues = [];
-                    
+
                     new Promise((resolve) => {
                         parser.parse(text, (error, quad, prefixes) => {
                             if (error) {
-                                let { realLine, realColumn } = getRealPosition(text, error.column);
+                                console.error("Parsing error detected:");
+                                console.error(`Message: ${error.message}`);
+                                console.error(`Line: ${error.line}, Column: ${error.column}`);
 
-                                // Ajouter la classe d'erreur à la ligne
-                                const lineHandle = editor.getLineHandle(realLine);
-                                editor.addLineClass(lineHandle, 'background', 'error-line');
+                                let { realLine, realColumn } = getRealPosition(text, error.column);
+                                console.log(`Recalculated position -> Line: ${realLine}, Column: ${realColumn}`);
                                 
+                                let line = extractLineNumber(error.message);
+                                console.log("line : "+line);
+
                                 issues.push({
                                     message: error.message,
                                     severity: 'error',
-                                    from: CodeMirror.Pos(realLine, realColumn),
-                                    to: CodeMirror.Pos(realLine, realColumn + 1)
+                                    from: CodeMirror.Pos(line, realColumn),
+                                    to: CodeMirror.Pos(line, realColumn + 1)
                                 });
                             }
+
+                            // Quand le parsing est terminé, on résout la promesse
+                            updateErrorCounts(issues);
                             resolve();
                         });
                     }).then(() => {
@@ -305,7 +326,7 @@ public class CodeMirrorView extends StackPane {
                         updateErrorCounts(issues);
                         callback(issues);
                     });
-                }
+                }         
                 
                 CodeMirror.registerHelper("lint", "turtle", turtleLinter);
                 
@@ -362,6 +383,7 @@ public class CodeMirrorView extends StackPane {
                     if (!change.origin || change.origin !== 'setValue') {
                         if (window.bridge) {
                             window.bridge.onContentChanged(editor.getValue());
+                            turtleLinter(editor.getValue, '');
                         }
                     }
                 });
