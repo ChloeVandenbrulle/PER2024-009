@@ -107,15 +107,13 @@ public class CodeMirrorView extends StackPane {
                     color: #f57c00;
                     border: 1px solid #ffe0b2;
                 }
-                
-                .error-line {
+
+                .CodeMirror-line-error {
                     background-color: rgba(255, 0, 0, 0.1);
-                    border-bottom: 2px solid #f57c00;
                 }
                 
-                .warning-line {
+                .CodeMirror-line-warning {
                     background-color: rgba(255, 152, 0, 0.1);
-                    border-bottom: 2px solid #f57c00;
                 }
                 
                 .error-icon, .warning-icon {
@@ -158,10 +156,7 @@ public class CodeMirrorView extends StackPane {
                     background-position: left bottom;
                     background-repeat: repeat-x;
                 }
-                        
-                .CodeMirror-lint-mark-error {
-                    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9sJDw4cOCW1/KIAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAHElEQVQI12NggIL/DAz/GdA5/xkY/qPKMDAwAADLZwf5rvm+LQAAAABJRU5ErkJggg==");
-                }
+
             </style>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/eclipse.min.css">
@@ -262,7 +257,7 @@ public class CodeMirrorView extends StackPane {
                     const warningCounter = document.getElementById('warning-count');
                     
                     if (errorCounter) {
-                    errorCounter.style.display = errorCount >= 0 ? 'flex' : 'none';
+                        errorCounter.style.display = errorCount > 0 ? 'flex' : 'none';
                         const countElement = errorCounter.querySelector('.count');
                         if (countElement) {
                             countElement.textContent = errorCount;
@@ -270,7 +265,7 @@ public class CodeMirrorView extends StackPane {
                     }
 
                     if (warningCounter) {
-                        warningCounter.style.display = warningCount >= 0 ? 'flex' : 'none';
+                        warningCounter.style.display = warningCount > 0 ? 'flex' : 'none';
                         const countElement = warningCounter.querySelector('.count');
                         if (countElement) {
                             countElement.textContent = warningCount;
@@ -279,13 +274,17 @@ public class CodeMirrorView extends StackPane {
                 }
 
                 function turtleLinter(text, callback) {
-                    console.log("Hello from turtleLinter!");
+                    console.log("Running turtleLinter!");
 
                     console.log("Before N3.Parser initialization");
                     const parser = new N3.Parser({ format: 'Turtle' });
                     console.log("After N3.Parser initialization");
 
                     var issues = [];
+                    const lines = text.split('\\n');
+                    console.log(lines);
+                    let currentText = '';
+                    
 
                     new Promise((resolve) => {
                         parser.parse(text, (error, quad, prefixes) => {
@@ -306,6 +305,8 @@ public class CodeMirrorView extends StackPane {
                                     from: CodeMirror.Pos(line, realColumn),
                                     to: CodeMirror.Pos(line, realColumn + 1)
                                 });
+                                
+                                editor.addLineClass(line, 'background', 'CodeMirror-line-error');
                             }
 
                             // Quand le parsing est terminé, on résout la promesse
@@ -326,7 +327,7 @@ public class CodeMirrorView extends StackPane {
                         updateErrorCounts(issues);
                         callback(issues);
                     });
-                }         
+                }
                 
                 CodeMirror.registerHelper("lint", "turtle", turtleLinter);
                 
@@ -348,7 +349,7 @@ public class CodeMirrorView extends StackPane {
                         getAnnotations: turtleLinter,
                         async: true
                     },
-                    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
+                    gutters: ["CodeMirror-linenumbers", "CodeMirror-lint-markers", "CodeMirror-foldgutter"],
                     extraKeys: {
                         "Ctrl-S": function(cm) {
                             if (window.bridge) {
