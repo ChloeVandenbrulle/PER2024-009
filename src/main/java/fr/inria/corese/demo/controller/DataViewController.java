@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -96,7 +97,20 @@ public class DataViewController {
 
             if (configActionBox != null && configActionBox.getParent() instanceof VBox) {
                 VBox parent = (VBox) configActionBox.getParent();
-                parent.getChildren().add(0, ruleView);
+
+                // Create a scroll pane and set its properties
+                ScrollPane scrollPane = new ScrollPane();
+                scrollPane.setFitToWidth(true);
+                scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+                scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+                scrollPane.getStyleClass().add("edge-to-edge");
+
+                scrollPane.setMaxHeight(parent.getMaxHeight());
+                scrollPane.setContent(ruleView);
+
+                // Add the scroll pane to the parent
+                parent.getChildren().add(0, scrollPane);
+                VBox.setVgrow(scrollPane, Priority.ALWAYS);
             }
         } catch (IOException e) {
             e.printStackTrace();

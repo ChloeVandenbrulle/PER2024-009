@@ -12,20 +12,20 @@
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
 
-    <TitledPane text="RDFS" expanded="true">
+    <TitledPane text="RDFS Rules" expanded="true">
         <VBox spacing="5">
             <VBox fx:id="rdfsRulesContainer" spacing="5"/>
         </VBox>
     </TitledPane>
 
-    <TitledPane text="OWL" expanded="true">
+    <TitledPane text="OWL Rules" expanded="true">
         <VBox spacing="5">
             <VBox fx:id="owlRulesContainer" spacing="5"/>
         </VBox>
     </TitledPane>
 
     <!-- Nouvelle section pour les règles personnalisées -->
-    <TitledPane text="Custom Rules" expanded="true">
+    <TitledPane text="Personal Rules" expanded="true">
         <VBox spacing="5">
             <VBox fx:id="customRulesContainer" spacing="5"/>
         </VBox>

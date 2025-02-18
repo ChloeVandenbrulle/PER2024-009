@@ -43,11 +43,11 @@ public class EmptyStateView extends StackPane {
         Group iconGroup = new Group(blurredIcon, sharpIcon);
 
         // Labels
-        Label titleLabel = new Label("Aucun fichier chargé");
+        Label titleLabel = new Label("No files loaded");
         titleLabel.setFont(Font.font("System", FontWeight.SEMI_BOLD, 18));
         titleLabel.setTextFill(Color.web("#333333"));
 
-        Label messageLabel = new Label("Ouvrez un dossier ou chargez un fichier TTL\npour visualiser les graphes sémantiques");
+        Label messageLabel = new Label("Open a folder or load a TTL file\nto visualize semantic graphs");
         messageLabel.setFont(Font.font("System", 14));
         messageLabel.setTextFill(Color.web("#666666"));
         messageLabel.setAlignment(Pos.CENTER);
