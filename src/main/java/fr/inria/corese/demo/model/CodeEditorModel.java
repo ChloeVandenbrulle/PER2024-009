@@ -1,5 +1,7 @@
 package fr.inria.corese.demo.model;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -7,10 +9,11 @@ import java.util.Stack;
 
 public class CodeEditorModel {
     private final StringProperty content = new SimpleStringProperty("");
+    private String currentSavedContent;
+    private BooleanProperty modified = new SimpleBooleanProperty(false);
     private final Stack<CodeEditorChange> undoStack = new Stack<>();
     private final Stack<CodeEditorChange> redoStack = new Stack<>();
     private String currentFile;
-    private boolean isModified;
     private static final int MAX_HISTORY = 500;
 
     public StringProperty contentProperty() {
@@ -26,6 +29,14 @@ public class CodeEditorModel {
         setModified(true);
     }
 
+    public String getCurrentSavedContent() {
+        return currentSavedContent;
+    }
+
+    public void setCurrentSavedContent(String originalContent) {
+        currentSavedContent = originalContent;
+    }
+
     public String getCurrentFile() {
         return currentFile;
     }
@@ -34,12 +45,16 @@ public class CodeEditorModel {
         this.currentFile = currentFile;
     }
 
+    public BooleanProperty modifiedProperty() {
+        return modified;
+    }
+
     public boolean isModified() {
-        return isModified;
+        return modified.get();
     }
 
     public void setModified(boolean modified) {
-        isModified = modified;
+        this.modified.set(modified);
     }
 
     public void recordCurrentChange(String newContent) {
@@ -52,6 +67,7 @@ public class CodeEditorModel {
                 undoStack.remove(0);
             }
             setContent(newContent);
+            setModified(true);
         }
     }
 

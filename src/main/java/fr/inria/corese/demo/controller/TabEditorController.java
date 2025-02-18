@@ -3,6 +3,8 @@ package fr.inria.corese.demo.controller;
 import fr.inria.corese.demo.enums.IconButtonBarType;
 import fr.inria.corese.demo.model.TabEditorModel;
 import fr.inria.corese.demo.view.TabEditorView;
+import fr.inria.corese.demo.view.popup.PopupFactory;
+import fr.inria.corese.demo.view.popup.SaveConfirmationPopup;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.Tab;
 import javafx.scene.input.KeyEvent;
@@ -44,11 +46,21 @@ public class TabEditorController {
     }
 
     private void initializeKeyboardShortcuts(){
+        // TODO: Ajouter shortcut pour fermer le fichier
         view.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 newScene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
                     if (event.isControlDown() && event.getCode() == KeyCode.S) {
+                        System.out.println("CTRL+S");
                         handleSaveShortcut();
+                        event.consume();
+                    }
+                    if (event.isControlDown() && event.getCode() == KeyCode.W) {
+                        System.out.println("CTRL+W");
+                        Tab tab = view.getSelectionModel().getSelectedItem();
+                        if (handleCloseFile(tab)) {
+                            view.getTabs().remove(tab);
+                        }
                         event.consume();
                     }
                 });
@@ -66,8 +78,36 @@ public class TabEditorController {
         }
     }
 
+    private boolean handleCloseFile(Tab tab) {
+        CodeEditorController controller = model.getControllerForTab(tab);
+        if (controller != null && controller.getModel().isModified()) {
+            SaveConfirmationPopup saveConfirmationPopup = (SaveConfirmationPopup) PopupFactory.getInstance(null).createPopup("saveFileConfirmation");
+            saveConfirmationPopup.setOnSaveCallback(() -> {
+                controller.saveFile();
+            });
+
+            String result = saveConfirmationPopup.getResult();
+            switch (result) {
+                case "save":
+                    model.getTabControllers().remove(tab);
+                    return true;
+                case "close":
+                    model.getTabControllers().remove(tab);
+                    return true;
+                case "cancel":
+                    return false;
+                default:
+                    return false;
+            }
+        } else {
+            model.getTabControllers().remove(tab);
+            return true;
+        }
+    }
+
     public void addNewTab(String title) {
         CodeEditorController codeEditorController = new CodeEditorController(type);
+        System.out.println(codeEditorController.getModel().modifiedProperty());
         Tab tab = view.addNewEditorTab(title, codeEditorController.getView());
         model.addTabModel(tab, codeEditorController);
     }
@@ -81,15 +121,17 @@ public class TabEditorController {
 
             codeEditorController.getModel().setCurrentFile(file.getPath());
 
-            tab.setOnClosed(event -> {
-                CodeEditorController controller = model.getControllerForTab(tab);
-                if (controller != null && controller.getModel().isModified()) {
-                    // TODO: Ajouter une popup pour demander si l'utilisateur veut sauvegarder
-                    controller.saveFile();
-                }
-                model.getTabControllers().remove(tab);
+            codeEditorController.getModel().modifiedProperty().addListener((obs, oldVal, newVal) -> {
+                System.out.println("modified : "+ newVal);
+                view.updateTabIcon(tab, newVal);
             });
 
+            tab.setOnCloseRequest(event -> {
+                event.consume();
+                if (handleCloseFile(tab)) {
+                    view.getTabs().remove(tab);
+                }
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }

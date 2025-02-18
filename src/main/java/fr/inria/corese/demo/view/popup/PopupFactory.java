@@ -15,6 +15,7 @@ public class PopupFactory {
     public static final String RENAME_POPUP = "rename";
     public static final String DELETE_POPUP = "delete";
     public static final String CLEAR_GRAPH_CONFIRMATION = "clearGraphConfirmation";
+    public static final String SAVE_FILE_CONFIRMATION = "saveFileConfirmation";
 
 
     private final Map<String, IPopup> popupCache = new HashMap<>();
@@ -43,6 +44,7 @@ public class PopupFactory {
             case RENAME_POPUP -> new RenamePopup();
             case DELETE_POPUP -> new DeleteConfirmationPopup();
             case CLEAR_GRAPH_CONFIRMATION -> new ClearGraphConfirmationPopup();
+            case SAVE_FILE_CONFIRMATION -> new SaveConfirmationPopup();
             default -> throw new IllegalArgumentException("Unknown popup type: " + type);
         };
 

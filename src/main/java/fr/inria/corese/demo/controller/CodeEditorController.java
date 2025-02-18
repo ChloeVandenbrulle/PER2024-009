@@ -18,7 +18,6 @@ public class CodeEditorController {
     private final CodeEditorModel model;
     private boolean isUpdatingContent = false;
     private final IconButtonBarController iconButtonBarController;
-    private PopupFactory popupFactory;
     private CodeMirrorView editorContainer;
     private String content = "";
 
@@ -26,7 +25,6 @@ public class CodeEditorController {
         this.view = new CodeEditorView();
         this.model = new CodeEditorModel();
         this.iconButtonBarController = IconButtonBarFactory.create(type);
-        this.popupFactory = new PopupFactory(null);
         System.out.println("Initializing CodeEditorController");
 
         this.editorContainer = view.getCodeMirrorView();
@@ -66,7 +64,7 @@ public class CodeEditorController {
                 view.setCodeMirrorViewContent(content);
 
                 if (model != null) {
-                    model.setContent(content);
+                    model.setCurrentSavedContent(content);
 
                     // Écouter les changements de la vue
                     editorContainer.contentProperty().addListener((obs, oldVal, newVal) -> {
@@ -99,17 +97,17 @@ public class CodeEditorController {
         System.out.println("Saving file: " + currentFile);
 
         if (currentFile != null) {
-            // Save the file if it already exists
             try (FileWriter writer = new FileWriter(currentFile)) {
                 writer.write(model.getContent());
                 IPopup successPopup = PopupFactory.getInstance(null).createPopup(PopupFactory.TOAST_NOTIFICATION);
                 successPopup.setMessage("File has been saved successfully!");
                 successPopup.displayPopup();
+                model.setModified(false);
+                model.setCurrentSavedContent(model.getContent());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
-            // Show Save As dialog if the file does not exist
             iconButtonBarController.getView().getButton(IconButtonType.SAVE).fire();
         }
     }

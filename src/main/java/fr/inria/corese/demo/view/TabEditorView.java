@@ -2,17 +2,16 @@ package fr.inria.corese.demo.view;
 
 import javafx.animation.ScaleTransition;
 import javafx.scene.Cursor;
-import javafx.scene.control.Button;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
+import org.kordamp.ikonli.materialdesign2.*;
 
 public class TabEditorView extends TabPane {
     private Tab addTab;
     private Button addTabButton;
+    private FontIcon modifiedFile;
 
     public TabEditorView() {
         setTabClosingPolicy(TabClosingPolicy.ALL_TABS);
@@ -58,15 +57,19 @@ public class TabEditorView extends TabPane {
         addTab.setClosable(false);
 
         getTabs().add(addTab);
+
+        modifiedFile = new FontIcon(MaterialDesignC.CHECKBOX_BLANK_CIRCLE);
+        modifiedFile.setIconSize(5);
+        modifiedFile.setIconColor(Color.web("#2196F3"));
     }
 
     public Tab addNewEditorTab(String title, CodeEditorView codeEditorView) {
         Tab tab = new Tab(title);
-
         tab.setStyle("""
             -fx-background-color: transparent;
             -fx-border-color: #E0E0E0;
             -fx-border-width: 0 1 0 1;
+            -fx-font-size: 12px;
         """);
         tab.setOnSelectionChanged(e -> {
             if (tab.isSelected()) {
@@ -88,6 +91,18 @@ public class TabEditorView extends TabPane {
         getTabs().add(getTabs().size() - 1, tab);
         getSelectionModel().select(tab);
         return tab;
+    }
+
+    public void updateTabIcon(Tab tab, boolean isModified) {
+        FontIcon icon = new FontIcon(MaterialDesignR.RECORD);
+        icon.setIconSize(2);
+        if (isModified) {
+            icon.setVisible(true);
+        } else {
+            icon.setVisible(false);
+        }
+
+        tab.setGraphic(icon);
     }
 
     public Tab getAddTab() {
