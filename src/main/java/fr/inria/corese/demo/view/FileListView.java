@@ -9,6 +9,7 @@ import fr.inria.corese.demo.model.ProjectDataModel;
 import fr.inria.corese.demo.factory.IconButtonBarFactory;
 import fr.inria.corese.demo.enums.IconButtonType;
 import fr.inria.corese.demo.controller.IconButtonBarController;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -20,13 +21,13 @@ public class FileListView extends VBox {
     private FileListModel model;
     private ProjectDataModel projectDataModel;
     private PopupFactory popupFactory;
-
-    @FXML
-    private ListView<FileItem> fileList;
+    private EmptyStateView emptyStateView;
     private Button clearButton;
     private Button reloadButton;
     private Button loadButton;
 
+    @FXML
+    private ListView<FileItem> fileList;
     @FXML
     private HBox buttonContainer;
 
@@ -42,11 +43,12 @@ public class FileListView extends VBox {
             loader.setController(this);
             loader.load();
             setupListView();
+            setupEmptyState();
+
         } catch (IOException e) {
             throw new RuntimeException("Impossible de charger FileListView.fxml", e);
         }
     }
-
 
     private void setupIconButtons() {
         // Créer les boutons avec IconButtonView
@@ -75,6 +77,12 @@ public class FileListView extends VBox {
         this.model = model;
         if (model != null && fileList != null) {
             fileList.setItems(model.getFiles());
+
+            // Bind empty state visibility to model's file list size
+            emptyStateView.visibleProperty().bind(Bindings.isEmpty(model.getFiles()));
+
+            // Ensure that when empty state is visible, fileList is not visible
+            fileList.visibleProperty().bind(Bindings.isNotEmpty(model.getFiles()));
         }
     }
 
@@ -114,6 +122,36 @@ public class FileListView extends VBox {
 
     public boolean confirmDelete(FileItem item) {
         return showWarningPopup("Removing this file will reset the current graph. Do you want to continue?");
+    }
+
+    private void setupEmptyState() {
+        // Create empty state view
+        emptyStateView = new EmptyStateView();
+
+        // Create a StackPane to hold both the ListView and empty state
+        StackPane contentContainer = new StackPane();
+
+        // Get the current fileList from the FXML
+        if (fileList != null) {
+            // Remove the ListView from its current parent
+            VBox parent = (VBox)fileList.getParent();
+            int index = parent.getChildren().indexOf(fileList);
+            parent.getChildren().remove(fileList);
+
+            // Add both to the stack pane
+            contentContainer.getChildren().addAll(emptyStateView, fileList);
+
+            // Add the stack pane to the parent at the same position
+            parent.getChildren().add(index, contentContainer);
+            VBox.setVgrow(contentContainer, Priority.ALWAYS);
+        } else {
+            // If fileList is still null (unlikely with proper FXML loading)
+            getChildren().add(0, contentContainer);
+            VBox.setVgrow(contentContainer, Priority.ALWAYS);
+        }
+
+        // Initially hide the empty state until model is set
+        emptyStateView.setVisible(false);
     }
 
     private static class FileListCell extends ListCell<FileItem> {
@@ -159,4 +197,6 @@ public class FileListView extends VBox {
             }
         }
     }
+
+
 }

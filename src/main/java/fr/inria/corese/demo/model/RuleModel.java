@@ -7,7 +7,6 @@ import fr.inria.corese.core.rule.RuleEngine;
 import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 public class RuleModel {
     private RuleEngine ruleEngine;
@@ -19,13 +18,10 @@ public class RuleModel {
     private boolean isOWLRLExtendedEnabled;
     private boolean isOWLRLTestEnabled;
     private boolean isOWLCleanEnabled;
-    private boolean isTraceEnabled;
-    private boolean isLoadNamedEnabled;
-    private boolean isGraphIndexEnabled;
 
     public RuleModel() {
         this.graph = Graph.create();
-        this.ruleEngine = new RuleEngine();
+        this.ruleEngine = RuleEngine.create(graph);
         this.loadedRules = new ArrayList<>();
     }
 
@@ -35,44 +31,13 @@ public class RuleModel {
     public boolean isOWLRLExtendedEnabled() { return isOWLRLExtendedEnabled; }
     public boolean isOWLRLTestEnabled() { return isOWLRLTestEnabled; }
     public boolean isOWLCleanEnabled() { return isOWLCleanEnabled; }
-    public boolean isTraceEnabled() { return isTraceEnabled; }
-    public boolean isLoadNamedEnabled() { return isLoadNamedEnabled; }
-    public boolean isGraphIndexEnabled() { return isGraphIndexEnabled; }
 
     public void loadRDFSSubset() {
-        if (isRDFSSubsetEnabled) {
-            try {
-                RuleEngine ruleEngine = RuleEngine.create(graph);
-                RuleLoad ruleLoader = RuleLoad.create(ruleEngine);
-                ruleLoader.parse("rdfsubset.rul");
-
-                // Apply rules on graph
-                ruleEngine.process();
-            } catch (Exception e) {
-                System.err.println("Error loading RDFS Subset: " + e.getMessage());
-            }
-        } else {
-            loadedRules.remove("RDFS Subset");
-            reloadRules();
-        }
+        //TODO: Implement this method for RDFS Subset
     }
 
     public void loadRDFSRL() {
-        if (isRDFSRLEnabled) {
-            try {
-                RuleEngine ruleEngine = RuleEngine.create(graph);
-                RuleLoad ruleLoader = RuleLoad.create(ruleEngine);
-                ruleLoader.parse("rdfsrl.rul");
-
-                // Apply rules on graph
-                ruleEngine.process();
-            } catch (Exception e) {
-                System.err.println("Error loading RDFS RL: " + e.getMessage());
-            }
-        } else {
-            loadedRules.remove("RDFS RL");
-            reloadRules();
-        }
+        //TODO: Implement this method for RDFS RL
     }
 
     public void loadOWLRL() {
@@ -121,18 +86,7 @@ public class RuleModel {
     }
 
     public void loadOWLClean(){
-        if (isOWLCleanEnabled) {
-            try {
-                RuleEngine engine = RuleEngine.create(graph);
-                engine.setProfile(String.valueOf(RuleEngine.OWL_CLEAN));
-                engine.process();
-            } catch (Exception e) {
-                System.err.println("Error loading OWL Clean: " + e.getMessage());
-            }
-        } else {
-            loadedRules.remove("OWL Clean");
-            reloadRules();
-        }
+        //TODO: Implement this method for OWL Clean
     }
 
     private void reloadRules() {
@@ -144,10 +98,6 @@ public class RuleModel {
         if (isOWLRLExtendedEnabled) loadOWLRLExtended();
         if (isOWLRLTestEnabled) loadOWLRLTest();
         if (isOWLCleanEnabled) loadOWLClean();
-    }
-
-    public List<String> getLoadedRules() {
-        return new ArrayList<>(loadedRules);
     }
 
     public void setRDFSSubsetEnabled(boolean enabled) {
@@ -180,72 +130,22 @@ public class RuleModel {
         loadOWLClean();
     }
 
-    public void setTraceEnabled(boolean enabled) {
-        this.isTraceEnabled = enabled;
-        if (enabled) {
-            // Activer le mode trace dans le RuleEngine
-            ruleEngine.setDebug(true);  // Utilise setDebug au lieu d'une méthode inexistante
-            loadedRules.add("Trace");
-        } else {
-            ruleEngine.setDebug(false);
-            loadedRules.remove("Trace");
-        }
-    }
-
-    public void setLoadNamedEnabled(boolean enabled) {
-        this.isLoadNamedEnabled = enabled;
-        if (enabled) {
-            // Pour Load Named, nous devons plutôt utiliser la propriété lors du chargement des règles
-            loadedRules.add("Load Named");
-        } else {
-            loadedRules.remove("Load Named");
-        }
-        reloadRules(); // Recharger les règles pour appliquer le changement
-    }
-
-    public void setGraphIndexEnabled(boolean enabled) {
-        this.isGraphIndexEnabled = enabled;
-        if (enabled) {
-            // Pour Graph Index, on peut utiliser les propriétés du graphe différemment
-            graph.init(); // Réinitialise et reconstruit les index
-            loadedRules.add("Graph index");
-        } else {
-            loadedRules.remove("Graph index");
-        }
-    }
-
-    public RuleEngine duplicateRule(String ruleName) {
-        // TODO: Implement the logic to duplicate a rule
-        // This will depend on how rules are stored and managed in corese-core
-        return new RuleEngine();
-    }
-
     public void loadRuleFile(File file) {
         try {
-            // Si le mode trace est activé
-            if (isTraceEnabled) {
-                ruleEngine.setDebug(true);
+            // S'assurer que le ruleEngine est correctement initialisé avec un graphe
+            if (ruleEngine == null || ruleEngine.getGraph() == null) {
+                ruleEngine = RuleEngine.create(graph);
             }
 
             RuleLoad ruleLoader = RuleLoad.create(ruleEngine);
-
-            // Si Load Named est activé, configurer les options appropriées
-            if (isLoadNamedEnabled) {
-                // Configuration spécifique pour Load Named
-                // Par exemple, charger les graphes nommés si nécessaire
-            }
-
-            // Si Graph Index est activé
-            if (isGraphIndexEnabled) {
-                graph.init();
-            }
-
             ruleLoader.parse(file.getAbsolutePath());
+
             String ruleName = file.getName();
             if (!loadedRules.contains(ruleName)) {
                 loadedRules.add(ruleName);
             }
 
+            // Appliquer les règles sur le graphe
             ruleEngine.process();
         } catch (Exception e) {
             System.err.println("Error loading rule file: " + e.getMessage());
@@ -254,15 +154,34 @@ public class RuleModel {
         }
     }
 
-    public List<String> getActiveRules() {
-        return loadedRules.stream()
-                .filter(rule -> !isPredefinedRule(rule))
-                .collect(Collectors.toList());
+    public List<String> getLoadedRules() {
+        // Renvoie une copie de la liste pour éviter les modifications externes
+        return new ArrayList<>(loadedRules);
     }
 
-    private boolean isPredefinedRule(String ruleName) {
-        return ruleName.equals("Trace") ||
-                ruleName.equals("Load Named") ||
-                ruleName.equals("Graph index");
+    /**
+     * Retourne le nombre total de règles actuellement chargées dans le modèle.
+     * Cela inclut à la fois les règles prédéfinies activées et les règles personnalisées.
+     *
+     * @return Le nombre de règles chargées
+     */
+    public int getLoadedRulesCount() {
+        int count = 0;
+
+        // Compter les règles personnalisées
+        count += loadedRules.size();
+
+        return count;
     }
+
+    public void removeRule(String ruleName) {
+        // Supprimer la règle de la liste des règles chargées
+        loadedRules.remove(ruleName);
+
+        // Comme nous ne pouvons pas supprimer des règles individuelles du moteur,
+        // nous recréons le moteur et rechargeons toutes les règles restantes
+        reloadRules();
+    }
+
+
 }

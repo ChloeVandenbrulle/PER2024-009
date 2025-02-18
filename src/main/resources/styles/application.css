@@ -166,6 +166,7 @@
 
 .titled-pane > .title > .text {
     -fx-font-size: 13px;
+    -fx-font-weight: bold;
 }
 
 .titled-pane > .content {

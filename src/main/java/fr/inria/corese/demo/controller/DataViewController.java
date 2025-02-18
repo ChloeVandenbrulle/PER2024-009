@@ -12,16 +12,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 public class DataViewController {
     private DataView view;
@@ -33,10 +32,6 @@ public class DataViewController {
     private final LogDialog logDialog;
     private FileListView fileListView;
 
-    @FXML
-    private HBox topButtonBox;
-    @FXML
-    private HBox fileActionBox;
     @FXML
     private HBox configActionBox;
     @FXML
@@ -51,7 +46,6 @@ public class DataViewController {
     private Label rulesLoadedLabel;
     @FXML
     private TopBar topBar;
-
 
     public DataViewController() {
         this.model = new ProjectDataModel();
@@ -103,28 +97,24 @@ public class DataViewController {
 
             if (configActionBox != null && configActionBox.getParent() instanceof VBox) {
                 VBox parent = (VBox) configActionBox.getParent();
-                parent.getChildren().add(0, ruleView);
+
+                // Create a scroll pane and set its properties
+                ScrollPane scrollPane = new ScrollPane();
+                scrollPane.setFitToWidth(true);
+                scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+                scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+                scrollPane.getStyleClass().add("edge-to-edge");
+
+                scrollPane.setMaxHeight(parent.getMaxHeight());
+                scrollPane.setContent(ruleView);
+
+                // Add the scroll pane to the parent
+                parent.getChildren().add(0, scrollPane);
+                VBox.setVgrow(scrollPane, Priority.ALWAYS);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void setupTopButtons() {
-        Button showLogsButton = buttonManager.getButton(ButtonType.SHOW_LOGS);
-        showLogsButton.setOnAction(e -> handleShowLogs());
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        HBox leftButtons = new HBox(5);
-        leftButtons.getChildren().addAll(
-                buttonManager.getButton(ButtonType.OPEN_PROJECT),
-                buttonManager.getButton(ButtonType.SAVE_AS)
-        );
-
-        topButtonBox.getChildren().clear();
-        topButtonBox.getChildren().addAll(leftButtons, spacer, showLogsButton);
     }
 
     private void setupConfigButtons() {
@@ -272,7 +262,13 @@ public class DataViewController {
             semanticElementsLabel.setText("Number of semantic elements loaded: " + model.getSemanticElementsCount());
             tripletLabel.setText("Number of triplet: " + model.getTripletCount());
             graphLabel.setText("Number of graph: " + model.getGraphCount());
-            rulesLoadedLabel.setText("Number of rules loaded: " + model.getRulesLoadedCount());
+
+            // Utilisez la méthode getLoadedRulesCount pour obtenir le nombre de règles à jour
+            int ruleCount = 0;
+            if (ruleModel != null) {
+                ruleCount = ruleModel.getLoadedRulesCount();
+            }
+            rulesLoadedLabel.setText("Number of rules loaded: " + ruleCount);
         }
     }
 

@@ -77,4 +77,9 @@ public class IconButtonView extends Button{
 
         setGraphic(fontIcon);
     }
+
+    public void setType(IconButtonType iconButtonType) {
+        this.iconButtonType = iconButtonType;
+        createIcon(iconButtonType);
+    }
 }
