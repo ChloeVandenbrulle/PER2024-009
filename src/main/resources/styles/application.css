@@ -1,174 +1,118 @@
-/* Variables de couleurs */
+/* Variables de couleurs - inspirées de l'image */
 * {
-    -color-primary: #4F46E5;
-    -color-primary-hover: #4338CA;
-    -color-bg-default: #FFFFFF;
-    -color-bg-subtle: #F9FAFB;
-    -color-border-subtle: #E5E7EB;
-    -color-border-default: #D1D5DB;
-    -color-text-default: #111827;
-    -color-text-subtle: #6B7280;
-    -transition-default: all 0.2s ease-in-out;
+    -color-primary: #2196F3;     /* Bleu vif comme dans la barre latérale */
+    -color-primary-hover: #1976D2;
+    -color-secondary: #64B5F6;
+    -color-bg-default: #ffffff;
+    -color-bg-subtle: #f0f7ff;   /* Fond bleuté léger comme dans l'image */
+    -color-bg-panel: #ffffff;
+    -color-bg-header: #e6f0fa;   /* Couleur d'en-tête des sections repliables */
+    -color-border-subtle: #dae8f6;
+    -color-border-default: #c0d8f0;
+    -color-text-default: #333333;
+    -color-text-subtle: #6b7280;
+    -transition-default: all 0.15s ease-in-out;
 }
 
 /* Base */
 .root {
-    -fx-background-color: -color-bg-default;
-    -fx-font-family: 'Inter', system-ui, sans-serif;
-}
-
-/* Split Pane */
-.split-pane {
-    -fx-background-color: transparent;
-    -fx-padding: 0;
-}
-
-.split-pane:horizontal > .split-pane-divider {
-    -fx-background-color: -color-border-subtle;
-    -fx-padding: 0 0.5px;
-}
-
-/* Sidebar */
-.sidebar {
     -fx-background-color: -color-bg-subtle;
-    -fx-border-color: -color-border-subtle;
+    -fx-font-family: 'Segoe UI', system-ui, sans-serif;
+    -fx-font-size: 14px;  /* Police de base augmentée */
+}
+
+/* Sidebar - style similaire à l'image */
+.sidebar {
+    -fx-background-color: #f0f7ff;
+    -fx-border-color: #dae8f6;
     -fx-border-width: 0 1 0 0;
 }
 
-/* Navigation */
-.nav-container {
-    -fx-spacing: 12;
-}
-
+/* Navigation - style bleu clair comme dans l'image */
 .nav-button {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
-    -fx-min-height: 50;
-    -fx-pref-width: 160;
-    -fx-font-size: 14;
-    -fx-text-fill: -color-text-default;
-    -fx-padding: 8 16;
+    -fx-min-height: 40;
+    -fx-pref-width: 140;
+    -fx-font-size: 14;  /* Taille augmentée */
+    -fx-text-fill: #2196F3;
+    -fx-padding: 8 12;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 4, 0, 0, 1);
 }
 
 .nav-button:hover {
-    -fx-background-color: derive(-color-bg-subtle, 5%);
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 8, 0, 0, 2);
-}
-
-.nav-button:pressed {
-    -fx-background-color: derive(-color-bg-subtle, -5%);
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 2, 0, 0, 0);
+    -fx-background-color: #e3f2fd;
 }
 
 .nav-button:selected {
-    -fx-background-color: -color-primary;
-    -fx-text-fill: white;
-    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.3), 8, 0, 0, 2);
+    -fx-background-color: #e3f2fd;
+    -fx-text-fill: #2196F3;
+    -fx-border-color: #2196F3;
+    -fx-border-width: 0 0 0 3;
 }
 
-/* Toolbar */
-.tool-bar {
-    -fx-background-color: -color-bg-default;
-    -fx-border-color: -color-border-subtle;
-    -fx-border-width: 0 0 1 0;
-    -fx-padding: 12 16;
-    -fx-spacing: 8;
-}
-
-/* Boutons */
-.rounded-button {
-    -fx-background-color: -color-bg-default;
-    -fx-border-color: -color-border-default;
-    -fx-min-height: 40;
-    -fx-padding: 8 16;
-    -fx-cursor: hand;
-    -fx-text-fill: -color-text-default;
-    -fx-font-size: 14;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 4, 0, 0, 1);
-    -fx-transition: -transition-default;
-}
-
-.rounded-button:hover {
-    -fx-background-color: -color-bg-subtle;
-    -fx-border-color: -color-border-default;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 8, 0, 0, 2);
-}
-
-.rounded-button:pressed {
-    -fx-background-color: derive(-color-bg-subtle, -5%);
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 2, 0, 0, 0);
-}
-
-.rounded-button .ikonli-font-icon {
-    -fx-icon-color: -color-text-default;
-}
-
-/* Menu Button */
-.menu-button {
-    -fx-min-width: 120;
-    -fx-min-height: 40;
-    -fx-background-color: -color-bg-default;
-    -fx-border-color: -color-border-default;
-    -fx-cursor: hand;
-}
-
-.menu-button:hover {
-    -fx-background-color: -color-bg-subtle;
-}
-
-.menu-button:showing {
-    -fx-background-color: derive(-color-bg-subtle, -5%);
-}
-
-/* Tree View */
-.tree-view {
-    -fx-background-color: -color-bg-default;
-    -fx-border-color: -color-border-subtle;
-    -fx-border-width: 1;
-    -fx-padding: 4;
-}
-
-.tree-view .tree-cell {
-    -fx-background-color: transparent;
-    -fx-padding: 8 12;
-    -fx-text-fill: -color-text-default;
-}
-
-.tree-view .tree-cell:selected {
-    -fx-background-color: derive(-color-primary, 90%);
+/* TitledPane styles - avec barre verticale bleue comme dans l'image */
+.titled-pane {
     -fx-text-fill: -color-primary;
+    -fx-font-size: 14px;
 }
 
-.tree-view .tree-cell:hover {
-    -fx-background-color: -color-bg-subtle;
-}
-
-/* Scroll Bar */
-.scroll-bar {
-    -fx-background-color: transparent;
-    -fx-pref-width: 12;
-}
-
-.scroll-bar .thumb {
-    -fx-background-color: -color-border-default;
-}
-
-.scroll-bar .thumb:hover {
-    -fx-background-color: -color-border-subtle;
-}
-
-/* Effets de transition */
-.nav-button, .rounded-button, .menu-button {
-    -fx-transition: -transition-default;
-}
-
-.titled-pane > .title > .text {
-    -fx-font-size: 13px;
+.titled-pane > .title {
+    -fx-background-color: #e6f0fa;  /* Arrière-plan bleu clair comme dans l'image */
+    -fx-border-color: #2196F3;
+    -fx-border-width: 0 0 0 3;  /* Barre verticale bleue */
     -fx-font-weight: bold;
+    -fx-padding: 6 8;
+}
+
+.titled-pane:expanded > .title {
+    -fx-background-color: #e6f0fa;
 }
 
 .titled-pane > .content {
-    -fx-padding: 0 0 10px 10px;
+    -fx-background-color: white;
+    -fx-border-color: #e9ecef;
+    -fx-border-width: 1;
+    -fx-padding: 6 8;
+}
+
+/* CheckBox styles */
+.check-box .box {
+    -fx-background-color: white;
+    -fx-border-color: #bdbdbd;
+    -fx-border-radius: 2px;
+    -fx-pref-height: 16px;
+    -fx-pref-width: 16px;
+}
+
+.check-box .text {
+    -fx-font-size: 14px;  /* Taille augmentée */
+}
+
+.check-box:selected .box {
+    -fx-background-color: #2196F3;
+    -fx-border-color: #2196F3;
+}
+
+/* ListView styles */
+.list-view {
+    -fx-background-color: white;
+    -fx-border-color: #e9ecef;
+    -fx-padding: 2;
+}
+
+.list-view .list-cell {
+    -fx-padding: 6 8;
+    -fx-font-size: 14px;  /* Taille augmentée */
+}
+
+.list-view .list-cell:selected {
+    -fx-background-color: #e3f2fd;
+    -fx-text-fill: #2196F3;
+}
+
+/* Labels dans la zone de statistiques */
+.stats-container .label {
+    -fx-font-size: 14px;
+    -fx-padding: 3 0;
 }

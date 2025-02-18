@@ -12,6 +12,7 @@ import fr.inria.corese.demo.controller.IconButtonBarController;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -29,7 +30,7 @@ public class FileListView extends VBox {
     @FXML
     private ListView<FileItem> fileList;
     @FXML
-    private HBox buttonContainer;
+    private FlowPane buttonContainer;
 
     public FileListView() {
         loadFxml();
@@ -52,14 +53,16 @@ public class FileListView extends VBox {
 
     private void setupIconButtons() {
         // Créer les boutons avec IconButtonView
-        clearButton = new IconButtonView(IconButtonType.DELETE);
-        reloadButton = new IconButtonView(IconButtonType.RELOAD);
         loadButton = new IconButtonView(IconButtonType.IMPORT);
+        reloadButton = new IconButtonView(IconButtonType.RELOAD);
+        clearButton = new IconButtonView(IconButtonType.DELETE);
 
-        // Ajouter les boutons au conteneur
+        // Ajouter les boutons au conteneur vertical dans l'ordre souhaité
         buttonContainer.getChildren().clear();
-        buttonContainer.getChildren().addAll(clearButton, reloadButton, loadButton);
-        buttonContainer.setAlignment(Pos.CENTER_LEFT);
+        buttonContainer.getChildren().addAll(loadButton, reloadButton, clearButton);
+
+        // S'assurer que les boutons sont bien alignés en haut à gauche
+        buttonContainer.setAlignment(Pos.TOP_LEFT);
     }
 
     @FXML
@@ -133,8 +136,8 @@ public class FileListView extends VBox {
 
         // Get the current fileList from the FXML
         if (fileList != null) {
-            // Remove the ListView from its current parent
-            VBox parent = (VBox)fileList.getParent();
+            // Remove the ListView from its current parent (maintenant un HBox)
+            HBox parent = (HBox)fileList.getParent();
             int index = parent.getChildren().indexOf(fileList);
             parent.getChildren().remove(fileList);
 
@@ -143,9 +146,9 @@ public class FileListView extends VBox {
 
             // Add the stack pane to the parent at the same position
             parent.getChildren().add(index, contentContainer);
-            VBox.setVgrow(contentContainer, Priority.ALWAYS);
+            HBox.setHgrow(contentContainer, Priority.ALWAYS);
         } else {
-            // If fileList is still null (unlikely with proper FXML loading)
+            // Si fileList est toujours null
             getChildren().add(0, contentContainer);
             VBox.setVgrow(contentContainer, Priority.ALWAYS);
         }

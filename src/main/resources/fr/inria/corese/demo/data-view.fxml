@@ -18,7 +18,7 @@
         <HBox spacing="0">
             <VBox spacing="5" styleClass="section-container" HBox.hgrow="ALWAYS">
                 <padding>
-                    <Insets top="10" right="10" bottom="10" left="10"/>
+                    <Insets top="4" right="4" bottom="4" left="4"/>
                 </padding>
                 <VBox fx:id="fileListContainer" VBox.vgrow="ALWAYS" styleClass="file-container"/>
                 <VBox styleClass="stats-container">
@@ -34,7 +34,7 @@
 
             <VBox spacing="10" styleClass="section-container">
                 <padding>
-                    <Insets top="10" right="10" bottom="10" left="10"/>
+                    <Insets top="4" right="4" bottom="4" left="4"/>
                 </padding>
                 <HBox fx:id="configActionBox" spacing="10" alignment="BOTTOM_RIGHT"/>
             </VBox>
