@@ -1,15 +1,18 @@
 package fr.inria.corese.demo.controller;
 
+import fr.inria.corese.demo.enums.IconButtonType;
 import fr.inria.corese.demo.model.ProjectDataModel;
 import fr.inria.corese.demo.model.RuleModel;
+import fr.inria.corese.demo.view.IconButtonView;
 import fr.inria.corese.demo.view.RuleItem;
 import fr.inria.corese.demo.view.RuleView;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
-import javafx.scene.control.CheckBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.util.*;
 
 public class RuleViewController {
     private RuleModel ruleModel;
@@ -22,9 +25,7 @@ public class RuleViewController {
     @FXML
     private VBox owlRulesContainer;
     @FXML
-    private VBox globalOptionsContainer;
-    @FXML
-    private VBox activeRulesContainer;
+    private VBox customRulesContainer;
 
     // Constructeur par défaut utilisé par FXML
     public RuleViewController() {
@@ -43,20 +44,19 @@ public class RuleViewController {
     public void initialize() {
         view = new RuleView();
         initializeRules();
+
+        if (customRulesContainer != null) {
+            Label noRulesLabel = new Label("No custom rules loaded");
+            noRulesLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #888888;");
+            customRulesContainer.getChildren().clear();
+            customRulesContainer.getChildren().add(noRulesLabel);
+        }
     }
 
     public void initializeRules() {
         if (rdfsRulesContainer != null && owlRulesContainer != null) {
             rdfsRulesContainer.getChildren().clear();
             owlRulesContainer.getChildren().clear();
-
-            if (globalOptionsContainer != null) {
-                globalOptionsContainer.getChildren().clear();
-                // Ajouter les options globales
-                addRuleItem(globalOptionsContainer, "Trace", true);
-                addRuleItem(globalOptionsContainer, "Load Named", true);
-                addRuleItem(globalOptionsContainer, "Graph index", true);
-            }
 
             // RDFS rules
             addRuleItem(rdfsRulesContainer, "RDFS Subset", true);
@@ -70,30 +70,24 @@ public class RuleViewController {
         }
     }
 
-    private void setupPredefinedRuleHandlers() {
-        RuleView ruleView = (RuleView) view;
-        ruleView.setRuleCheckboxHandler("Trace", e ->
-                handleRuleToggle("Trace", ((CheckBox)e.getSource()).isSelected()));
-        ruleView.setRuleCheckboxHandler("Load Named", e ->
-                handleRuleToggle("Load Named", ((CheckBox)e.getSource()).isSelected()));
-        ruleView.setRuleCheckboxHandler("Graph index", e ->
-                handleRuleToggle("Graph index", ((CheckBox)e.getSource()).isSelected()));
-    }
-
     void updateView() {
-        RuleView ruleView = (RuleView) view;
-        if (ruleView != null) {
-            // Mettre à jour l'état des règles prédéfinies
-            ruleView.setPredefinedRuleState("Trace", ruleModel.isTraceEnabled());
-            ruleView.setPredefinedRuleState("Load Named", ruleModel.isLoadNamedEnabled());
-            ruleView.setPredefinedRuleState("Graph index", ruleModel.isGraphIndexEnabled());
-
-            // Mettre à jour les règles actives
-            ruleView.updateActiveRules(ruleModel.getActiveRules());
-        }
-
         // Mettre à jour les états des règles RDFS et OWL
         updatePredefinedRuleStates();
+
+        if (ruleModel != null) {
+            List<String> customRules = new ArrayList<>(ruleModel.getLoadedRules());
+            // Filtrer pour ne garder que les règles personnalisées
+            customRules.removeIf(rule ->
+                    rule.equals("RDFS Subset") ||
+                            rule.equals("RDFS RL") ||
+                            rule.equals("OWL RL") ||
+                            rule.equals("OWL RL Extended") ||
+                            rule.equals("OWL RL Test") ||
+                            rule.equals("OWL Clean"));
+
+            // Afficher les règles personnalisées
+            displayCustomRules(customRules);
+        }
     }
 
     private void updatePredefinedRuleStates() {
@@ -126,20 +120,11 @@ public class RuleViewController {
     }
 
     private void handleShowDocumentation(String ruleName) {
-        //external link to documentation
+        //TODO: open documentation with external link
     }
 
     private void handleRuleToggle(String ruleName, boolean selected) {
         switch (ruleName) {
-            case "Trace":
-                ruleModel.setTraceEnabled(selected);
-                break;
-            case "Load Named":
-                ruleModel.setLoadNamedEnabled(selected);
-                break;
-            case "Graph index":
-                ruleModel.setGraphIndexEnabled(selected);
-                break;
             case "RDFS Subset":
                 ruleModel.setRDFSSubsetEnabled(selected);
                 break;
@@ -162,9 +147,91 @@ public class RuleViewController {
         updateView();
     }
 
-    private void handleDuplicateRule(String ruleName) {
-        System.out.println("Duplicating rule: " + ruleName);
-        ruleModel.duplicateRule(ruleName);
-        updateView();
+    private void displayCustomRules(List<String> customRules) {
+        // Vérifier que le conteneur existe
+        if (customRulesContainer == null) {
+            System.err.println("Custom rules container not found in FXML");
+            return;
+        }
+
+        // Effacer le conteneur
+        customRulesContainer.getChildren().clear();
+
+        if (customRules.isEmpty()) {
+            // Afficher un message si aucune règle personnalisée n'est chargée
+            Label noRulesLabel = new Label("No custom rules loaded");
+            noRulesLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #888888;");
+            customRulesContainer.getChildren().add(noRulesLabel);
+        } else {
+            // Ajouter chaque règle personnalisée au conteneur
+            for (String ruleName : customRules) {
+                RuleItem ruleItem = new RuleItem(ruleName);
+
+                // Configurer le checkbox pour qu'il soit toujours coché
+                ruleItem.getCheckBox().setSelected(true);
+
+                // Transformer le bouton de documentation en bouton de suppression
+                Button deleteButton = ruleItem.getDocumentationButton();
+                // Changer l'icône du bouton pour un icône de suppression
+                IconButtonView deleteIconButton = new IconButtonView(IconButtonType.DELETE);
+
+                // Si le bouton original est un IconButtonView, on peut simplement changer son type
+                if (deleteButton instanceof IconButtonView) {
+                    ((IconButtonView) deleteButton).setType(IconButtonType.DELETE);
+                } else {
+                    // Sinon, on remplace le bouton existant par notre nouveau bouton
+                    HBox parent = (HBox) deleteButton.getParent();
+                    int index = parent.getChildren().indexOf(deleteButton);
+                    parent.getChildren().remove(deleteButton);
+                    parent.getChildren().add(index, deleteIconButton);
+                    deleteButton = deleteIconButton;
+                }
+
+                // Configurer l'action du bouton de suppression
+                deleteButton.setOnAction(e -> handleDeleteCustomRule(ruleName));
+
+                // Ajouter l'élément de règle au conteneur
+                customRulesContainer.getChildren().add(ruleItem);
+            }
+        }
+    }
+
+    private void handleDeleteCustomRule(String ruleName) {
+        // Confirmation avant suppression
+        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmDialog.setTitle("Delete Rule");
+        confirmDialog.setHeaderText("Delete Custom Rule");
+        confirmDialog.setContentText("Are you sure you want to delete the rule: " + ruleName + "?");
+
+        Optional<ButtonType> result = confirmDialog.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                // Supprimer la règle du modèle
+                ruleModel.removeRule(ruleName);
+
+                // Mettre à jour le compte de règles dans le modèle de projet si nécessaire
+                if (projectDataModel != null) {
+                    int ruleCount = ruleModel.getLoadedRulesCount();
+                    projectDataModel.setRulesLoadedCount(ruleCount);
+                }
+
+                // Mettre à jour l'affichage
+                updateView();
+
+                // Notification de succès
+                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                successAlert.setTitle("Rule Deleted");
+                successAlert.setHeaderText(null);
+                successAlert.setContentText("Rule '" + ruleName + "' has been deleted successfully.");
+                successAlert.showAndWait();
+            } catch (Exception ex) {
+                // Notification d'erreur en cas de problème
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setTitle("Error");
+                errorAlert.setHeaderText("Error Deleting Rule");
+                errorAlert.setContentText("Failed to delete rule: " + ex.getMessage());
+                errorAlert.showAndWait();
+            }
+        }
     }
 }

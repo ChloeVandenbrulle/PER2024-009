@@ -47,7 +47,6 @@ public class FileListView extends VBox {
         }
     }
 
-
     private void setupIconButtons() {
         // Créer les boutons avec IconButtonView
         clearButton = new IconButtonView(IconButtonType.DELETE);
@@ -159,4 +158,6 @@ public class FileListView extends VBox {
             }
         }
     }
+
+
 }

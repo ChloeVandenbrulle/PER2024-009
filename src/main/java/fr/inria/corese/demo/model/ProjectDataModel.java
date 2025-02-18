@@ -56,6 +56,11 @@ public class ProjectDataModel {
         logEntries.add(timestamp + " - " + entry);
     }
 
+    public void setRulesLoadedCount(int count) {
+        rulesLoadedCount = count;
+    }
+
+
     public FileListModel getFileListModel() {
         return fileListModel;
     }
