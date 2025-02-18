@@ -285,7 +285,15 @@ public class CodeMirrorView extends StackPane {
                     console.log(lines);
                     let currentText = '';
                     
-
+                    if (window.errorLines) {
+                        
+                        window.errorLines.forEach(lineNumber => {
+                            console.log("line "+lineNumber);
+                            editor.removeLineClass(lineNumber, 'background', 'CodeMirror-line-error');
+                        });
+                    }
+                    window.errorLines = [];
+                  
                     new Promise((resolve) => {
                         parser.parse(text, (error, quad, prefixes) => {
                             if (error) {
@@ -307,9 +315,8 @@ public class CodeMirrorView extends StackPane {
                                 });
                                 
                                 editor.addLineClass(line, 'background', 'CodeMirror-line-error');
+                                window.errorLines.push(line);
                             }
-
-                            // Quand le parsing est terminé, on résout la promesse
                             updateErrorCounts(issues);
                             resolve();
                         });
