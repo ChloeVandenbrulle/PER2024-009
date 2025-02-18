@@ -18,5 +18,7 @@ public enum IconButtonType {
     CLOSE_FILE_EXPLORER,
     RELOAD,
     LOGS,
-    DELETE
+    DELETE,
+    COPY,
+    PASTE,
 }

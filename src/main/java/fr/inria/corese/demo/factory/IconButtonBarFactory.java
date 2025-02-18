@@ -43,18 +43,9 @@ public class IconButtonBarFactory {
                     IconButtonType.REDO,
                     IconButtonType.DOCUMENTATION
             );
-            case QUERY_EDITOR -> List.of(
+            case QUERY -> List.of(
                     IconButtonType.IMPORT,
                     IconButtonType.EXPORT
-            );
-            case QUERY_TABLE, QUERY_TEXT -> List.of(
-                    IconButtonType.EXPORT
-            );
-            case QUERY_GRAPH -> List.of(
-                    IconButtonType.EXPORT,
-                    IconButtonType.ZOOM_IN,
-                    IconButtonType.ZOOM_OUT,
-                    IconButtonType.FULL_SCREEN
             );
         };
     }

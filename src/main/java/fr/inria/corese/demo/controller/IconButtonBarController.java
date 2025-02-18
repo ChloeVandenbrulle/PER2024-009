@@ -199,4 +199,7 @@ public class IconButtonBarController {
         alert.showAndWait();
     }
 
+    public void addCustomButton(Button runButton) {
+        view.addCustomButton(runButton);
+    }
 }

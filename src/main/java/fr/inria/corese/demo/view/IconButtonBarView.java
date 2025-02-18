@@ -32,4 +32,7 @@ public class IconButtonBarView extends VBox {
         return buttons.get(type);
     }
 
+    public void addCustomButton(Button runButton) {
+        getChildren().add(runButton);
+    }
 }
