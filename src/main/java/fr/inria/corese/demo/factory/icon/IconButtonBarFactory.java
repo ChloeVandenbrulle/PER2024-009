@@ -27,24 +27,11 @@ public class IconButtonBarFactory {
                     IconButtonType.CLOSE_FILE_EXPLORER,
                     IconButtonType.DOCUMENTATION
             );
-            case RDF_EDITOR -> List.of(
+            case RDF_EDITOR, VALIDATION, QUERY -> List.of(
                     IconButtonType.SAVE,
                     IconButtonType.UNDO,
                     IconButtonType.REDO,
                     IconButtonType.DOCUMENTATION
-            );
-            case VALIDATION -> List.of(
-                    IconButtonType.SAVE,
-                    IconButtonType.OPEN_FILE,
-                    IconButtonType.EXPORT,
-                    IconButtonType.CLEAR,
-                    IconButtonType.UNDO,
-                    IconButtonType.REDO,
-                    IconButtonType.DOCUMENTATION
-            );
-            case QUERY -> List.of(
-                    IconButtonType.IMPORT,
-                    IconButtonType.EXPORT
             );
         };
     }
