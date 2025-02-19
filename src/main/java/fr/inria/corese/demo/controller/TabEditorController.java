@@ -46,17 +46,15 @@ public class TabEditorController {
     }
 
     private void initializeKeyboardShortcuts(){
-        // TODO: Ajouter shortcut pour fermer le fichier
         view.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 newScene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-                    if (event.isControlDown() && event.getCode() == KeyCode.S) {
-                        System.out.println("CTRL+S");
+                    boolean isShortcutDown = event.isControlDown() || event.isMetaDown();
+                    if (isShortcutDown && event.getCode() == KeyCode.S) {
                         handleSaveShortcut();
                         event.consume();
                     }
-                    if (event.isControlDown() && event.getCode() == KeyCode.W) {
-                        System.out.println("CTRL+W");
+                    if (isShortcutDown && event.getCode() == KeyCode.W) {
                         Tab tab = view.getSelectionModel().getSelectedItem();
                         if (handleCloseFile(tab)) {
                             view.getTabs().remove(tab);
