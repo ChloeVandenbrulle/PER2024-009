@@ -16,6 +16,7 @@ public class FileExplorerView extends HBox {
     private IconButtonView newFileButton;
     private IconButtonView newFolderButton;
     private IconButtonView openFolderButton;
+    private EmptyStateView emptyStateView;
     private HBox buttonBar;
     private VBox mainContent;
 
@@ -32,6 +33,12 @@ public class FileExplorerView extends HBox {
     }
 
     private void initializeComponents() {
+        emptyStateView = new EmptyStateView();
+        emptyStateView.setMaxWidth(Double.MAX_VALUE);
+        emptyStateView.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(emptyStateView, Priority.ALWAYS);
+        emptyStateView.setAlignment(Pos.TOP_CENTER);
+
         treeView = new TreeView<>();
 
         treeView.setCellFactory(tv -> new TreeCell<String>() {
@@ -101,7 +108,25 @@ public class FileExplorerView extends HBox {
         treeView.setMaxHeight(Double.MAX_VALUE);
 
         openFolderButton.setAlignment(Pos.CENTER);
-        mainContent.getChildren().addAll(buttonBar, treeView);
+        mainContent.getChildren().add(buttonBar);
+        if (treeView.getRoot() != null) {
+            mainContent.getChildren().add(treeView);
+        } else {
+            mainContent.getChildren().add(emptyStateView);
+        }
+    }
+
+    public void switchView(boolean hasRoot) {
+        mainContent.getChildren().remove(1);
+        if (hasRoot) {
+            mainContent.getChildren().add(treeView);
+        } else {
+            VBox emptyStateContainer = new VBox();
+            emptyStateContainer.setAlignment(Pos.CENTER);
+            emptyStateContainer.getChildren().add(emptyStateView);
+            VBox.setVgrow(emptyStateContainer, Priority.ALWAYS);
+            mainContent.getChildren().add(emptyStateContainer);
+        }
     }
 
     public TreeView<String> getTreeView() {
@@ -124,5 +149,9 @@ public class FileExplorerView extends HBox {
 
     public Button getOpenFolderButton() {
         return openFolderButton;
+    }
+
+    public VBox getMainContent() {
+        return mainContent;
     }
 }

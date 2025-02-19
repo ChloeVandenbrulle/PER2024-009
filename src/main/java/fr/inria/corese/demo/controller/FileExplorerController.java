@@ -189,6 +189,7 @@ public class FileExplorerController {
         }
 
         view.getTreeView().setRoot(root);
+        view.switchView(root!=null);
     }
 
     private void populateTreeItems(TreeItem<String> parentItem, File parent) throws IOException {
