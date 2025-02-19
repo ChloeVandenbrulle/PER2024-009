@@ -1,6 +1,7 @@
 package fr.inria.corese.demo.view;
 
-import fr.inria.corese.demo.enums.IconButtonType;
+import fr.inria.corese.demo.enums.icon.IconButtonType;
+import fr.inria.corese.demo.view.icon.IconButtonView;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;

@@ -1,6 +1,6 @@
 package fr.inria.corese.demo.controller;
 
-import fr.inria.corese.demo.model.FileListModel;
+import fr.inria.corese.demo.model.fileList.FileListModel;
 import fr.inria.corese.demo.view.FileListView;
 import javafx.stage.FileChooser;
 import java.io.File;

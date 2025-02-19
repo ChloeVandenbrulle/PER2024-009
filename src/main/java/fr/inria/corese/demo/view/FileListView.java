@@ -1,18 +1,16 @@
 package fr.inria.corese.demo.view;
 
-import fr.inria.corese.demo.model.FileItem;
-import fr.inria.corese.demo.model.FileListModel;
-import fr.inria.corese.demo.view.popup.IPopup;
-import fr.inria.corese.demo.view.popup.PopupFactory;
-import fr.inria.corese.demo.view.popup.WarningPopup;
+import fr.inria.corese.demo.model.fileList.FileItem;
+import fr.inria.corese.demo.model.fileList.FileListModel;
+import fr.inria.corese.demo.factory.popup.IPopup;
+import fr.inria.corese.demo.factory.popup.PopupFactory;
+import fr.inria.corese.demo.factory.popup.WarningPopup;
 import fr.inria.corese.demo.model.ProjectDataModel;
-import fr.inria.corese.demo.factory.IconButtonBarFactory;
-import fr.inria.corese.demo.enums.IconButtonType;
-import fr.inria.corese.demo.controller.IconButtonBarController;
+import fr.inria.corese.demo.enums.icon.IconButtonType;
+import fr.inria.corese.demo.view.icon.IconButtonView;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;

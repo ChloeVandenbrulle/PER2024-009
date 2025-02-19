@@ -1,6 +1,6 @@
 package fr.inria.corese.demo.view;
 
-import fr.inria.corese.demo.model.ButtonType;
+import fr.inria.corese.demo.enums.button.ButtonType;
 import javafx.scene.control.Button;
 import java.util.function.Consumer;
 

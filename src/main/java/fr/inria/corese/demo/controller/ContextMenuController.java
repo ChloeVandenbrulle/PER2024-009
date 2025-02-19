@@ -2,9 +2,9 @@ package fr.inria.corese.demo.controller;
 
 import fr.inria.corese.demo.model.ContextMenuModel;
 import fr.inria.corese.demo.view.ContextMenuView;
-import fr.inria.corese.demo.view.popup.DeleteConfirmationPopup;
-import fr.inria.corese.demo.view.popup.PopupFactory;
-import fr.inria.corese.demo.view.popup.RenamePopup;
+import fr.inria.corese.demo.factory.popup.DeleteConfirmationPopup;
+import fr.inria.corese.demo.factory.popup.PopupFactory;
+import fr.inria.corese.demo.factory.popup.RenamePopup;
 import javafx.scene.control.*;
 
 import java.io.File;

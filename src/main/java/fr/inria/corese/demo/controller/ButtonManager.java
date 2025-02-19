@@ -1,6 +1,6 @@
 package fr.inria.corese.demo.controller;
 
-import fr.inria.corese.demo.model.ButtonType;
+import fr.inria.corese.demo.enums.button.ButtonType;
 import fr.inria.corese.demo.model.ProjectDataModel;
 import fr.inria.corese.demo.view.CustomButton;
 import java.util.HashMap;

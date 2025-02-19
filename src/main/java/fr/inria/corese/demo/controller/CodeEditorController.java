@@ -1,14 +1,13 @@
 package fr.inria.corese.demo.controller;
 
-import fr.inria.corese.demo.enums.IconButtonBarType;
-import fr.inria.corese.demo.enums.IconButtonType;
-import fr.inria.corese.demo.factory.IconButtonBarFactory;
-import fr.inria.corese.demo.model.CodeEditorModel;
-import fr.inria.corese.demo.view.CodeEditorView;
-import fr.inria.corese.demo.view.CodeMirrorView;
-import fr.inria.corese.demo.view.popup.DeleteConfirmationPopup;
-import fr.inria.corese.demo.view.popup.IPopup;
-import fr.inria.corese.demo.view.popup.PopupFactory;
+import fr.inria.corese.demo.enums.icon.IconButtonBarType;
+import fr.inria.corese.demo.enums.icon.IconButtonType;
+import fr.inria.corese.demo.factory.icon.IconButtonBarFactory;
+import fr.inria.corese.demo.model.codeEditor.CodeEditorModel;
+import fr.inria.corese.demo.view.codeEditor.CodeEditorView;
+import fr.inria.corese.demo.view.codeEditor.CodeMirrorView;
+import fr.inria.corese.demo.factory.popup.IPopup;
+import fr.inria.corese.demo.factory.popup.PopupFactory;
 import javafx.application.Platform;
 import java.io.FileWriter;
 import java.io.IOException;

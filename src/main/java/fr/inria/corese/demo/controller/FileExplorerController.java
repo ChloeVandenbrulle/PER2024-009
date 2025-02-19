@@ -1,10 +1,10 @@
 package fr.inria.corese.demo.controller;
 
 import fr.inria.corese.demo.model.FileExplorerModel;
-import fr.inria.corese.demo.model.FileItem;
+import fr.inria.corese.demo.model.fileList.FileItem;
 import fr.inria.corese.demo.view.FileExplorerView;
-import fr.inria.corese.demo.view.popup.NewFilePopup;
-import fr.inria.corese.demo.view.popup.PopupFactory;
+import fr.inria.corese.demo.factory.popup.NewFilePopup;
+import fr.inria.corese.demo.factory.popup.PopupFactory;
 import javafx.scene.control.TreeItem;
 import javafx.stage.DirectoryChooser;
 import org.kordamp.ikonli.javafx.FontIcon;

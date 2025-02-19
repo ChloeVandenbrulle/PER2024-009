@@ -1,5 +1,6 @@
 package fr.inria.corese.demo.view;
 
+import fr.inria.corese.demo.view.codeEditor.CodeEditorView;
 import javafx.animation.ScaleTransition;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;

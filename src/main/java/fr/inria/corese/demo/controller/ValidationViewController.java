@@ -1,6 +1,6 @@
 package fr.inria.corese.demo.controller;
 
-import fr.inria.corese.demo.enums.IconButtonBarType;
+import fr.inria.corese.demo.enums.icon.IconButtonBarType;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.SplitPane;

@@ -1,10 +1,10 @@
 package fr.inria.corese.demo.controller;
 
-import fr.inria.corese.demo.enums.IconButtonBarType;
+import fr.inria.corese.demo.enums.icon.IconButtonBarType;
 import fr.inria.corese.demo.model.TabEditorModel;
 import fr.inria.corese.demo.view.TabEditorView;
-import fr.inria.corese.demo.view.popup.PopupFactory;
-import fr.inria.corese.demo.view.popup.SaveConfirmationPopup;
+import fr.inria.corese.demo.factory.popup.PopupFactory;
+import fr.inria.corese.demo.factory.popup.SaveConfirmationPopup;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.Tab;
 import javafx.scene.input.KeyEvent;

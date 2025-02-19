@@ -1,14 +1,12 @@
 package fr.inria.corese.demo.controller;
 
-import fr.inria.corese.demo.enums.IconButtonType;
-import fr.inria.corese.demo.model.CodeEditorModel;
+import fr.inria.corese.demo.enums.icon.IconButtonType;
+import fr.inria.corese.demo.model.codeEditor.CodeEditorModel;
 import fr.inria.corese.demo.model.IconButtonBarModel;
-import fr.inria.corese.demo.view.IconButtonBarView;
-import fr.inria.corese.demo.view.NavigationBarView;
-import fr.inria.corese.demo.view.popup.DocumentationPopup;
-import fr.inria.corese.demo.view.popup.IPopup;
-import fr.inria.corese.demo.view.popup.NewFilePopup;
-import fr.inria.corese.demo.view.popup.PopupFactory;
+import fr.inria.corese.demo.view.icon.IconButtonBarView;
+import fr.inria.corese.demo.factory.popup.DocumentationPopup;
+import fr.inria.corese.demo.factory.popup.IPopup;
+import fr.inria.corese.demo.factory.popup.PopupFactory;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.stage.FileChooser;

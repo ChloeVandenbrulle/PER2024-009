@@ -1,6 +1,7 @@
 package fr.inria.corese.demo.model;
 
-import fr.inria.corese.demo.enums.IconButtonType;
+import fr.inria.corese.demo.enums.icon.IconButtonType;
+import fr.inria.corese.demo.model.codeEditor.CodeEditorModel;
 
 import java.util.HashMap;
 import java.util.List;

@@ -1,8 +1,7 @@
 package fr.inria.corese.demo.controller;
 
-import fr.inria.corese.demo.enums.IconButtonBarType;
+import fr.inria.corese.demo.enums.icon.IconButtonBarType;
 import fr.inria.corese.demo.model.TabEditorModel;
-import fr.inria.corese.demo.view.CodeEditorView;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;

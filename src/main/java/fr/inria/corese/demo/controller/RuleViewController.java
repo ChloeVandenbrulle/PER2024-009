@@ -1,14 +1,13 @@
 package fr.inria.corese.demo.controller;
 
-import fr.inria.corese.demo.enums.IconButtonType;
+import fr.inria.corese.demo.enums.icon.IconButtonType;
 import fr.inria.corese.demo.model.ProjectDataModel;
 import fr.inria.corese.demo.model.RuleModel;
-import fr.inria.corese.demo.view.IconButtonView;
-import fr.inria.corese.demo.view.RuleItem;
-import fr.inria.corese.demo.view.RuleView;
+import fr.inria.corese.demo.view.icon.IconButtonView;
+import fr.inria.corese.demo.view.rule.RuleItem;
+import fr.inria.corese.demo.view.rule.RuleView;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 

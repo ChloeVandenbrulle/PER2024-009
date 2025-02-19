@@ -1,5 +1,6 @@
 package fr.inria.corese.demo.model;
 
+import fr.inria.corese.demo.model.fileList.FileListModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.io.File;

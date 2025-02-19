@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<?import fr.inria.corese.demo.view.CodeMirrorView?>
+<?import fr.inria.corese.demo.view.codeEditor.CodeMirrorView?>
 
 <?import fr.inria.corese.demo.view.FileExplorerView?>
 <BorderPane fx:id="mainContainer"

@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Label?>
-<?import fr.inria.corese.demo.view.CodeMirrorView?>
+<?import fr.inria.corese.demo.view.codeEditor.CodeMirrorView?>
 
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="fr.inria.corese.demo.controller.ValidationViewController">
     <padding>

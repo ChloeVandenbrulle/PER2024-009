@@ -1,13 +1,13 @@
 package fr.inria.corese.demo.controller;
 
-import fr.inria.corese.demo.enums.IconButtonType;
-import fr.inria.corese.demo.model.ButtonType;
+import fr.inria.corese.demo.enums.icon.IconButtonType;
+import fr.inria.corese.demo.enums.button.ButtonType;
 import fr.inria.corese.demo.model.RuleModel;
 import fr.inria.corese.demo.view.DataView;
 import fr.inria.corese.demo.model.ProjectDataModel;
 import fr.inria.corese.demo.view.FileListView;
 import fr.inria.corese.demo.view.TopBar;
-import fr.inria.corese.demo.view.popup.*;
+import fr.inria.corese.demo.factory.popup.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
