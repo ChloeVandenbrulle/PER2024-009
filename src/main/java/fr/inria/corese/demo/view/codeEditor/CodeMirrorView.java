@@ -1,5 +1,7 @@
 package fr.inria.corese.demo.view.codeEditor;
 
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 import javafx.scene.web.WebEngine;
@@ -7,6 +9,8 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.application.Platform;
 import netscape.javascript.JSObject;
+
+import static javafx.scene.layout.VBox.setVgrow;
 
 public class CodeMirrorView extends StackPane {
     private final WebView webView;
@@ -20,8 +24,17 @@ public class CodeMirrorView extends StackPane {
         webEngine = webView.getEngine();
 
         webView.setContextMenuEnabled(false);
-        webView.prefWidthProperty().bind(widthProperty());
-        webView.prefHeightProperty().bind(heightProperty());
+        webView.setPrefWidth(USE_COMPUTED_SIZE);
+        webView.setPrefHeight(USE_COMPUTED_SIZE);
+        webView.setMaxHeight(Double.MAX_VALUE);
+        webView.setMaxWidth(Double.MAX_VALUE);
+
+        webView.setMinHeight(0);
+        webView.setMinWidth(0);
+        setVgrow(webView, Priority.ALWAYS);
+
+        setMinHeight(400);
+        setPrefHeight(Region.USE_COMPUTED_SIZE);
 
         getChildren().add(webView);
 
@@ -50,13 +63,29 @@ public class CodeMirrorView extends StackPane {
                 .editor-container {
                     display: flex;
                     flex-direction: column;
-                    height: 100vh;
+                    height: 100vh; /* Utilisez viewport height au lieu de 100% */
                     position: relative;
+                    overflow: hidden;
                 }
+                       
                 .CodeMirror {
-                    flex-grow: 1;
-                    font-family: 'JetBrains Mono', monospace;
-                    font-size: 14px;
+                    flex: 1;
+                    height: 100% !important; /* Force la hauteur à 100% */
+                    width: 100%;
+                    position: relative;
+                    display: flex;
+                    flex-direction: column;
+                }
+                
+                .CodeMirror-scroll {
+                    flex: 1;
+                    height: auto !important;
+                    max-height: none !important;
+                }
+                
+                #editor {
+                    width: 100%;
+                    height: 100%;
                 }
                 .status-bar {
                     height: 25px;
@@ -80,7 +109,7 @@ public class CodeMirrorView extends StackPane {
                 
                 .error-indicators {
                     position: absolute;
-                    top: 10px;
+                    bottom: 50px;
                     right: 50px;
                     display: flex;
                     gap: 10px;
@@ -368,8 +397,14 @@ public class CodeMirrorView extends StackPane {
                         "Ctrl-Space": "autocomplete",
                         "Ctrl-Z": function(cm) { cm.undo(); },
                         "Ctrl-Y": function(cm) { cm.redo(); },
-                    }
+                    },
+                    viewportMargin: Infinity,
+                    scrollbarStyle: 'native'
                 });
+                
+                setTimeout(() => {
+                    editor.refresh();
+                }, 100);
 
                 // Mise à jour de la position du curseur
                 editor.on('cursorActivity', function() {
@@ -388,6 +423,7 @@ public class CodeMirrorView extends StackPane {
                 });
 
                 editor.on('change', function(cm, change) {
+                    editor.refresh();
                     if (!change.origin || change.origin !== 'setValue') {
                         if (window.bridge) {
                             window.bridge.onContentChanged(editor.getValue());
@@ -408,6 +444,10 @@ public class CodeMirrorView extends StackPane {
                 window.getContent = function() {
                     return editor.getValue();
                 };
+                
+                window.addEventListener('resize', () => {
+                    editor.refresh();
+                });
             </script>
         </body>
         </html>
