@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="mainContainer"
+            xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="fr.inria.corese.demo.controller.ValidationViewController"
+            stylesheets="@../../../../styles/application.css">
+
+    <center>
+        <BorderPane fx:id="contentContainer">
+            <center>
+
+                <SplitPane fx:id="splitPane" dividerPositions="0.7" orientation="VERTICAL">
+                    <StackPane fx:id="editorContainer" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"/>
+                    <HBox></HBox>
+                </SplitPane>
+            </center>
+        </BorderPane>
+    </center>
+
+</BorderPane>

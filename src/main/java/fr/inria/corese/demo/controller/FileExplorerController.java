@@ -25,31 +25,8 @@ public class FileExplorerController {
         this.view = new FileExplorerView();
         this.contextMenuController = new ContextMenuController();
 
-        initializeTreeView();
         initializeButtons();
         initializeTreeViewEvents();
-    }
-
-    private void initializeTreeView() {
-        if (view.getTreeView() != null) {
-            TreeItem<String> root = new TreeItem<>("Project");
-            root.setExpanded(true);
-
-            TreeItem<String> src = new TreeItem<>("src");
-            TreeItem<String> resources = new TreeItem<>("resources");
-
-            root.getChildren().addAll(src, resources);
-            view.getTreeView().setRoot(root);
-
-            // Set initial folder icons
-            FontIcon folderIcon = new FontIcon(MaterialDesignF.FOLDER_OUTLINE);
-            folderIcon.setIconSize(20);
-            src.setGraphic(folderIcon);
-
-            FontIcon resourcesFolderIcon = new FontIcon(MaterialDesignF.FOLDER_OUTLINE);
-            resourcesFolderIcon.setIconSize(20);
-            resources.setGraphic(resourcesFolderIcon);
-        }
     }
 
     private void initializeButtons() {

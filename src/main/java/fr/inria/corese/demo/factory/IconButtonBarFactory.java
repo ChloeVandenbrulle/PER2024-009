@@ -29,7 +29,6 @@ public class IconButtonBarFactory {
             );
             case RDF_EDITOR -> List.of(
                     IconButtonType.SAVE,
-                    IconButtonType.EXPORT,
                     IconButtonType.UNDO,
                     IconButtonType.REDO,
                     IconButtonType.DOCUMENTATION
