@@ -7,6 +7,8 @@ import fr.inria.corese.core.rule.RuleEngine;
 import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class RuleModel {
     private RuleEngine ruleEngine;
@@ -25,6 +27,17 @@ public class RuleModel {
         this.loadedRules = new ArrayList<>();
     }
 
+    public void setGraph(Graph graph) {
+        this.graph = graph;
+        this.ruleEngine = RuleEngine.create(graph);
+        // Recharger les règles avec le nouveau graphe
+        reloadRules();
+    }
+
+    public Graph getGraph() {
+        return this.graph;
+    }
+
     public boolean isRDFSSubsetEnabled() { return isRDFSSubsetEnabled; }
     public boolean isRDFSRLEnabled() { return isRDFSRLEnabled; }
     public boolean isOWLRLEnabled() { return isOWLRLEnabled; }
@@ -33,11 +46,11 @@ public class RuleModel {
     public boolean isOWLCleanEnabled() { return isOWLCleanEnabled; }
 
     public void loadRDFSSubset() {
-        //TODO: Implement this method for RDFS Subset
+        //TODO
     }
 
     public void loadRDFSRL() {
-        //TODO: Implement this method for RDFS RL
+        //TODO
     }
 
     public void loadOWLRL() {
@@ -46,6 +59,10 @@ public class RuleModel {
                 RuleEngine engine = RuleEngine.create(graph);
                 engine.setProfile(RuleEngine.OWL_RL);
                 engine.process();
+
+                if (!loadedRules.contains("OWL RL")) {
+                    loadedRules.add("OWL RL");
+                }
             } catch (Exception e) {
                 System.err.println("Error loading OWL RL: " + e.getMessage());
             }
@@ -61,6 +78,10 @@ public class RuleModel {
                 RuleEngine engine = RuleEngine.create(graph);
                 engine.setProfile(RuleEngine.OWL_RL_EXT);
                 engine.process();
+
+                if (!loadedRules.contains("OWL RL Extended")) {
+                    loadedRules.add("OWL RL Extended");
+                }
             } catch (Exception e) {
                 System.err.println("Error loading OWL RL Extended: " + e.getMessage());
             }
@@ -76,6 +97,10 @@ public class RuleModel {
                 RuleEngine engine = RuleEngine.create(graph);
                 engine.setProfile(RuleEngine.OWL_RL_TEST);
                 engine.process();
+
+                if (!loadedRules.contains("OWL RL Test")) {
+                    loadedRules.add("OWL RL Test");
+                }
             } catch (Exception e) {
                 System.err.println("Error loading OWL RL Test: " + e.getMessage());
             }
@@ -85,19 +110,71 @@ public class RuleModel {
         }
     }
 
-    public void loadOWLClean(){
-        //TODO: Implement this method for OWL Clean
+    public void loadOWLClean() {
+        //TODO
     }
 
-    private void reloadRules() {
-        graph = Graph.create();
-        ruleEngine = new RuleEngine();
+    public void reloadRules() {
+        // Sauvegarde des règles personnalisées
+        Set<String> customRules = new HashSet<>(loadedRules);
+        customRules.removeAll(List.of("RDFS Subset", "RDFS RL", "OWL RL", "OWL RL Extended", "OWL RL Test", "OWL Clean"));
+
+        // Réinitialiser la liste des règles
+        loadedRules.clear();
+
+        // Recréer le moteur de règles si nécessaire
+        if (ruleEngine == null || ruleEngine.getGraph() != graph) {
+            ruleEngine = RuleEngine.create(graph);
+        }
+
+        // Recharger les règles prédéfinies
         if (isRDFSSubsetEnabled) loadRDFSSubset();
         if (isRDFSRLEnabled) loadRDFSRL();
         if (isOWLRLEnabled) loadOWLRL();
         if (isOWLRLExtendedEnabled) loadOWLRLExtended();
         if (isOWLRLTestEnabled) loadOWLRLTest();
         if (isOWLCleanEnabled) loadOWLClean();
+
+        // Recharger les règles personnalisées
+        for (String customRule : customRules) {
+            // Essayer de trouver le fichier de règle correspondant
+            try {
+                // Essayer plusieurs chemins possibles
+                String[] possiblePaths = {
+                        "rules/" + customRule,
+                        "rules/" + customRule + ".rul",
+                        customRule,
+                        customRule + ".rul"
+                };
+
+                boolean loaded = false;
+                for (String path : possiblePaths) {
+                    File ruleFile = new File(path);
+                    if (ruleFile.exists()) {
+                        RuleLoad ruleLoader = RuleLoad.create(ruleEngine);
+                        ruleLoader.parse(path);
+                        loadedRules.add(customRule);
+                        loaded = true;
+                        break;
+                    }
+                }
+
+                if (!loaded && graph != null) {
+                    // Si on n'a pas trouvé le fichier, mais que la règle était chargée avant,
+                    // on l'ajoute quand même à la liste (elle est probablement dans le graphe)
+                    loadedRules.add(customRule);
+                }
+            } catch (Exception e) {
+                System.err.println("Error reloading custom rule " + customRule + ": " + e.getMessage());
+            }
+        }
+
+        // Appliquer toutes les règles
+        try {
+            ruleEngine.process();
+        } catch (Exception e) {
+            System.err.println("Error processing rules: " + e.getMessage());
+        }
     }
 
     public void setRDFSSubsetEnabled(boolean enabled) {
@@ -166,12 +243,7 @@ public class RuleModel {
      * @return Le nombre de règles chargées
      */
     public int getLoadedRulesCount() {
-        int count = 0;
-
-        // Compter les règles personnalisées
-        count += loadedRules.size();
-
-        return count;
+        return loadedRules.size();
     }
 
     public void removeRule(String ruleName) {
@@ -183,5 +255,19 @@ public class RuleModel {
         reloadRules();
     }
 
-
+    /**
+     * Exécute le moteur de règles sur le graphe actuel.
+     * Cette méthode peut être appelée après avoir modifié le graphe
+     * pour appliquer toutes les règles chargées.
+     */
+    public void process() {
+        try {
+            if (ruleEngine != null) {
+                ruleEngine.process();
+            }
+        } catch (Exception e) {
+            System.err.println("Error processing rules: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

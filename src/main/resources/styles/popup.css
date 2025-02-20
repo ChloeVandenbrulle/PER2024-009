@@ -29,3 +29,40 @@
     -fx-alignment: center;
     -fx-spacing: 8;
 }
+
+/* Pour ajouter dans le fichier de styles CSS de votre application */
+
+/* Style de l'indicateur de progression */
+.progress-indicator {
+    -fx-progress-color: #3498db;
+    -fx-stroke: white;
+}
+
+.progress-indicator .spinner {
+    -fx-background-color: transparent;
+}
+
+.progress-indicator .indicator {
+    -fx-background-color: transparent;
+}
+
+/* Style du LoadingPopup */
+.loading-popup {
+    -fx-background-color: rgba(44, 62, 80, 0.9);
+    -fx-background-radius: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 15, 0, 0, 5);
+}
+
+.loading-popup .message-label {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.loading-popup .detail-label {
+    -fx-text-fill: #ecf0f1;
+    -fx-font-size: 12px;
+    -fx-font-style: italic;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+}

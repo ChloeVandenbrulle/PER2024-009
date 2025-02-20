@@ -68,7 +68,7 @@ public class LogDialog extends BasePopup {
     public void updateLogs() {
         StringBuilder logs = new StringBuilder();
         logs.append("=== Application Logs ===\n");
-        logs.append(model.getLogs());
+        logs.append(model.getLogEntries());
         logs.append("\n=== Corese Logs ===\n");
         logs.append("Graph size: ").append(graph.size()).append(" triples\n");
         logs.append("Query engine status: ").append(exec.toString());
@@ -77,7 +77,8 @@ public class LogDialog extends BasePopup {
     }
 
     public void clearLogs() {
-        model.clearLogs();
+        model.clearGraph();
+        model.clearFiles();
         updateLogs();
     }
 
