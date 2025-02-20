@@ -19,11 +19,13 @@ public class CodeEditorController {
     private final IconButtonBarController iconButtonBarController;
     private CodeMirrorView editorContainer;
     private String content = "";
+    private IconButtonBarType type;
 
     public CodeEditorController(IconButtonBarType type) {
         this.view = new CodeEditorView();
         this.model = new CodeEditorModel();
         this.iconButtonBarController = IconButtonBarFactory.create(type);
+        this.type = type;
         System.out.println("Initializing CodeEditorController");
 
         this.editorContainer = view.getCodeMirrorView();
@@ -37,6 +39,7 @@ public class CodeEditorController {
         this.iconButtonBarController = IconButtonBarFactory.create(type);
         System.out.println("Initializing CodeEditorController");
         this.content = content;
+        this.type = type;
 
         this.editorContainer = view.getCodeMirrorView();
 
@@ -47,6 +50,10 @@ public class CodeEditorController {
         // Initialise the button bar
         view.getIconButtonBarView().getChildren().add(iconButtonBarController.getView());
         iconButtonBarController.getModel().setCodeEditorModel(model);
+
+        if (this.type.equals(IconButtonBarType.VALIDATION) || this.type.equals(IconButtonBarType.QUERY)){
+            view.displayRunButton();
+        }
 
         Platform.runLater(this::initializeEditor);
     }
