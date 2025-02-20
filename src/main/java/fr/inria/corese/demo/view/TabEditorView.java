@@ -4,19 +4,23 @@ import fr.inria.corese.demo.view.codeEditor.CodeEditorView;
 import javafx.animation.ScaleTransition;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.*;
 
-public class TabEditorView extends TabPane {
+public class TabEditorView extends StackPane {
+    private TabPane tabPane;
     private Tab addTab;
     private Button addTabButton;
     private FontIcon modifiedFile;
 
     public TabEditorView() {
-        setTabClosingPolicy(TabClosingPolicy.ALL_TABS);
-        setTabMaxWidth(150);
+        tabPane = new TabPane();
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
+        tabPane.setTabMaxWidth(150);
 
         addTabButton = new Button();
         FontIcon addIcon = new FontIcon(MaterialDesignP.PLUS);
@@ -57,15 +61,18 @@ public class TabEditorView extends TabPane {
         addTab.setGraphic(addTabButton);
         addTab.setClosable(false);
 
-        getTabs().add(addTab);
+        tabPane.getTabs().add(addTab);
 
         modifiedFile = new FontIcon(MaterialDesignC.CHECKBOX_BLANK_CIRCLE);
         modifiedFile.setIconSize(5);
         modifiedFile.setIconColor(Color.web("#2196F3"));
+
+        getChildren().add(tabPane);
     }
 
     public Tab addNewEditorTab(String title, CodeEditorView codeEditorView) {
         Tab tab = new Tab(title);
+
         tab.setStyle("""
             -fx-background-color: transparent;
             -fx-border-color: #E0E0E0;
@@ -89,8 +96,8 @@ public class TabEditorView extends TabPane {
         codeEditorView.setMaxHeight(Double.MAX_VALUE);
         tab.setContent(codeEditorView);
 
-        getTabs().add(getTabs().size() - 1, tab);
-        getSelectionModel().select(tab);
+        tabPane.getTabs().add(tabPane.getTabs().size() - 1, tab);
+        tabPane.getSelectionModel().select(tab);
         return tab;
     }
 
@@ -112,5 +119,8 @@ public class TabEditorView extends TabPane {
 
     public Button getAddTabButton() {
         return addTabButton;
+    }
+    public TabPane getTabPane() {
+        return tabPane;
     }
 }

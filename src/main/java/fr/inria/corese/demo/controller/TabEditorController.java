@@ -1,23 +1,32 @@
 package fr.inria.corese.demo.controller;
 
 import fr.inria.corese.demo.enums.icon.IconButtonBarType;
+import fr.inria.corese.demo.enums.icon.IconButtonType;
+import fr.inria.corese.demo.factory.popup.DocumentationPopup;
 import fr.inria.corese.demo.model.TabEditorModel;
 import fr.inria.corese.demo.view.TabEditorView;
 import fr.inria.corese.demo.factory.popup.PopupFactory;
 import fr.inria.corese.demo.factory.popup.SaveConfirmationPopup;
+import fr.inria.corese.demo.view.TopBar;
 import javafx.collections.ListChangeListener;
+import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Tab;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.KeyCode;
+import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TabEditorController {
     private final TabEditorView view;
     private final TabEditorModel model;
     private final IconButtonBarType type;
+    private TopBar topBar;
 
     public TabEditorController(IconButtonBarType type) {
         this.view = new TabEditorView();
@@ -26,17 +35,18 @@ public class TabEditorController {
 
         initializeFirstTab();
         initializeKeyboardShortcuts();
+        initializeTopBar();
+
     }
 
     private void initializeFirstTab() {
         addNewTab("Untitled");
 
-        // Empêcher la sélection du faux onglet
-        view.getTabs().addListener((ListChangeListener<Tab>) change -> {
-            if (view.getTabs().isEmpty()) {
-                view.getTabs().add(view.getAddTab());
-            } else if (view.getTabs().get(view.getTabs().size() - 1) != view.getAddTab()) {
-                view.getTabs().add(view.getAddTab());
+        view.getTabPane().getTabs().addListener((ListChangeListener<Tab>) change -> {
+            if (view.getTabPane().getTabs().isEmpty()) {
+                view.getTabPane().getTabs().add(view.getAddTab());
+            } else if (view.getTabPane().getTabs().get(view.getTabPane().getTabs().size() - 1) != view.getAddTab()) {
+                view.getTabPane().getTabs().add(view.getAddTab());
             }
         });
 
@@ -55,10 +65,14 @@ public class TabEditorController {
                         event.consume();
                     }
                     if (isShortcutDown && event.getCode() == KeyCode.W) {
-                        Tab tab = view.getSelectionModel().getSelectedItem();
+                        Tab tab = view.getTabPane().getSelectionModel().getSelectedItem();
                         if (handleCloseFile(tab)) {
-                            view.getTabs().remove(tab);
+                            view.getTabPane().getTabs().remove(tab);
                         }
+                        event.consume();
+                    }
+                    if (isShortcutDown && (event.getCode() == KeyCode.ENTER || event.getCode() == KeyCode.E)) {
+                        // shortcut to execute the code
                         event.consume();
                     }
                 });
@@ -66,8 +80,60 @@ public class TabEditorController {
         });
     }
 
+    private void initializeTopBar() {
+        topBar = new TopBar();
+        List<IconButtonType> buttons = new ArrayList<>();
+        System.out.println(type);
+        boolean isValidationOrQuery = type.equals(IconButtonBarType.VALIDATION) || type.equals(IconButtonBarType.QUERY);
+        if (isValidationOrQuery) {
+            buttons.add(IconButtonType.OPEN_FILE);
+        }
+        buttons.add(IconButtonType.DOCUMENTATION);
+        topBar.addRightButtons(buttons);
+        topBar.setMaxSize(40, 40);
+        view.setAlignment(topBar, Pos.TOP_RIGHT);
+
+        topBar.getButton(IconButtonType.DOCUMENTATION).setOnAction(e -> {
+            DocumentationPopup documentationPopup = new DocumentationPopup();
+            documentationPopup.displayPopup();
+        });
+
+        if (isValidationOrQuery) {
+            topBar.getButton(IconButtonType.OPEN_FILE).setOnAction(e -> onOpenFilesButtonClick());
+        }
+
+        view.getChildren().add(topBar);
+    }
+
+    private void onOpenFilesButtonClick() {
+        System.out.println("Open files button clicked");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open File");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("RDF Files", "*.ttl", "*.rdf", "*.n3"),
+                new FileChooser.ExtensionFilter("All Files", "*.*")
+        );
+
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            try {
+                addNewTab(file);
+            } catch (Exception e) {
+                showError("Error Opening File", "Could not open the file: " + e.getMessage());
+            }
+        }
+    }
+
+    private void showError(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
     private void handleSaveShortcut() {
-        Tab selectedTab = view.getSelectionModel().getSelectedItem();
+        Tab selectedTab = view.getTabPane().getSelectionModel().getSelectedItem();
         if (selectedTab != null && selectedTab != view.getAddTab()) {
             CodeEditorController activeController = model.getControllerForTab(selectedTab);
             if (activeController != null) {
@@ -120,14 +186,13 @@ public class TabEditorController {
             codeEditorController.getModel().setCurrentFile(file.getPath());
 
             codeEditorController.getModel().modifiedProperty().addListener((obs, oldVal, newVal) -> {
-                System.out.println("modified : "+ newVal);
                 view.updateTabIcon(tab, newVal);
             });
 
             tab.setOnCloseRequest(event -> {
                 event.consume();
                 if (handleCloseFile(tab)) {
-                    view.getTabs().remove(tab);
+                    view.getTabPane().getTabs().remove(tab);
                 }
             });
         } catch (IOException e) {
@@ -136,9 +201,9 @@ public class TabEditorController {
     }
 
     public void openFile(File file) {
-        for (Tab tab : view.getTabs()) {
+        for (Tab tab : view.getTabPane().getTabs()) {
             if (tab != view.getAddTab() && file.getName().equals(tab.getText())) {
-                view.getSelectionModel().select(tab);
+                view.getTabPane().getSelectionModel().select(tab);
                 return;
             }
         }

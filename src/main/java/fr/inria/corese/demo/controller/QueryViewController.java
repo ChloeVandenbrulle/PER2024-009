@@ -77,12 +77,12 @@ public class QueryViewController {
     public void openQueryFile(File file) {
         try {
             // Vérifier si le fichier est déjà ouvert
-            for (Tab tab : tabEditorController.getView().getTabs()) {
+            for (Tab tab : tabEditorController.getView().getTabPane().getTabs()) {
                 if (tab != tabEditorController.getView().getAddTab()) {
                     CodeEditorController controller = tabEditorController.getModel().getControllerForTab(tab);
                     if (controller != null && file.getPath().equals(controller.getModel().getCurrentFile())) {
                         // Fichier déjà ouvert, sélectionner son onglet
-                        tabEditorController.getView().getSelectionModel().select(tab);
+                        tabEditorController.getView().getTabPane().getSelectionModel().select(tab);
                         return;
                     }
                 }
