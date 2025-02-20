@@ -1,7 +1,6 @@
 package fr.inria.corese.demo.controller;
 
 import fr.inria.corese.demo.enums.icon.IconButtonType;
-import fr.inria.corese.demo.enums.button.ButtonType;
 import fr.inria.corese.demo.model.RuleModel;
 import fr.inria.corese.demo.view.DataView;
 import fr.inria.corese.demo.model.ProjectDataModel;
@@ -10,7 +9,6 @@ import fr.inria.corese.demo.view.TopBar;
 import fr.inria.corese.demo.factory.popup.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
@@ -25,7 +23,6 @@ import java.util.List;
 public class DataViewController {
     private DataView view;
     private ProjectDataModel model;
-    private ButtonManager buttonManager;
     private PopupFactory popupFactory;
     private RuleViewController ruleViewController;
     private RuleModel ruleModel;
@@ -36,6 +33,8 @@ public class DataViewController {
     private HBox configActionBox;
     @FXML
     private VBox fileListContainer;
+    @FXML
+    private VBox rulesContainer;
     @FXML
     private Label semanticElementsLabel;
     @FXML
@@ -70,58 +69,63 @@ public class DataViewController {
         topBar.setOnAction(IconButtonType.SAVE, this::handleSaveAs);
         topBar.setOnAction(IconButtonType.LOGS, this::handleShowLogs);
 
-        // Initialisation du ButtonManager
-        buttonManager = new ButtonManager(model);
-
+        // Initialisation de la liste de fichiers
         if (fileListContainer != null) {
-            fileListView = new FileListView();
-            fileListView.setModel(model.getFileListModel());
-            fileListView.setProjectDataModel(model);
-            fileListContainer.getChildren().add(fileListView);
-            VBox.setVgrow(fileListView, Priority.ALWAYS);
-
-            fileListView.getClearButton().setOnAction(e -> handleClearGraph());
-            fileListView.getReloadButton().setOnAction(e -> handleReloadFiles());
-            fileListView.getLoadButton().setOnAction(e -> handleLoadFiles());
+            setupFileList();
         }
 
-        setupConfigButtons();
-
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fr/inria/corese/demo/rule-view.fxml"));
-            VBox ruleView = loader.load();
-            ruleViewController = loader.getController();
-            ruleModel = new RuleModel();
-            ruleViewController.injectDependencies(model, ruleModel);
-            ruleViewController.initializeRules();
-
-            if (configActionBox != null && configActionBox.getParent() instanceof VBox) {
-                VBox parent = (VBox) configActionBox.getParent();
-
-                // Create a scroll pane and set its properties
-                ScrollPane scrollPane = new ScrollPane();
-                scrollPane.setFitToWidth(true);
-                scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-                scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-                scrollPane.getStyleClass().add("edge-to-edge");
-
-                scrollPane.setMaxHeight(parent.getMaxHeight());
-                scrollPane.setContent(ruleView);
-
-                // Add the scroll pane to the parent
-                parent.getChildren().add(0, scrollPane);
-                VBox.setVgrow(scrollPane, Priority.ALWAYS);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        // Initialisation des règles
+        if (rulesContainer != null) {
+            setupRulesView();
         }
     }
 
-    private void setupConfigButtons() {
-        Button loadRuleFileButton = buttonManager.getButton(ButtonType.LOAD_RULE_FILE);
-        loadRuleFileButton.setOnAction(event -> handleLoadRuleFile());
+    private void setupFileList() {
+        fileListView = new FileListView();
+        fileListView.setModel(model.getFileListModel());
+        fileListView.setProjectDataModel(model);
+        fileListContainer.getChildren().add(fileListView);
+        VBox.setVgrow(fileListView, Priority.ALWAYS);
 
-        configActionBox.getChildren().addAll(loadRuleFileButton);
+        fileListView.getClearButton().setOnAction(e -> handleClearGraph());
+        fileListView.getReloadButton().setOnAction(e -> handleReloadFiles());
+        fileListView.getLoadButton().setOnAction(e -> handleLoadFiles());
+    }
+
+    private void setupRulesView() {
+        try {
+            System.out.println("Loading rule view...");
+
+            // Création du modèle de règles
+            ruleModel = new RuleModel();
+
+            // Chargement du FXML pour la vue des règles
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fr/inria/corese/demo/rule-view.fxml"));
+            VBox ruleView = loader.load();
+
+            // Récupération du contrôleur
+            ruleViewController = loader.getController();
+            ruleViewController.injectDependencies(model, ruleModel);
+
+            // Placement de la vue dans un ScrollPane
+            ScrollPane scrollPane = new ScrollPane(ruleView);
+            scrollPane.setFitToWidth(true);
+            scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+            scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+            scrollPane.getStyleClass().add("edge-to-edge");
+
+            // Ajout du ScrollPane au conteneur de règles
+            rulesContainer.getChildren().add(scrollPane);
+            VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
+            // Initialisation des règles
+            ruleViewController.initializeRules();
+
+            System.out.println("Rule view loaded successfully");
+        } catch (IOException e) {
+            System.err.println("Error loading rule view: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void handleOpenProject() {
@@ -211,44 +215,6 @@ public class DataViewController {
                 ((WarningPopup) errorPopup).getResult();
             }
             updateView();
-        }
-    }
-
-    private void handleLoadRuleFile() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Rule files (*.rul)", "*.rul")
-        );
-
-        File selectedFile = fileChooser.showOpenDialog(null);
-        if (selectedFile != null) {
-            try {
-                // Ajout d'un log pour suivre le chargement
-                model.addLogEntry("Starting to load rule file: " + selectedFile.getName());
-
-                // Chargement de la règle via le RuleModel
-                ruleModel.loadRuleFile(selectedFile);
-
-                // Message de succès dans les logs
-                model.addLogEntry("Rule file loaded successfully: " + selectedFile.getName());
-
-                // Afficher une notification de succès
-                IPopup successPopup = popupFactory.createPopup(PopupFactory.TOAST_NOTIFICATION);
-                successPopup.setMessage("Rule file '" + selectedFile.getName() + "' has been successfully loaded!");
-                successPopup.displayPopup();
-
-                // Mettre à jour l'affichage
-                updateView();
-
-            } catch (Exception e) {
-                String errorMessage = "Error loading rule file: " + e.getMessage();
-                model.addLogEntry("ERROR: " + errorMessage);
-
-                // Afficher une popup d'erreur
-                IPopup errorPopup = popupFactory.createPopup(PopupFactory.WARNING_POPUP);
-                errorPopup.setMessage(errorMessage);
-                ((WarningPopup) errorPopup).getResult();
-            }
         }
     }
 

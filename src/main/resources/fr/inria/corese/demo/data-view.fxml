@@ -8,7 +8,7 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="fr.inria.corese.demo.controller.DataViewController"
-            stylesheets="@../../../../styles/buttons.css, @../../../../styles/list-view-styles.css">
+            stylesheets="@../../../../styles/buttons.css, @../../../../styles/list-view-styles.css, @../../../../styles/titled-pane-styles.css">
 
     <top>
         <TopBar fx:id="topBar"/>
@@ -16,6 +16,7 @@
 
     <center>
         <HBox spacing="0">
+            <!-- Panneau de gauche pour les fichiers -->
             <VBox spacing="5" styleClass="section-container" HBox.hgrow="ALWAYS">
                 <padding>
                     <Insets top="4" right="4" bottom="4" left="4"/>
@@ -32,11 +33,21 @@
                 </VBox>
             </VBox>
 
-            <VBox spacing="10" styleClass="section-container">
+            <!-- Panneau de droite pour les règles -->
+            <VBox spacing="10" styleClass="section-container" prefWidth="300" maxWidth="400">
                 <padding>
                     <Insets top="4" right="4" bottom="4" left="4"/>
                 </padding>
-                <HBox fx:id="configActionBox" spacing="10" alignment="BOTTOM_RIGHT"/>
+
+                <!-- Container pour injecter la vue des règles -->
+                <VBox fx:id="rulesContainer" VBox.vgrow="ALWAYS">
+                    <!-- Le contenu sera ajouté dynamiquement -->
+                </VBox>
+
+                <!-- Actions supplémentaires en bas -->
+                <HBox fx:id="configActionBox" spacing="10" alignment="BOTTOM_RIGHT">
+                    <!-- Boutons d'actions ajoutés dynamiquement -->
+                </HBox>
             </VBox>
         </HBox>
     </center>

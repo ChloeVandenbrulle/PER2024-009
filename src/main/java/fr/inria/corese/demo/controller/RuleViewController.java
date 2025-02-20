@@ -6,11 +6,14 @@ import fr.inria.corese.demo.model.RuleModel;
 import fr.inria.corese.demo.view.icon.IconButtonView;
 import fr.inria.corese.demo.view.rule.RuleItem;
 import fr.inria.corese.demo.view.rule.RuleView;
+import fr.inria.corese.demo.factory.popup.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.util.*;
 
 public class RuleViewController {
@@ -18,6 +21,7 @@ public class RuleViewController {
     private ProjectDataModel projectDataModel;
     private RuleView view;
     private Map<String, RuleItem> ruleItems;
+    private PopupFactory popupFactory;
 
     @FXML
     private VBox rdfsRulesContainer;
@@ -25,6 +29,10 @@ public class RuleViewController {
     private VBox owlRulesContainer;
     @FXML
     private VBox customRulesContainer;
+    @FXML
+    private Button loadRuleButton;
+    @FXML
+    private TitledPane personalRulesTitledPane;
 
     // Constructeur par défaut utilisé par FXML
     public RuleViewController() {
@@ -37,6 +45,7 @@ public class RuleViewController {
     public void injectDependencies(ProjectDataModel projectDataModel, RuleModel ruleModel) {
         this.projectDataModel = projectDataModel;
         this.ruleModel = ruleModel;
+        this.popupFactory = PopupFactory.getInstance(projectDataModel);
     }
 
     @FXML
@@ -49,6 +58,70 @@ public class RuleViewController {
             noRulesLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #888888;");
             customRulesContainer.getChildren().clear();
             customRulesContainer.getChildren().add(noRulesLabel);
+        }
+    }
+
+    @FXML
+    public void handleLoadRuleFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Rule files (*.rul)", "*.rul")
+        );
+
+        File selectedFile = fileChooser.showOpenDialog(rdfsRulesContainer.getScene().getWindow());
+        if (selectedFile != null) {
+            try {
+                // Ajout d'un log pour suivre le chargement
+                if (projectDataModel != null) {
+                    projectDataModel.addLogEntry("Starting to load rule file: " + selectedFile.getName());
+                }
+
+                // Chargement de la règle via le RuleModel
+                ruleModel.loadRuleFile(selectedFile);
+
+                // Message de succès dans les logs
+                if (projectDataModel != null) {
+                    projectDataModel.addLogEntry("Rule file loaded successfully: " + selectedFile.getName());
+                }
+
+                // Afficher une notification de succès
+                if (popupFactory != null) {
+                    IPopup successPopup = popupFactory.createPopup(PopupFactory.TOAST_NOTIFICATION);
+                    successPopup.setMessage("Rule file '" + selectedFile.getName() + "' has been successfully loaded!");
+                    successPopup.displayPopup();
+                } else {
+                    // Fallback si popupFactory n'est pas disponible
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Success");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Rule file '" + selectedFile.getName() + "' has been successfully loaded!");
+                    alert.showAndWait();
+                }
+
+                // Mettre à jour l'affichage
+                updateView();
+
+            } catch (Exception e) {
+                String errorMessage = "Error loading rule file: " + e.getMessage();
+
+                if (projectDataModel != null) {
+                    projectDataModel.addLogEntry("ERROR: " + errorMessage);
+                }
+
+                // Afficher une popup d'erreur
+                if (popupFactory != null) {
+                    IPopup errorPopup = popupFactory.createPopup(PopupFactory.WARNING_POPUP);
+                    errorPopup.setMessage(errorMessage);
+                    ((WarningPopup) errorPopup).getResult();
+                } else {
+                    // Fallback si popupFactory n'est pas disponible
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error Loading Rule");
+                    alert.setContentText(errorMessage);
+                    alert.showAndWait();
+                }
+            }
         }
     }
 
