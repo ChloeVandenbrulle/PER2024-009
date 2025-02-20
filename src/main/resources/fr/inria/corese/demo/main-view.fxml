@@ -12,9 +12,6 @@
 
     <left>
         <VBox fx:id="navigationContainer" styleClass="nav-container,sidebar">
-            <padding>
-                <Insets top="10" right="10" bottom="10" left="10"/>
-            </padding>
         </VBox>
     </left>
 

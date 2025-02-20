@@ -1,10 +1,15 @@
 package fr.inria.corese.demo.view;
 
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
 
+import java.util.Objects;
+
 public class NavigationBarView extends VBox {
+    private final ImageView logo;
     private final Button dataButton;
     private final Button rdfEditorButton;
     private final Button validationButton;
@@ -13,36 +18,55 @@ public class NavigationBarView extends VBox {
 
     private static final String BUTTON_STYLE_NORMAL = """
             -fx-background-color: white;
-            -fx-text-fill: #2196F3;
+            -fx-text-fill: #000000;
+            -fx-alignment: CENTER_LEFT;
             -fx-border-color: #2196F3;
             -fx-border-width: 0 0 1 0;
             -fx-min-height: 35;
             -fx-font-size: 14;
-            -fx-min-width: 160;
+            -fx-min-width: 50;
+            -fx-max-width: 90;
             """;
 
     private static final String BUTTON_STYLE_SELECTED = """
             -fx-background-color: #E3F2FD;
-            -fx-text-fill: #2196F3;
+            -fx-text-fill: #000000;
+            -fx-alignment: CENTER_LEFT;
             -fx-border-color: #2196F3;
             -fx-border-width: 0 0 1 3;
             -fx-min-height: 35;
             -fx-font-size: 14;
-            -fx-min-width: 160;
+            -fx-min-width: 50;
+            -fx-max-width: 90;
             """;
 
 
     private static final String BUTTON_STYLE_HOVER = """
             -fx-background-color: #E3F2FD;
-            -fx-text-fill: #2196F3;
+            -fx-text-fill: #000000;
+            -fx-alignment: CENTER_LEFT;
             -fx-border-color: #2196F3;
             -fx-border-width: 0 0 1 0;
             -fx-min-height: 35;
             -fx-font-size: 14;
-            -fx-min-width: 160;
+            -fx-min-width: 50;
+            -fx-max-width: 90;
             """;
 
     public NavigationBarView() {
+        logo = new ImageView();
+
+        try {
+            Image logoImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/logo.png")));
+
+            logo.setImage(logoImg);
+            logo.setFitWidth(40);
+            logo.setFitHeight(40);
+
+            VBox.setMargin(logo, new Insets(0, 25, 0, 25));
+        } catch (Exception e) {
+            System.err.println("Erreur lors du chargement du logo: " + e.getMessage());
+        }
 
         dataButton = createNavigationButton("Data");
         rdfEditorButton = createNavigationButton("RDF Editor");
@@ -50,7 +74,7 @@ public class NavigationBarView extends VBox {
         queryButton = createNavigationButton("Query");
         settingsButton = createNavigationButton("Settings");
 
-        getChildren().addAll(dataButton, rdfEditorButton, validationButton, queryButton, settingsButton);
+        getChildren().addAll(logo, dataButton, rdfEditorButton, validationButton, queryButton, settingsButton);
     }
 
     private Button createNavigationButton(String text) {
@@ -69,7 +93,7 @@ public class NavigationBarView extends VBox {
             }
         });
 
-        button.setPrefWidth(160);
+        button.setPrefWidth(90);
         return button;
     }
 
