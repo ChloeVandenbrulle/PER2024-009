@@ -29,7 +29,7 @@ public class Main extends Application {
             System.out.println("Main view loaded successfully");
 
             Scene scene = new Scene(root);
-            primaryStage.setTitle("Corese");
+            primaryStage.setTitle("Corese-GUI");
             primaryStage.setScene(scene);
             primaryStage.show();
 
