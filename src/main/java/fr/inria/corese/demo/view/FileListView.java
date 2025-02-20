@@ -71,6 +71,9 @@ public class FileListView extends VBox {
     private void setupListView() {
         if (fileList != null) {
             fileList.setCellFactory(lv -> new FileListCell(this));
+
+            // Ajouter un style pour que l'encadré soit toujours visible
+            fileList.getStyleClass().add("always-visible-border");
         }
     }
 
@@ -82,8 +85,8 @@ public class FileListView extends VBox {
             // Bind empty state visibility to model's file list size
             emptyStateView.visibleProperty().bind(Bindings.isEmpty(model.getFiles()));
 
-            // Ensure that when empty state is visible, fileList is not visible
-            fileList.visibleProperty().bind(Bindings.isNotEmpty(model.getFiles()));
+            // NE PAS lier la visibilité de fileList à la présence d'éléments
+            // Au lieu de cela, le ListView reste toujours visible et c'est son contenu qui change
         }
     }
 
@@ -139,12 +142,15 @@ public class FileListView extends VBox {
             int index = parent.getChildren().indexOf(fileList);
             parent.getChildren().remove(fileList);
 
-            // Add both to the stack pane
-            contentContainer.getChildren().addAll(emptyStateView, fileList);
+            // Add both to the stack pane, with the ListView ALWAYS visible
+            contentContainer.getChildren().addAll(fileList, emptyStateView);
 
             // Add the stack pane to the parent at the same position
             parent.getChildren().add(index, contentContainer);
             HBox.setHgrow(contentContainer, Priority.ALWAYS);
+
+            // Assurez-vous que le conteneur a les mêmes styles que fileList pour l'encadré
+            contentContainer.getStyleClass().add("list-view-container");
         } else {
             // Si fileList est toujours null
             getChildren().add(0, contentContainer);
@@ -198,6 +204,4 @@ public class FileListView extends VBox {
             }
         }
     }
-
-
 }

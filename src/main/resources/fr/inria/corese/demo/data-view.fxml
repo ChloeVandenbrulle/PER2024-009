@@ -8,7 +8,7 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="fr.inria.corese.demo.controller.DataViewController"
-            stylesheets="@../../../../styles/buttons.css">
+            stylesheets="@../../../../styles/buttons.css, @../../../../styles/list-view-styles.css">
 
     <top>
         <TopBar fx:id="topBar"/>

@@ -13,15 +13,12 @@
 
 .section-container {
     -fx-background-color: white;
-    -fx-background-radius: 4px;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 4, 0, 0, 1);
     -fx-padding: 6px;
 }
 
 .file-container {
     -fx-background-color: white;
-    -fx-border-radius: 2px;
-    -fx-background-radius: 2px;
     -fx-padding: 0;
 }
 

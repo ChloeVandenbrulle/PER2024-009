@@ -1,0 +1,17 @@
+.always-visible-border {
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 1px;
+    -fx-background-color: white;
+}
+
+.list-view-container {
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 1px;
+    -fx-background-color: white;
+}
+
+/* Style pour l'état vide */
+.empty-state-view {
+    -fx-alignment: center;
+    -fx-padding: 20px;
+}
