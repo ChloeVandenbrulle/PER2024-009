@@ -18,7 +18,7 @@
 
                 <SplitPane fx:id="splitPane" dividerPositions="0.7" orientation="VERTICAL">
                     <StackPane fx:id="editorContainer" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"/>
-                    <HBox></HBox>
+                    <StackPane fx:id="consoleContainer" HBox.hgrow="ALWAYS"/>
                 </SplitPane>
             </center>
         </BorderPane>

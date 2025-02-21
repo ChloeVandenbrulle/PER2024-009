@@ -7,24 +7,24 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 
 public class ValidationViewController {
     @FXML private BorderPane contentContainer;
     @FXML private StackPane editorContainer;
     @FXML private SplitPane splitPane;
+    @FXML private StackPane consoleContainer;
 
     private TabEditorController tabEditorController;
+    private ConsoleController consoleController;
 
     @FXML
     public void initialize() {
         checkFXMLInjections();
 
         try {
-            System.out.println("Initializing RDFEditorViewController");
-
             // Initialize components
             initializeTabEditor();
+            initializeConsole();
             initializeSplitPane();
             System.out.println("RDFEditorViewController initialization complete");
         } catch (Exception e) {
@@ -40,6 +40,13 @@ public class ValidationViewController {
         editorContainer.getChildren().add(tabEditorController.getView());
     }
 
+    private void initializeConsole() {
+        consoleController = new ConsoleController();
+        consoleController.getView().setMaxWidth(Double.MAX_VALUE);
+        consoleContainer.getChildren().add(consoleController.getView());
+        appendToConsole("Message de test");
+    }
+
     private void initializeSplitPane() {
         splitPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
@@ -47,7 +54,7 @@ public class ValidationViewController {
                     splitPane.lookupAll(".split-pane-divider").forEach(div -> {
                         div.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                             if (event.getClickCount() == 2) {
-                                toggleLeftPane();
+                                toggleConsolePane();
                             }
                         });
                     });
@@ -56,20 +63,23 @@ public class ValidationViewController {
         });
     }
 
-    private void toggleLeftPane() {
-        System.out.println("Toggling left pane");
-        System.out.println(splitPane.getDividerPositions()[0]);
-        if (splitPane.getDividerPositions()[0] > 0.01) {
-            splitPane.setDividerPositions(0.00);
+    private void toggleConsolePane() {
+        if (splitPane.getDividerPositions()[0] > 0.9) {
+            splitPane.setDividerPositions(0.7);
         } else {
-            splitPane.setDividerPositions(0.2);
+            splitPane.setDividerPositions(1.0);
         }
+    }
+
+    public void appendToConsole(String message) {
+        consoleController.appendMessage(message);
     }
 
     private void checkFXMLInjections() {
         StringBuilder missingInjections = new StringBuilder();
         if (contentContainer == null) missingInjections.append("contentContainer, ");
         if (editorContainer == null) missingInjections.append("editorContainer, ");
+        if (consoleContainer == null) missingInjections.append("consoleContainer, ");
 
         if (missingInjections.length() > 0) {
             System.err.println("Missing FXML injections: " + missingInjections);

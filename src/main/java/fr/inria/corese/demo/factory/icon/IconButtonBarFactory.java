@@ -30,8 +30,7 @@ public class IconButtonBarFactory {
             case RDF_EDITOR, VALIDATION, QUERY -> List.of(
                     IconButtonType.SAVE,
                     IconButtonType.UNDO,
-                    IconButtonType.REDO,
-                    IconButtonType.DOCUMENTATION
+                    IconButtonType.REDO
             );
         };
     }
