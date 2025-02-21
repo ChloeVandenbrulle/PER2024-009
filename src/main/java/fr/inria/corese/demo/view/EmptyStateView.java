@@ -10,8 +10,19 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.layout.StackPane;
 
 public class EmptyStateView extends StackPane {
+    private Label titleLabel;
+    private Label messageLabel;
+    private String image;
 
-    public EmptyStateView() {
+    public EmptyStateView(Label title, Label message, String img) {
+        titleLabel = title;
+        messageLabel = message;
+        image = img;
+
+        setupUI();
+    }
+
+    private void setupUI(){
         setStyle("-fx-background-color: white;");
         getStyleClass().add("empty-state-view");
 
@@ -20,20 +31,15 @@ public class EmptyStateView extends StackPane {
         container.setMaxWidth(400);
         container.setMaxHeight(300);
 
-        String folderOpenPath = "M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z";
-
         SVGPath folderOpenIcon = new SVGPath();
-        folderOpenIcon.setContent(folderOpenPath);
+        folderOpenIcon.setContent(image);
         folderOpenIcon.setFill(Color.web("#2196F3"));  // Couleur bleue primaire
         folderOpenIcon.setScaleX(2.5);
         folderOpenIcon.setScaleY(2.5);
 
-        // Labels
-        Label titleLabel = new Label("No files loaded");
         titleLabel.setFont(Font.font("System", FontWeight.SEMI_BOLD, 16));
         titleLabel.setTextFill(Color.web("#333333"));
 
-        Label messageLabel = new Label("Open a folder or load a TTL file\nto visualize semantic graphs");
         messageLabel.setFont(Font.font("System", 14));
         messageLabel.setTextFill(Color.web("#666666"));
         messageLabel.setAlignment(Pos.CENTER);
@@ -42,5 +48,29 @@ public class EmptyStateView extends StackPane {
 
         container.getChildren().addAll(folderOpenIcon, titleLabel, messageLabel);
         getChildren().add(container);
+    }
+
+    public void setTitleLabel(Label newLabel) {
+        titleLabel = newLabel;
+    }
+
+    public void setMessageLabel(Label newLabel) {
+        messageLabel = newLabel;
+    }
+
+    public void setImage(String newimage) {
+        image = newimage;
+    }
+
+    public Label getTitleLabel() {
+        return titleLabel;
+    }
+
+    public Label getMessageLabel() {
+        return messageLabel;
+    }
+
+    public String getImage() {
+        return image;
     }
 }
