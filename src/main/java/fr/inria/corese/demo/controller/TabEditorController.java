@@ -40,8 +40,6 @@ public class TabEditorController {
     }
 
     private void initializeFirstTab() {
-        addNewTab("Untitled");
-
         view.getTabPane().getTabs().addListener((ListChangeListener<Tab>) change -> {
             if (view.getTabPane().getTabs().isEmpty()) {
                 view.getTabPane().getTabs().add(view.getAddTab());
@@ -83,7 +81,6 @@ public class TabEditorController {
     private void initializeTopBar() {
         topBar = new TopBar();
         List<IconButtonType> buttons = new ArrayList<>();
-        System.out.println(type);
         boolean isValidationOrQuery = type.equals(IconButtonBarType.VALIDATION) || type.equals(IconButtonBarType.QUERY);
         if (isValidationOrQuery) {
             buttons.add(IconButtonType.OPEN_FILE);
