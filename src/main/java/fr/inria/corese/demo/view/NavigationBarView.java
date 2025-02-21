@@ -5,9 +5,25 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
-
 import java.util.Objects;
 
+/**
+ * Vue de la barre de navigation principale de l'application.
+ *
+ * Responsabilités principales :
+ * - Affichage des boutons de navigation
+ * - Gestion de la sélection et du style des boutons
+ * - Présentation du logo de l'application
+ *
+ * Caractéristiques principales :
+ * - Disposition verticale (VBox)
+ * - Boutons de navigation personnalisés
+ * - Styles visuels différenciés
+ *
+ * @author Clervie Causer
+ * @version 1.0
+ * @since 2025
+ */
 public class NavigationBarView extends VBox {
     private final ImageView logo;
     private final Button dataButton;
@@ -53,6 +69,14 @@ public class NavigationBarView extends VBox {
             -fx-max-width: 90;
             """;
 
+    /**
+     * Constructeur par défaut.
+     *
+     * Initialise :
+     * - Le logo
+     * - Les boutons de navigation
+     * - Personnalisation visuelle
+     */
     public NavigationBarView() {
         logo = new ImageView();
 
@@ -77,6 +101,12 @@ public class NavigationBarView extends VBox {
         getChildren().addAll(logo, dataButton, rdfEditorButton, validationButton, queryButton, settingsButton);
     }
 
+    /**
+     * Crée un bouton de navigation personnalisé.
+     *
+     * @param text Le texte du bouton
+     * @return Un bouton de navigation configuré
+     */
     private Button createNavigationButton(String text) {
         Button button = new Button(text);
         button.setStyle(BUTTON_STYLE_NORMAL);
@@ -97,6 +127,11 @@ public class NavigationBarView extends VBox {
         return button;
     }
 
+    /**
+     * Définit le bouton actuellement sélectionné.
+     *
+     * @param selectedButton Le bouton à marquer comme sélectionné
+     */
     public void setButtonSelected(Button selectedButton) {
         // Réinitialiser tous les boutons
         for (Button button : new Button[]{dataButton, rdfEditorButton, validationButton, queryButton, settingsButton}) {

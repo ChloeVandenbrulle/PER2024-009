@@ -11,22 +11,51 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Barre supérieure de navigation et d'actions dans l'interface utilisateur.
+ *
+ * Responsabilités principales :
+ * - Gestion des boutons de gauche et de droite
+ * - Configuration dynamique des actions des boutons
+ * - Chargement de l'interface à partir d'un fichier FXML
+ *
+ * Caractéristiques principales :
+ * - Disposition horizontale (HBox)
+ * - Conteneurs séparés pour boutons gauche et droite
+ * - Gestion centralisée des boutons
+ *
+ * @author Clervie Causer
+ * @version 1.0
+ * @since 2025
+ */
 public class TopBar extends HBox {
 
     @FXML
     private HBox leftButtonsContainer;
-
     @FXML
     private HBox rightButtonsContainer;
 
     private final Map<IconButtonType, IconButtonView> buttons;
 
+    /**
+     * Constructeur par défaut.
+     *
+     * Initialise :
+     * - Un map des boutons
+     * - Chargement du fichier FXML
+     * - Application du style de barre supérieure
+     */
     public TopBar() {
         this.buttons = new HashMap<>();
         loadFxml();
         getStyleClass().add("top-bar");
     }
 
+    /**
+     * Charge l'interface à partir d'un fichier FXML.
+     *
+     * Gère le chargement et les erreurs potentielles.
+     */
     private void loadFxml() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fr/inria/corese/demo/topbar.fxml"));
         loader.setRoot(this);
@@ -38,6 +67,11 @@ public class TopBar extends HBox {
         }
     }
 
+    /**
+     * Ajoute des boutons dans le conteneur de gauche.
+     *
+     * @param buttonTypes Liste des types de boutons à ajouter
+     */
     public void addLeftButtons(List<IconButtonType> buttonTypes) {
         leftButtonsContainer.getChildren().clear();
         buttonTypes.forEach(type -> {
@@ -47,6 +81,11 @@ public class TopBar extends HBox {
         });
     }
 
+    /**
+     * Ajoute des boutons dans le conteneur de droite.
+     *
+     * @param buttonTypes Liste des types de boutons à ajouter
+     */
     public void addRightButtons(List<IconButtonType> buttonTypes) {
         rightButtonsContainer.getChildren().clear();
         buttonTypes.forEach(type -> {
@@ -56,10 +95,22 @@ public class TopBar extends HBox {
         });
     }
 
+    /**
+     * Récupère un bouton spécifique par son type.
+     *
+     * @param type Le type de bouton recherché
+     * @return Le bouton correspondant, ou null s'il n'existe pas
+     */
     public Button getButton(IconButtonType type) {
         return buttons.get(type);
     }
 
+    /**
+     * Définit l'action à exécuter pour un bouton spécifique.
+     *
+     * @param type Le type de bouton
+     * @param action L'action à exécuter lors du clic
+     */
     public void setOnAction(IconButtonType type, Runnable action) {
         IconButtonView button = buttons.get(type);
         if (button != null) {

@@ -2,16 +2,6 @@
 package fr.inria.corese.demo.enums.button;
 
 public enum ButtonType {
-    // Project Buttons
-    OPEN_PROJECT("Open project", "project-button"),
-    SAVE_AS("Save as", "project-button"),
-    SHOW_LOGS("Show logs", "log-button"),
-
-    // File Buttons
-    CLEAR_GRAPH("", "file-button"),
-    RELOAD_FILES("", "file-button"),
-    LOAD_FILES("", "file-button"),
-    LOAD_RULE_FILE( "Load rule file", "file-button"),
     RUN("Run", "file-button");
 
     private final String label;

@@ -16,11 +16,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * Modèle central de gestion de projet pour une application de traitement de données sémantiques.
+ *
+ * Responsabilités principales :
+ * - Gestion du graphe sémantique
+ * - Gestion des fichiers du projet
+ * - Suivi des journaux d'événements
+ * - Chargement, sauvegarde et manipulation de projets
+ *
+ * Fonctionnalités clés :
+ * - Chargement et gestion de fichiers RDF
+ * - Gestion des modèles de règles
+ * - Journalisation des opérations
+ * - Calcul de métriques sur les données sémantiques
+ *
+ * @author Clervie Causer
+ * @version 1.0
+ * @since 2025
+ */
 public class ProjectDataModel {
     private static final Logger logger = Logger.getLogger(ProjectDataModel.class.getName());
-    // Définition de la constante RDF_TYPE comme URI standard
-    private static final String RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
-
     private Graph graph;
     private final FileListModel fileListModel;
     private final List<String> logEntries;
@@ -28,6 +44,15 @@ public class ProjectDataModel {
     private String projectPath;
     private int rulesLoadedCount = 0;
 
+    /**
+     * Constructeur par défaut.
+     *
+     * Initialise :
+     * - Un graphe sémantique vide
+     * - Un modèle de liste de fichiers
+     * - Un journal d'événements
+     * - Un modèle de règles
+     */
     public ProjectDataModel() {
         this.graph = Graph.create();
         this.fileListModel = new FileListModel();
@@ -37,25 +62,39 @@ public class ProjectDataModel {
         this.ruleModel.setGraph(this.graph);
     }
 
+    /**
+     * Récupère le modèle de liste de fichiers.
+     *
+     * @return Le modèle de liste de fichiers associé au projet
+     */
     public FileListModel getFileListModel() {
         return fileListModel;
     }
 
+    /**
+     * Récupère le modèle de règles.
+     *
+     * @return Le modèle de règles associé au projet
+     */
     public RuleModel getRuleModel() {
         return ruleModel;
     }
 
-    public void setRuleModel(RuleModel ruleModel) {
-        this.ruleModel = ruleModel;
-        // S'assurer que le ruleModel utilise notre graphe
-        this.ruleModel.setGraph(this.graph);
-    }
-
+    /**
+     * Ajoute une entrée au journal des événements.
+     *
+     * @param entry L'entrée de journal à ajouter
+     */
     public void addLogEntry(String entry) {
         logEntries.add(entry);
         logger.info(entry);
     }
 
+    /**
+     * Récupère toutes les entrées du journal.
+     *
+     * @return Une liste des entrées de journal
+     */
     public List<String> getLogEntries() {
         return new ArrayList<>(logEntries);
     }
@@ -64,10 +103,12 @@ public class ProjectDataModel {
         this.rulesLoadedCount = count;
     }
 
-    public int getRulesLoadedCount() {
-        return this.rulesLoadedCount;
-    }
-
+    /**
+     * Charge un fichier dans le graphe sémantique.
+     *
+     * @param file Le fichier à charger
+     * @throws LoadException En cas d'erreur lors du chargement du fichier
+     */
     public void loadFile(File file) throws LoadException {
         try {
             clearGraph();
@@ -86,14 +127,25 @@ public class ProjectDataModel {
         }
     }
 
+    /**
+     * Ajoute un fichier à la liste des fichiers.
+     *
+     * @param fileName Le nom du fichier à ajouter
+     */
     public void addFile(String fileName) {
         fileListModel.addFile(fileName);
     }
 
+    /**
+     * Efface tous les fichiers de la liste.
+     */
     public void clearFiles() {
         fileListModel.clearFiles();
     }
 
+    /**
+     * Efface le graphe sémantique.
+     */
     public void clearGraph() {
         this.graph = Graph.create();
 
@@ -105,6 +157,9 @@ public class ProjectDataModel {
         addLogEntry("Graph cleared");
     }
 
+    /**
+     * Recharge tous les fichiers précédemment chargés.
+     */
     public void reloadFiles() {
         clearGraph();
 
@@ -136,6 +191,11 @@ public class ProjectDataModel {
         }
     }
 
+    /**
+     * Charge un projet à partir d'un répertoire.
+     *
+     * @param directory Le répertoire contenant le projet
+     */
     public void loadProject(File directory) {
         clearGraph();
         clearFiles();
@@ -180,6 +240,11 @@ public class ProjectDataModel {
         }
     }
 
+    /**
+     * Sauvegarde le projet dans un fichier cible.
+     *
+     * @param targetFile Le fichier cible pour la sauvegarde
+     */
     public void saveProject(File targetFile) {
         String directory = targetFile.getParent();
         String baseName = targetFile.getName();
@@ -229,11 +294,14 @@ public class ProjectDataModel {
         }
     }
 
+    /**
+     * Compte le nombre d'éléments sémantiques dans le graphe.
+     *
+     * @return Le nombre d'éléments sémantiques
+     */
     public int getSemanticElementsCount() {
         if (graph == null) return 0;
         try {
-            // Approche simplifiée - utiliser la taille du graphe divisée par 3 comme approximation
-            // (chaque triplet représente environ un tiers des éléments sémantiques)
             return graph.size() / 3;
         } catch (Exception e) {
             addLogEntry("Error counting semantic elements: " + e.getMessage());
@@ -241,10 +309,20 @@ public class ProjectDataModel {
         }
     }
 
+    /**
+     * Récupère le nombre de triplets dans le graphe.
+     *
+     * @return Le nombre de triplets
+     */
     public int getTripletCount() {
         return graph != null ? graph.size() : 0;
     }
 
+    /**
+     * Récupère le nombre de graphes.
+     *
+     * @return Le nombre de graphes
+     */
     public int getGraphCount() {
         if (graph == null) return 0;
         try {
@@ -272,15 +350,6 @@ public class ProjectDataModel {
         } catch (Exception e) {
             addLogEntry("Error counting graphs: " + e.getMessage());
             return 1; // On suppose qu'il y a au moins le graphe par défaut
-        }
-    }
-
-    public void uploadRuleFile(File file) {
-        try {
-            ruleModel.loadRuleFile(file);
-            addLogEntry("Loaded rule file: " + file.getName());
-        } catch (Exception e) {
-            addLogEntry("Error loading rule file " + file.getName() + ": " + e.getMessage());
         }
     }
 }

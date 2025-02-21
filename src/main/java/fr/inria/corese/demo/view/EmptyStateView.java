@@ -9,11 +9,34 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.layout.StackPane;
 
+/**
+ * Vue représentant un état vide ou initial dans l'interface utilisateur.
+ *
+ * Cette classe permet d'afficher un écran personnalisé lorsqu'aucun contenu
+ * n'est disponible, avec un titre, un message et une icône SVG.
+ *
+ * Caractéristiques principales :
+ * - Disposition centrée sur un StackPane
+ * - Personnalisation du titre et du message
+ * - Affichage d'une icône SVG
+ * - Style configurable
+ *
+ * @author Clervie Causer
+ * @version 1.0
+ * @since 2025
+ */
 public class EmptyStateView extends StackPane {
     private Label titleLabel;
     private Label messageLabel;
     private String image;
 
+    /**
+     * Constructeur pour créer une vue d'état vide.
+     *
+     * @param title Le label de titre à afficher
+     * @param message Le label de message à afficher
+     * @param img Le chemin ou le contenu SVG de l'icône
+     */
     public EmptyStateView(Label title, Label message, String img) {
         titleLabel = title;
         messageLabel = message;
@@ -22,6 +45,15 @@ public class EmptyStateView extends StackPane {
         setupUI();
     }
 
+    /**
+     * Configure l'interface utilisateur de la vue.
+     *
+     * Initialise :
+     * - Le style de fond
+     * - Le conteneur vertical
+     * - L'icône SVG
+     * - Les labels de titre et de message
+     */
     private void setupUI(){
         setStyle("-fx-background-color: white;");
         getStyleClass().add("empty-state-view");
@@ -48,29 +80,5 @@ public class EmptyStateView extends StackPane {
 
         container.getChildren().addAll(folderOpenIcon, titleLabel, messageLabel);
         getChildren().add(container);
-    }
-
-    public void setTitleLabel(Label newLabel) {
-        titleLabel = newLabel;
-    }
-
-    public void setMessageLabel(Label newLabel) {
-        messageLabel = newLabel;
-    }
-
-    public void setImage(String newimage) {
-        image = newimage;
-    }
-
-    public Label getTitleLabel() {
-        return titleLabel;
-    }
-
-    public Label getMessageLabel() {
-        return messageLabel;
-    }
-
-    public String getImage() {
-        return image;
     }
 }

@@ -196,8 +196,4 @@ public class IconButtonBarController {
         alert.setContentText(content);
         alert.showAndWait();
     }
-
-    public void addCustomButton(Button runButton) {
-        view.addCustomButton(runButton);
-    }
 }

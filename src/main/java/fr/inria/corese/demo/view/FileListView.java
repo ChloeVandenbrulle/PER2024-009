@@ -16,6 +16,23 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import java.io.IOException;
 
+/**
+ * Vue de gestion de liste de fichiers dans une application sémantique.
+ *
+ * Responsabilités principales :
+ * - Affichage de la liste des fichiers chargés
+ * - Gestion des interactions utilisateur avec les fichiers
+ * - Gestion des états vides et peuplés
+ *
+ * Caractéristiques principales :
+ * - Liste personnalisable des fichiers
+ * - Boutons d'actions (charger, recharger, effacer)
+ * - Gestion des popups de confirmation
+ *
+ * @author Clervie Causer
+ * @version 1.0
+ * @since 2025
+ */
 public class FileListView extends VBox {
     private FileListModel model;
     private ProjectDataModel projectDataModel;
@@ -30,11 +47,26 @@ public class FileListView extends VBox {
     @FXML
     private FlowPane buttonContainer;
 
+    /**
+     * Constructeur par défaut.
+     *
+     * Initialise :
+     * - Chargement du FXML
+     * - Configuration des boutons d'icônes
+     */
     public FileListView() {
         loadFxml();
         setupIconButtons();
     }
 
+    /**
+     * Charge la vue à partir d'un fichier FXML.
+     *
+     * Gère :
+     * - Le chargement du fichier FXML
+     * - La configuration de la vue de liste
+     * - La configuration de l'état vide
+     */
     private void loadFxml() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fr/inria/corese/demo/fileList-view.fxml"));
@@ -49,6 +81,14 @@ public class FileListView extends VBox {
         }
     }
 
+    /**
+     * Configure les boutons d'icônes pour les actions de fichiers.
+     *
+     * Crée et positionne les boutons :
+     * - Charger
+     * - Recharger
+     * - Effacer
+     */
     private void setupIconButtons() {
         // Créer les boutons avec IconButtonView
         loadButton = new IconButtonView(IconButtonType.IMPORT);
@@ -63,11 +103,14 @@ public class FileListView extends VBox {
         buttonContainer.setAlignment(Pos.TOP_LEFT);
     }
 
-    @FXML
-    private void initialize() {
-        setupListView();
-    }
 
+    /**
+     * Configure la vue de liste.
+     *
+     * Définit :
+     * - L'usine de cellules personnalisées
+     * - Les styles de la liste
+     */
     private void setupListView() {
         if (fileList != null) {
             fileList.setCellFactory(lv -> new FileListCell(this));
@@ -77,6 +120,11 @@ public class FileListView extends VBox {
         }
     }
 
+    /**
+     * Définit le modèle de liste de fichiers.
+     *
+     * @param model Le modèle de liste de fichiers à associer
+     */
     public void setModel(FileListModel model) {
         this.model = model;
         if (model != null && fileList != null) {
@@ -84,33 +132,25 @@ public class FileListView extends VBox {
 
             // Bind empty state visibility to model's file list size
             emptyStateView.visibleProperty().bind(Bindings.isEmpty(model.getFiles()));
-
-            // NE PAS lier la visibilité de fileList à la présence d'éléments
-            // Au lieu de cela, le ListView reste toujours visible et c'est son contenu qui change
         }
     }
 
+    /**
+     * Définit le modèle de données de projet.
+     *
+     * @param projectDataModel Le modèle de données de projet
+     */
     public void setProjectDataModel(ProjectDataModel projectDataModel) {
         this.projectDataModel = projectDataModel;
         this.popupFactory = PopupFactory.getInstance(projectDataModel);
     }
 
-    public Button getClearButton() {
-        return clearButton;
-    }
-
-    public Button getReloadButton() {
-        return reloadButton;
-    }
-
-    public Button getLoadButton() {
-        return loadButton;
-    }
-
-    public ListView<FileItem> getFileList() {
-        return fileList;
-    }
-
+    /**
+     * Affiche un popup d'avertissement.
+     *
+     * @param message Le message à afficher
+     * @return true si l'utilisateur confirme, false sinon
+     */
     private boolean showWarningPopup(String message) {
         if (popupFactory != null) {
             IPopup warningPopup = popupFactory.createPopup(PopupFactory.WARNING_POPUP);
@@ -120,14 +160,28 @@ public class FileListView extends VBox {
         return true;
     }
 
+    /**
+     * Demande confirmation avant de recharger les fichiers.
+     *
+     * @return true si l'utilisateur confirme, false sinon
+     */
     public boolean confirmReload() {
         return showWarningPopup("Reloading files will reset the current graph. Do you want to continue?");
     }
 
+    /**
+     * Demande confirmation avant de supprimer un fichier.
+     *
+     * @param item Le fichier à supprimer
+     * @return true si l'utilisateur confirme, false sinon
+     */
     public boolean confirmDelete(FileItem item) {
         return showWarningPopup("Removing this file will reset the current graph. Do you want to continue?");
     }
 
+    /**
+     * Retourne l'espace quand il n'y a pas de fichiers chargés.
+     */
     private void setupEmptyState() {
         // Create empty state view
         Label emptyStateTitle = new Label("No files loaded");
@@ -164,13 +218,43 @@ public class FileListView extends VBox {
         emptyStateView.setVisible(false);
     }
 
+    public Button getClearButton() {
+        return clearButton;
+    }
+
+    public Button getReloadButton() {
+        return reloadButton;
+    }
+
+    public Button getLoadButton() {
+        return loadButton;
+    }
+
+    public ListView<FileItem> getFileList() {
+        return fileList;
+    }
+
+    /**
+     * Classe interne représentant une cellule personnalisée de liste de fichiers.
+     */
     private static class FileListCell extends ListCell<FileItem> {
         private final FileListView parentView;
 
+        /**
+         * Constructeur par défaut.
+         *
+         * @param parentView
+         */
         public FileListCell(FileListView parentView) {
             this.parentView = parentView;
         }
 
+        /**
+         * Met à jour l'affichage de la cellule.
+         *
+         * @param item
+         * @param empty
+         */
         @Override
         protected void updateItem(FileItem item, boolean empty) {
             super.updateItem(item, empty);

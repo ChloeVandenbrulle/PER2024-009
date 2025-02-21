@@ -1,13 +1,8 @@
 package fr.inria.corese.demo.controller;
 
 import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.kgram.api.core.Expr;
-import fr.inria.corese.core.kgram.api.core.Node;
-import fr.inria.corese.core.kgram.core.Mapping;
-import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.core.sparql.exceptions.EngineException;
 import fr.inria.corese.demo.enums.icon.IconButtonBarType;
 import fr.inria.corese.demo.model.TabEditorModel;
 import fr.inria.corese.demo.view.CustomButton;
@@ -22,12 +17,33 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import javafx.application.Platform;
-import javafx.scene.web.WebView;
 
-import java.util.*;
 
+/**
+ * Contrôleur de la vue de requêtes pour une application de gestion de données sémantiques.
+ *
+ * Responsabilités principales :
+ * - Gestion de l'interface utilisateur pour l'édition et l'exécution de requêtes SPARQL
+ * - Initialisation du moteur de requêtage Corese
+ * - Gestion du chargement et de l'exécution des requêtes
+ *
+ * Fonctionnalités clés :
+ * - Chargement et gestion de graphes RDF
+ * - Édition de requêtes avec support de plusieurs onglets
+ * - Exécution de requêtes SPARQL
+ * - Gestion de l'interface utilisateur dynamique
+ *
+ * Caractéristiques principales :
+ * - Utilisation de Corese comme moteur de requêtage
+ * - Chargement de données de test
+ * - Configuration dynamique des éditeurs de requêtes
+ * - Gestion des interactions utilisateur
+ *
+ * @author Généré automatiquement
+ * @version 1.0
+ * @since 2024
+ */
 public class QueryViewController {
-    public TabPane resultsTabPane;
     @FXML private StackPane editorContainer;
     @FXML private TextArea resultTextArea;
     @FXML private BorderPane mainBorderPane;
@@ -36,12 +52,27 @@ public class QueryViewController {
     private TabEditorController tabEditorController;
     private Graph graph;
     private QueryProcess exec;
-    private String currentQuery = "";
+    public TabPane resultsTabPane;
 
+    /**
+     * Constructeur par défaut du contrôleur de vue de requêtes.
+     *
+     * Initialise les composants de base du contrôleur.
+     */
     public QueryViewController() {
         System.out.println("QueryViewController initialized");
     }
 
+    /**
+     * Initialise les composants de la vue de requêtes.
+     *
+     * Actions principales :
+     * - Initialisation du moteur Corese
+     * - Création d'un fichier temporaire avec des données de test
+     * - Configuration du contrôleur d'éditeur de requêtes
+     * - Configuration des écouteurs d'événements
+     * - Gestion de la disposition de l'interface utilisateur
+     */
     @FXML
     public void initialize() {
         // Initialiser Corese
@@ -132,10 +163,11 @@ public class QueryViewController {
         });
     }
 
-    public void loadRDFFile(File file) {
-        Load.create(graph).load(file.getAbsolutePath());
-    }
-
+    /**
+     * Initialise le moteur de requêtage Corese.
+     *
+     * Crée un nouveau graphe et un processus de requêtage.
+     */
     private void initializeCorese() {
         try {
             graph = Graph.create();
@@ -145,6 +177,14 @@ public class QueryViewController {
         }
     }
 
+    /**
+     * Configure le bouton d'exécution de requête.
+     *
+     * Gère :
+     * - L'affichage du bouton Run
+     * - Les actions du bouton
+     * - Le raccourci clavier Ctrl+Entrée
+     */
     private void setupRunButton() {
         // Configuration initiale pour l'onglet actif
         Tab currentTab = tabEditorController.getView().getTabPane().getSelectionModel().getSelectedItem();
@@ -166,6 +206,11 @@ public class QueryViewController {
         });
     }
 
+    /**
+     * Configure le bouton d'exécution pour un éditeur de code spécifique.
+     *
+     * @param codeEditorController Le contrôleur de l'éditeur de code
+     */
     private void configureEditorRunButton(CodeEditorController codeEditorController) {
         // S'assurer que le bouton Run est visible
         codeEditorController.getView().displayRunButton();
@@ -186,7 +231,11 @@ public class QueryViewController {
         });
     }
 
-
+    /**
+     * Exécute la requête actuellement sélectionnée.
+     *
+     * Récupère et affiche le contenu de la requête depuis l'onglet actif.
+     */
     private void executeQuery() {
         Tab selectedTab = tabEditorController.getView().getTabPane().getSelectionModel().getSelectedItem();
         if (selectedTab != null && selectedTab != tabEditorController.getView().getAddTab()) {
@@ -201,6 +250,12 @@ public class QueryViewController {
         }
     }
 
+    /**
+     * Affiche un message d'erreur à l'utilisateur.
+     *
+     * @param title Le titre de l'alerte
+     * @param message Le message d'erreur à afficher
+     */
     private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -266,14 +321,18 @@ public class QueryViewController {
     }
 
     /**
-     * Accède au contrôleur TabEditor
+     * Récupère le contrôleur d'éditeur d'onglets.
+     *
+     * @return Le contrôleur d'éditeur d'onglets
      */
     public TabEditorController getTabEditorController() {
         return tabEditorController;
     }
 
     /**
-     * Accède au modèle TabEditor
+     * Récupère le modèle d'éditeur d'onglets.
+     *
+     * @return Le modèle d'éditeur d'onglets
      */
     public TabEditorModel getTabEditorModel() {
         return tabEditorController.getModel();

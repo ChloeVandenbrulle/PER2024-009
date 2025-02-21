@@ -16,6 +16,29 @@ import javafx.stage.FileChooser;
 import java.io.File;
 import java.util.*;
 
+/**
+ * Contrôleur de gestion des règles dans une application web sémantique.
+ *
+ * Responsabilités principales :
+ * - Gestion de l'interface utilisateur pour les règles RDFS et OWL
+ * - Chargement et configuration des règles prédéfinies et personnalisées
+ * - Interaction avec le modèle de règles
+ *
+ * Fonctionnalités clés :
+ * - Initialisation des règles prédéfinies
+ * - Chargement de fichiers de règles
+ * - Activation/désactivation des règles
+ * - Gestion des règles personnalisées
+ *
+ * Types de règles gérés :
+ * - Règles RDFS (Subset, RL)
+ * - Règles OWL (RL, RL Extended, RL Test, Clean)
+ * - Règles personnalisées
+ *
+ * @author Clervie Causer
+ * @version 1.0
+ * @since 2025
+ */
 public class RuleViewController {
     private RuleModel ruleModel;
     private ProjectDataModel projectDataModel;
@@ -29,25 +52,41 @@ public class RuleViewController {
     private VBox owlRulesContainer;
     @FXML
     private VBox customRulesContainer;
-    @FXML
-    private Button loadRuleButton;
-    @FXML
-    private TitledPane personalRulesTitledPane;
 
-    // Constructeur par défaut utilisé par FXML
+    /**
+     * Constructeur par défaut du contrôleur de règles.
+     *
+     * Initialise :
+     * - Le modèle de règles
+     * - La vue des règles
+     * - La map des éléments de règles
+     */
     public RuleViewController() {
         this.ruleModel = new RuleModel();
         this.view = new RuleView();
         this.ruleItems = new HashMap<>();
     }
 
-    // Méthode pour injecter les dépendances après la construction
+    /**
+     * Injecte les dépendances nécessaires après la construction.
+     *
+     * @param projectDataModel Le modèle de données du projet
+     * @param ruleModel Le modèle de règles
+     */
     public void injectDependencies(ProjectDataModel projectDataModel, RuleModel ruleModel) {
         this.projectDataModel = projectDataModel;
         this.ruleModel = ruleModel;
         this.popupFactory = PopupFactory.getInstance(projectDataModel);
     }
 
+    /**
+     * Initialise l'interface utilisateur des règles.
+     *
+     * Actions principales :
+     * - Création de la vue des règles
+     * - Initialisation des règles prédéfinies
+     * - Configuration du conteneur de règles personnalisées
+     */
     @FXML
     public void initialize() {
         view = new RuleView();
@@ -61,6 +100,15 @@ public class RuleViewController {
         }
     }
 
+    /**
+     * Gère le chargement d'un fichier de règles.
+     *
+     * Workflow :
+     * 1. Ouverture d'un sélecteur de fichiers (.rul)
+     * 2. Chargement du fichier de règles
+     * 3. Journalisation de l'action
+     * 4. Affichage de notifications de succès ou d'erreur
+     */
     @FXML
     public void handleLoadRuleFile() {
         FileChooser fileChooser = new FileChooser();
@@ -125,6 +173,13 @@ public class RuleViewController {
         }
     }
 
+    /**
+     * Initialise les règles prédéfinies.
+     *
+     * Configure :
+     * - Les règles RDFS
+     * - Les règles OWL
+     */
     public void initializeRules() {
         if (rdfsRulesContainer != null && owlRulesContainer != null) {
             rdfsRulesContainer.getChildren().clear();
@@ -142,6 +197,13 @@ public class RuleViewController {
         }
     }
 
+    /**
+     * Met à jour la vue des règles.
+     *
+     * Actions :
+     * - Mise à jour des états des règles prédéfinies
+     * - Affichage des règles personnalisées
+     */
     void updateView() {
         // Mettre à jour les états des règles RDFS et OWL
         updatePredefinedRuleStates();
@@ -162,6 +224,11 @@ public class RuleViewController {
         }
     }
 
+    /**
+     * Met à jour l'état des règles prédéfinies.
+     *
+     * Synchronise l'état des cases à cocher avec le modèle de règles.
+     */
     private void updatePredefinedRuleStates() {
         for (Map.Entry<String, RuleItem> entry : ruleItems.entrySet()) {
             String ruleName = entry.getKey();
@@ -181,6 +248,13 @@ public class RuleViewController {
         }
     }
 
+    /**
+     * Ajoute un élément de règle à un conteneur.
+     *
+     * @param container Le conteneur JavaFX pour l'élément de règle
+     * @param ruleName Le nom de la règle
+     * @param predefined Indique si la règle est prédéfinie
+     */
     private void addRuleItem(VBox container, String ruleName, boolean predefined) {
         RuleItem ruleItem = new RuleItem(ruleName);
         ruleItems.put(ruleName, ruleItem);
@@ -191,10 +265,21 @@ public class RuleViewController {
         container.getChildren().add(ruleItem);
     }
 
+    /**
+     * Affiche la documentation d'une règle.
+     *
+     * @param ruleName Le nom de la règle dont la documentation doit être affichée
+     */
     private void handleShowDocumentation(String ruleName) {
         //TODO: open documentation with external link
     }
 
+    /**
+     * Gère l'activation/désactivation d'une règle.
+     *
+     * @param ruleName Le nom de la règle
+     * @param selected L'état d'activation de la règle
+     */
     private void handleRuleToggle(String ruleName, boolean selected) {
         switch (ruleName) {
             case "RDFS Subset":
@@ -219,6 +304,11 @@ public class RuleViewController {
         updateView();
     }
 
+    /**
+     * Affiche les règles personnalisées.
+     *
+     * @param customRules Liste des règles personnalisées à afficher
+     */
     private void displayCustomRules(List<String> customRules) {
         // Vérifier que le conteneur existe
         if (customRulesContainer == null) {
@@ -268,6 +358,11 @@ public class RuleViewController {
         }
     }
 
+    /**
+     * Gère la suppression d'une règle personnalisée.
+     *
+     * @param ruleName Le nom de la règle à supprimer
+     */
     private void handleDeleteCustomRule(String ruleName) {
         // Confirmation avant suppression
         Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
