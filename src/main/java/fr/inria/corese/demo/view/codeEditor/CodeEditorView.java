@@ -27,8 +27,8 @@ public class CodeEditorView extends AnchorPane {
         setTopAnchor(iconButtonBarView, 5.0);
         setRightAnchor(iconButtonBarView, 5.0);
 
-        setRightAnchor(runButton, 20.0);
-        setBottomAnchor(runButton, 10.0);
+        setRightAnchor(runButton, 15.0);
+        setBottomAnchor(runButton, 30.0);
 
         getChildren().addAll(codeMirrorView, iconButtonBarView);
     }
