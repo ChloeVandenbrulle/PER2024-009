@@ -9,11 +9,33 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="fr.inria.corese.demo.controller.QueryViewController"
-            prefHeight="600.0" prefWidth="800.0">
+            prefHeight="600.0" prefWidth="800.0"
+            fx:id="mainBorderPane">
 
     <center>
-        <!-- Conteneur pour le TabEditor -->
-        <StackPane fx:id="editorContainer" VBox.vgrow="ALWAYS"/>
+        <SplitPane fx:id="mainSplitPane" orientation="VERTICAL" VBox.vgrow="ALWAYS">
+            <items>
+                <!-- Conteneur pour le TabEditor -->
+                <StackPane fx:id="editorContainer" VBox.vgrow="ALWAYS" minHeight="150.0">
+                    <SplitPane.resizableWithParent>true</SplitPane.resizableWithParent>
+                </StackPane>
+
+                <!-- TabPane pour les résultats -->
+                <TabPane fx:id="resultsTabPane">
+                    <SplitPane.resizableWithParent>true</SplitPane.resizableWithParent>
+                    <tabs>
+                        <Tab text="Results" closable="false">
+                            <content>
+                                <TextArea fx:id="resultTextArea"
+                                          editable="false"
+                                          wrapText="true"
+                                          style="-fx-font-family: monospace;"/>
+                            </content>
+                        </Tab>
+                    </tabs>
+                </TabPane>
+            </items>
+        </SplitPane>
     </center>
 
 </BorderPane>

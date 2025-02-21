@@ -8,7 +8,8 @@ import javafx.scene.layout.AnchorPane;
 public class CodeEditorView extends AnchorPane {
     private final CodeMirrorView codeMirrorView;
     private final IconButtonBarView iconButtonBarView;
-    private CustomButton runButton;
+    private final CustomButton runButton;
+    private boolean runButtonDisplayed = false;
 
     public CodeEditorView() {
         this.codeMirrorView = new CodeMirrorView();
@@ -27,18 +28,25 @@ public class CodeEditorView extends AnchorPane {
         setRightAnchor(iconButtonBarView, 5.0);
 
         setRightAnchor(runButton, 20.0);
-        setBottomAnchor(runButton, 50.0);
+        setBottomAnchor(runButton, 10.0);
 
         getChildren().addAll(codeMirrorView, iconButtonBarView);
     }
 
     public void displayRunButton() {
-        String cssPath = "/styles/buttons.css";
-        this.getStylesheets().add(getClass().getResource(cssPath).toExternalForm());
+        if (!runButtonDisplayed) {
+            runButton.setStyle("-fx-padding: 3 6; -fx-background-radius: 2; -fx-cursor: hand; -fx-font-size: 14px;" +
+                    "-fx-background-color: #2196F3; -fx-text-fill: white; -fx-min-width: 50px");
 
-        getChildren().add(runButton);
+            runButton.setOnMouseEntered(e -> runButton.setStyle("-fx-padding: 3 6; -fx-background-radius: 2; -fx-cursor: hand; -fx-font-size: 14px;" +
+                    "-fx-background-color: #1976D2; -fx-text-fill: white; -fx-min-width: 50px"));
+            runButton.setOnMouseExited(e -> runButton.setStyle("-fx-padding: 3 6; -fx-background-radius: 2; -fx-cursor: hand; -fx-font-size: 14px;" +
+                    "-fx-background-color: #2196F3; -fx-text-fill: white; -fx-min-width: 50px"));
+
+            getChildren().add(runButton);
+            runButtonDisplayed = true;
+        }
     }
-
 
     public CodeMirrorView getCodeMirrorView() {
         return codeMirrorView;

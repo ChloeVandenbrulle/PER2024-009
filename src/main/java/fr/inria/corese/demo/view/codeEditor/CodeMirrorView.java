@@ -2,7 +2,7 @@ package fr.inria.corese.demo.view.codeEditor;
 
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.scene.web.WebEngine;
 import javafx.beans.property.StringProperty;
@@ -10,9 +10,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.application.Platform;
 import netscape.javascript.JSObject;
 
-import static javafx.scene.layout.VBox.setVgrow;
 
-public class CodeMirrorView extends StackPane {
+public class CodeMirrorView extends VBox {
     private final WebView webView;
     private final WebEngine webEngine;
     private final StringProperty contentProperty = new SimpleStringProperty("");
@@ -23,18 +22,20 @@ public class CodeMirrorView extends StackPane {
         webView = new WebView();
         webEngine = webView.getEngine();
 
+        // Configuration du WebView
         webView.setContextMenuEnabled(false);
-        webView.setPrefWidth(USE_COMPUTED_SIZE);
-        webView.setPrefHeight(USE_COMPUTED_SIZE);
-        webView.setMaxHeight(Double.MAX_VALUE);
-        webView.setMaxWidth(Double.MAX_VALUE);
 
+        // Permettre au WebView de se redimensionner
+        webView.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        webView.setPrefHeight(Region.USE_COMPUTED_SIZE);
         webView.setMinHeight(0);
         webView.setMinWidth(0);
-        setVgrow(webView, Priority.ALWAYS);
 
-        setMinHeight(400);
+        // Configuration VBox
+        setVgrow(webView, Priority.ALWAYS);
         setPrefHeight(Region.USE_COMPUTED_SIZE);
+        setPrefWidth(Region.USE_COMPUTED_SIZE);
+        setFillWidth(true);
 
         getChildren().add(webView);
 
@@ -43,6 +44,15 @@ public class CodeMirrorView extends StackPane {
         contentProperty.addListener((obs, old, newValue) -> {
             if (initialized && newValue != null && !isInternalUpdate) {
                 updateEditorContent(newValue);
+            }
+        });
+
+        // Ajouter un listener de redimensionnement
+        heightProperty().addListener((obs, oldVal, newVal) -> {
+            if (initialized) {
+                Platform.runLater(() -> {
+                    webEngine.executeScript("editor.refresh();");
+                });
             }
         });
     }

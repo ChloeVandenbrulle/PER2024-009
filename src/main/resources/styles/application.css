@@ -116,3 +116,37 @@
     -fx-font-size: 14px;
     -fx-padding: 3 0;
 }
+
+.tab-pane {
+    -fx-background-color: white;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #f4f4f4;
+}
+
+.tab-pane .tab {
+    -fx-background-color: #e0e0e0;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: white;
+}
+
+.table-view {
+    -fx-background-color: white;
+}
+
+.web-view {
+    -fx-background-color: white;
+}
+
+.split-pane {
+    -fx-background-color: white;
+    -fx-box-border: transparent;
+}
+
+.split-pane:horizontal > .split-pane-divider {
+    -fx-background-color: #cccccc;
+    -fx-padding: 0 0.5px 0 0.5px;
+}
