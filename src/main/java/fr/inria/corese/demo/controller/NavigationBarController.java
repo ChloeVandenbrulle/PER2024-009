@@ -1,5 +1,6 @@
 package fr.inria.corese.demo.controller;
 
+import fr.inria.corese.demo.manager.ApplicationStateManager;
 import fr.inria.corese.demo.model.ProjectDataModel;
 import fr.inria.corese.demo.view.NavigationBarView;
 import javafx.scene.Node;
@@ -30,31 +31,75 @@ import javafx.scene.control.Button;
  * @since 2025
  */
 public class NavigationBarController {
-    private final NavigationBarView view;
     private final BorderPane mainContent;
-    private final ProjectDataModel projectDataModel;
+    private final ApplicationStateManager stateManager;
+    private final NavigationBarView view;
+    private String currentViewName;
 
-    /**
-     * Construit un contrôleur de barre de navigation.
-     *
-     * Actions réalisées :
-     * - Validation du contenu principal
-     * - Création de la vue de barre de navigation
-     * - Initialisation des boutons de navigation
-     *
-     * @param mainContent Le conteneur principal de l'application
-     * @param projectDataModel Le modèle de données du projet
-     * @throws IllegalArgumentException si le contenu principal est null
-     */
     public NavigationBarController(BorderPane mainContent, ProjectDataModel projectDataModel) {
         if (mainContent == null) {
             throw new IllegalArgumentException("mainContent cannot be null");
         }
         this.mainContent = mainContent;
+        this.stateManager = ApplicationStateManager.getInstance();
         this.view = new NavigationBarView();
-        this.projectDataModel = projectDataModel;
-        System.out.println("NavigationBarController initialized with mainContent: " + mainContent);
+
         initializeButtons();
+    }
+
+    public void selectView(String viewName) {
+        try {
+            // Sauvegarde de l'état actuel avant de changer de vue
+            if (currentViewName != null) {
+                stateManager.saveCurrentState();
+                System.out.println("State saved before navigating from " + currentViewName + " to " + viewName);
+            }
+
+            // Mémoriser le nom de la vue courante pour les opérations futures
+            currentViewName = viewName;
+
+            String fxmlPath = "/fr/inria/corese/demo/" + viewName + ".fxml";
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+
+            Node content = loader.load();
+            Object controller = loader.getController();
+
+            ProjectDataModel projectDataModel = stateManager.getProjectDataModel();
+
+            // Injection du ProjectDataModel et restauration de l'état
+            if (controller instanceof DataViewController) {
+                ((DataViewController) controller).setProjectDataModel(projectDataModel);
+                stateManager.restoreState();  // Restaurer l'état global pour cette vue
+                System.out.println("Restored state for DataViewController");
+            } else if (controller instanceof QueryViewController) {
+                QueryViewController queryController = (QueryViewController) controller;
+                queryController.setProjectDataModel(projectDataModel);
+                stateManager.restoreState();  // Restaurer explicitement l'état pour la vue Query
+                System.out.println("Restored state for QueryViewController");
+            } else if (controller instanceof RDFEditorViewController) {
+                // Assurer que l'état global est restauré aussi pour l'éditeur RDF
+                stateManager.restoreState();
+                System.out.println("Restored state for RDFEditorViewController");
+            } else if (controller instanceof ValidationViewController) {
+                // Assurer que l'état global est restauré aussi pour la vue de validation
+                stateManager.restoreState();
+                System.out.println("Restored state for ValidationViewController");
+            }
+
+            // Sélection visuelle du bouton correspondant
+            Button selectedButton = getButtonForView(viewName);
+            if (selectedButton != null) {
+                view.setButtonSelected(selectedButton);
+            }
+
+            mainContent.setCenter(content);
+
+            // Log de debug
+            System.out.println("View changed to " + viewName);
+        } catch (IOException e) {
+            System.err.println("Error loading view: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -96,60 +141,6 @@ public class NavigationBarController {
         });
 
         System.out.println("All button handlers initialized");
-    }
-
-    /**
-     * Sélectionne et charge une vue spécifique dans le contenu principal.
-     *
-     * Workflow :
-     * 1. Charger le fichier FXML correspondant à la vue
-     * 2. Définir le contenu chargé comme centre du conteneur principal
-     * 3. Mettre à jour le bouton sélectionné dans la barre de navigation
-     *
-     * @param viewName Le nom de la vue à charger (par exemple "data-view")
-     * @throws IOException en cas d'erreur de chargement du fichier FXML
-     */
-    public void selectView(String viewName) {
-        try {
-            System.out.println("Attempting to select view: " + viewName);
-            String fxmlPath = "/fr/inria/corese/demo/" + viewName + ".fxml";
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            System.out.println("FXML Loader created for: " + fxmlPath);
-
-            // Load the view
-            Node content = loader.load();
-
-            // Get the controller and inject dependencies
-            Object controller = loader.getController();
-
-            // Inject ProjectDataModel based on controller type
-            if (controller instanceof DataViewController) {
-                ((DataViewController) controller).setProjectDataModel(projectDataModel);
-            } else if (controller instanceof QueryViewController) {
-                ((QueryViewController) controller).setProjectDataModel(projectDataModel);
-            }
-            // Add other controller types as needed
-
-            if (mainContent == null) {
-                System.err.println("mainContent is null when trying to set center!");
-                return;
-            }
-
-            mainContent.setCenter(content);
-            System.out.println("Content set to center of mainContent");
-
-            // Update selected button
-            Button selectedButton = getButtonForView(viewName);
-            if (selectedButton != null) {
-                view.setButtonSelected(selectedButton);
-                System.out.println("Button selected: " + selectedButton.getText());
-            }
-
-        } catch (IOException e) {
-            System.err.println("Error loading " + viewName + ": " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 
     /**

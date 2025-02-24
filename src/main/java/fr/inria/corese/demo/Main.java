@@ -1,5 +1,6 @@
 package fr.inria.corese.demo;
 
+import fr.inria.corese.demo.manager.ApplicationStateManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,6 +11,8 @@ import atlantafx.base.theme.NordLight;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
+        ApplicationStateManager stateManager = ApplicationStateManager.getInstance();
+
         Application.setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
 
         try {

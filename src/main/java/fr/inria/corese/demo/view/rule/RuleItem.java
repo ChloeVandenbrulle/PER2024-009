@@ -7,6 +7,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Button;
 
+import java.io.File;
+
 /**
  * Représente un élément de règle dans l'interface utilisateur.
  *
@@ -25,6 +27,8 @@ import javafx.scene.control.Button;
 public class RuleItem extends HBox {
     private final CheckBox checkBox;
     private final IconButtonView documentationButton;
+    private final File ruleFile;
+    private final String ruleName;
 
     /**
      * Constructeur d'un élément de règle.
@@ -39,8 +43,35 @@ public class RuleItem extends HBox {
     public RuleItem(String ruleName) {
         super(5); // spacing between elements
 
+        this.ruleName = ruleName;
+        this.ruleFile = null;
+
         // Create checkbox with rule name
         checkBox = new CheckBox(ruleName);
+
+        // Create flexible space between checkbox and buttons
+        Spacer spacer = new Spacer();
+
+        // Create documentation button using IconButtonView
+        documentationButton = new IconButtonView(IconButtonType.DOCUMENTATION);
+
+        // Add all elements to the HBox
+        getChildren().addAll(checkBox, spacer, documentationButton);
+    }
+
+    /**
+     * Constructeur d'un élément de règle à partir d'un fichier.
+     *
+     * @param file Le fichier de règle
+     */
+    public RuleItem(File file) {
+        super(5); // spacing between elements
+
+        this.ruleFile = file;
+        this.ruleName = file.getName();
+
+        // Create checkbox with rule name
+        checkBox = new CheckBox(file.getName());
 
         // Create flexible space between checkbox and buttons
         Spacer spacer = new Spacer();
@@ -68,5 +99,23 @@ public class RuleItem extends HBox {
      */
     public Button getDocumentationButton() {
         return documentationButton;
+    }
+
+    /**
+     * Récupère le fichier de règle associé.
+     *
+     * @return Le fichier de règle, ou null si l'élément a été créé à partir d'un nom
+     */
+    public File getRuleFile() {
+        return ruleFile;
+    }
+
+    /**
+     * Récupère le nom de la règle.
+     *
+     * @return Le nom de la règle
+     */
+    public String getRuleName() {
+        return ruleName;
     }
 }

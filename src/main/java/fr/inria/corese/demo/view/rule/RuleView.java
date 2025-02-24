@@ -3,6 +3,8 @@ package fr.inria.corese.demo.view.rule;
 import javafx.scene.layout.VBox;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +25,6 @@ import java.util.Map;
  */
 public class RuleView extends VBox {
     private final ObservableList<RuleItem> ruleItems;
-    private final Map<String, RuleItem> predefinedRuleItems;
 
     /**
      * Constructeur par défaut.
@@ -34,25 +35,6 @@ public class RuleView extends VBox {
      * - Ajout des règles prédéfinies
      */
     public RuleView() {
-        this.predefinedRuleItems = new HashMap<>();
-
         ruleItems = FXCollections.observableArrayList();
-
-        // Ajouter les règles prédéfinies
-        addPredefinedRules();
-    }
-
-    /**
-     * Ajoute les règles prédéfinies à la vue.
-     *
-     * Crée des éléments de règle pour un ensemble prédéfini de règles et les ajoute à la map des règles prédéfinies.
-     */
-    private void addPredefinedRules() {
-        String[] predefinedRules = {"Trace", "Load Named", "Graph index"};
-
-        for (String ruleName : predefinedRules) {
-            RuleItem ruleItem = new RuleItem(ruleName);
-            predefinedRuleItems.put(ruleName, ruleItem);
-        }
     }
 }
