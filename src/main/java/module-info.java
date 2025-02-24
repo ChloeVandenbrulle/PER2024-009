@@ -34,4 +34,6 @@ module fr.inria.corese.demo {
     opens fr.inria.corese.demo.view.rule to javafx.fxml;
     exports fr.inria.corese.demo.view.codeEditor;
     opens fr.inria.corese.demo.view.codeEditor to javafx.fxml;
+    exports fr.inria.corese.demo.model.graph;
+    opens fr.inria.corese.demo.model.graph to javafx.fxml;
 }

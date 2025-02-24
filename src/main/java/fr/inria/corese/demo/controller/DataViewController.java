@@ -50,49 +50,23 @@ public class DataViewController {
     private PopupFactory popupFactory;
     private RuleViewController ruleViewController;
     private RuleModel ruleModel;
-    private final LogDialog logDialog;
+    private LogDialog logDialog;
     private FileListView fileListView;
 
-    @FXML
-    private HBox configActionBox;
-    @FXML
-    private VBox fileListContainer;
-    @FXML
-    private VBox rulesContainer;
-    @FXML
-    private Label semanticElementsLabel;
-    @FXML
-    private Label tripletLabel;
-    @FXML
-    private Label graphLabel;
-    @FXML
-    private Label rulesLoadedLabel;
-    @FXML
-    private TopBar topBar;
+    // Injection FXML
+    @FXML private HBox configActionBox;
+    @FXML private VBox fileListContainer;
+    @FXML private VBox rulesContainer;
+    @FXML private Label semanticElementsLabel;
+    @FXML private Label tripletLabel;
+    @FXML private Label graphLabel;
+    @FXML private Label rulesLoadedLabel;
+    @FXML private TopBar topBar;
 
-    /**
-     * Construit un nouveau DataViewController.
-     *
-     * Initialise :
-     * - ProjectDataModel
-     * - LogDialog
-     * - PopupFactory
-     */
     public DataViewController() {
-        this.model = new ProjectDataModel();
-        this.logDialog = new LogDialog(model);
-        this.popupFactory = PopupFactory.getInstance(model);
+        System.out.println("DataViewController initialized");
     }
 
-    /**
-     * Initialise les composants de la vue après la construction.
-     *
-     * Réalise les configurations suivantes :
-     * - Configuration des boutons de la barre supérieure et de leurs actions
-     * - Configuration de la vue de liste de fichiers
-     * - Configuration de la vue des règles
-     * - Ajout des gestionnaires d'événements pour diverses actions
-     */
     @FXML
     public void initialize() {
         // Configuration de la TopBar
@@ -109,7 +83,17 @@ public class DataViewController {
         topBar.setOnAction(IconButtonType.OPEN_FILE, this::handleOpenProject);
         topBar.setOnAction(IconButtonType.SAVE, this::handleSaveAs);
         topBar.setOnAction(IconButtonType.LOGS, this::handleShowLogs);
+    }
 
+    public void setProjectDataModel(ProjectDataModel model) {
+        this.model = model;
+        this.logDialog = new LogDialog(model);
+        this.popupFactory = PopupFactory.getInstance(model);
+
+        initializeComponents();
+    }
+
+    private void initializeComponents() {
         // Initialisation de la liste de fichiers
         if (fileListContainer != null) {
             setupFileList();
@@ -119,6 +103,9 @@ public class DataViewController {
         if (rulesContainer != null) {
             setupRulesView();
         }
+
+        // Mise à jour de la vue
+        updateView();
     }
 
     /**

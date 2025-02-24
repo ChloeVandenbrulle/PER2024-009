@@ -27,7 +27,7 @@ public class CustomButton extends Button {
      *
      * @param type The button type defining its behavior and style
      */
-    private CustomButton(ButtonType type) {
+    public CustomButton(ButtonType type) {
         super(type.getLabel());
         this.type = type;
         setupStyle();

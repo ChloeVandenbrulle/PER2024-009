@@ -112,6 +112,9 @@ public class TabEditorView extends StackPane {
 
         tabPane.getTabs().add(tabPane.getTabs().size() - 1, tab);
         tabPane.getSelectionModel().select(tab);
+
+        System.out.println("Adding tab: " + title + ", CodeEditorView: " + codeEditorView);
+
         return tab;
     }
 

@@ -1,10 +1,14 @@
 package fr.inria.corese.demo.model;
 
 import fr.inria.corese.core.Graph;
+import fr.inria.corese.core.kgram.core.Mappings;
 import fr.inria.corese.core.load.Load;
-import fr.inria.corese.core.load.LoadException;
+import fr.inria.corese.core.print.ResultFormat;
+import fr.inria.corese.core.query.QueryProcess;
+import fr.inria.corese.demo.model.graph.CoreseGraph;
 import fr.inria.corese.demo.model.fileList.FileItem;
 import fr.inria.corese.demo.model.fileList.FileListModel;
+import fr.inria.corese.demo.model.graph.SemanticGraph;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -16,208 +20,218 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-/**
- * Modèle central de gestion de projet pour une application de traitement de données sémantiques.
- *
- * Responsabilités principales :
- * - Gestion du graphe sémantique
- * - Gestion des fichiers du projet
- * - Suivi des journaux d'événements
- * - Chargement, sauvegarde et manipulation de projets
- *
- * Fonctionnalités clés :
- * - Chargement et gestion de fichiers RDF
- * - Gestion des modèles de règles
- * - Journalisation des opérations
- * - Calcul de métriques sur les données sémantiques
- *
- * @author Clervie Causer
- * @version 1.0
- * @since 2025
- */
 public class ProjectDataModel {
-    private static final Logger logger = Logger.getLogger(ProjectDataModel.class.getName());
-    private Graph graph;
-    private final FileListModel fileListModel;
-    private final List<String> logEntries;
-    private RuleModel ruleModel;
-    private String projectPath;
-    private int rulesLoadedCount = 0;
+        private static final Logger logger = Logger.getLogger(ProjectDataModel.class.getName());
+        private Graph graph;
+        private QueryProcess exec;
+        private final FileListModel fileListModel;
+        private final List<String> logEntries;
+        private RuleModel ruleModel;
+        private String projectPath;
+        private int rulesLoadedCount = 0;
+        private final SemanticGraph semanticGraph;
 
-    /**
-     * Constructeur par défaut.
-     *
-     * Initialise :
-     * - Un graphe sémantique vide
-     * - Un modèle de liste de fichiers
-     * - Un journal d'événements
-     * - Un modèle de règles
-     */
-    public ProjectDataModel() {
-        this.graph = Graph.create();
-        this.fileListModel = new FileListModel();
-        this.logEntries = new ArrayList<>();
-        this.ruleModel = new RuleModel();
-        // Informer le ruleModel du graphe
-        this.ruleModel.setGraph(this.graph);
-    }
-
-    /**
-     * Récupère le modèle de liste de fichiers.
-     *
-     * @return Le modèle de liste de fichiers associé au projet
-     */
-    public FileListModel getFileListModel() {
-        return fileListModel;
-    }
-
-    /**
-     * Récupère le modèle de règles.
-     *
-     * @return Le modèle de règles associé au projet
-     */
-    public RuleModel getRuleModel() {
-        return ruleModel;
-    }
-
-    /**
-     * Ajoute une entrée au journal des événements.
-     *
-     * @param entry L'entrée de journal à ajouter
-     */
-    public void addLogEntry(String entry) {
-        logEntries.add(entry);
-        logger.info(entry);
-    }
-
-    /**
-     * Récupère toutes les entrées du journal.
-     *
-     * @return Une liste des entrées de journal
-     */
-    public List<String> getLogEntries() {
-        return new ArrayList<>(logEntries);
-    }
-
-    public void setRulesLoadedCount(int count) {
-        this.rulesLoadedCount = count;
-    }
-
-    /**
-     * Charge un fichier dans le graphe sémantique.
-     *
-     * @param file Le fichier à charger
-     * @throws LoadException En cas d'erreur lors du chargement du fichier
-     */
-    public void loadFile(File file) throws LoadException {
-        try {
-            clearGraph();
-            Load ld = Load.create(graph);
-            ld.parse(file.getAbsolutePath());
-            addLogEntry("File loaded: " + file.getName() + " with " + graph.size() + " triples");
-
-            // Après le chargement du fichier, appliquer les règles
-            if (ruleModel != null) {
-                ruleModel.process();
-                addLogEntry("Applied " + ruleModel.getLoadedRulesCount() + " rules to the graph");
-            }
-        } catch (LoadException e) {
-            addLogEntry("Error loading file: " + e.getMessage());
-            throw e;
+        public ProjectDataModel() {
+            this.semanticGraph = new CoreseGraph();
+            this.fileListModel = new FileListModel();
+            this.logEntries = new ArrayList<>();
+            this.graph = Graph.create();
+            this.exec = QueryProcess.create(graph);
+            this.ruleModel = new RuleModel();
+            this.ruleModel.setGraph(this.graph);
         }
+
+        public Object[] executeQuery(String queryString) throws Exception {
+            String queryType = determineQueryType(queryString);
+            Mappings mappings = exec.query(queryString);
+            Object formattedResult;
+
+            switch (queryType) {
+                case "SELECT" -> {
+                    formattedResult = ResultFormat.create(mappings, ResultFormat.format.MARKDOWN_FORMAT).toString();
+                    addLogEntry("SELECT query executed successfully");
+                }
+                case "CONSTRUCT" -> {
+                    Graph resultGraph = (Graph) mappings.getGraph();
+                    formattedResult = resultGraph != null ?
+                            ResultFormat.create(resultGraph, ResultFormat.format.TRIG_FORMAT).toString() :
+                            "No results.";
+                    addLogEntry("CONSTRUCT query executed successfully");
+                }
+                case "ASK" -> {
+                    formattedResult = !mappings.isEmpty();
+                    addLogEntry("ASK query executed successfully");
+                }
+                case "DESCRIBE" -> {
+                    Graph resultGraph = (Graph) mappings.getGraph();
+                    formattedResult = resultGraph != null ?
+                            ResultFormat.create(resultGraph, ResultFormat.format.TRIG_FORMAT).toString() :
+                            "No results.";
+                    addLogEntry("DESCRIBE query executed successfully");
+                }
+                default -> throw new Exception("Unsupported query type: " + queryType);
+            }
+
+            return new Object[]{formattedResult, queryType};
+        }
+
+        public void loadFile(File file) throws Exception {
+            try {
+                Load loader = Load.create(graph);
+
+                // Détecter le format basé sur l'extension du fichier
+                String fileName = file.getName().toLowerCase();
+                if (fileName.endsWith(".ttl")) {
+                    loader.parse(file.getAbsolutePath(), Load.format.TURTLE_FORMAT);
+                } else if (fileName.endsWith(".rdf") || fileName.endsWith(".xml")) {
+                    loader.parse(file.getAbsolutePath(), Load.format.RDFXML_FORMAT);
+                } else if (fileName.endsWith(".jsonld")) {
+                    loader.parse(file.getAbsolutePath(), Load.format.JSONLD_FORMAT);
+                } else {
+                    // Par défaut, essayer Turtle
+                    loader.parse(file.getAbsolutePath(), Load.format.TURTLE_FORMAT);
+                }
+
+                addLogEntry("File loaded successfully: " + file.getName());
+
+                // Appliquer les règles après le chargement si nécessaire
+                if (ruleModel != null) {
+                    ruleModel.process();
+                    addLogEntry("Applied " + ruleModel.getLoadedRulesCount() + " rules to the graph");
+                }
+            } catch (Exception e) {
+                addLogEntry("Error loading file: " + e.getMessage());
+                throw e;
+            }
+        }
+
+        private String determineQueryType(String queryString) {
+            String upperQuery = queryString.trim().toUpperCase();
+            if (upperQuery.startsWith("SELECT")) return "SELECT";
+            if (upperQuery.startsWith("CONSTRUCT")) return "CONSTRUCT";
+            if (upperQuery.startsWith("ASK")) return "ASK";
+            if (upperQuery.startsWith("DESCRIBE")) return "DESCRIBE";
+            return "UNKNOWN";
+        }
+
+        // Support de différents formats de résultats pour différents types de requêtes
+        public String getQueryResultAsFormat(Object result, String format, String queryType) {
+            try {
+                switch (queryType) {
+                    case "SELECT" -> {
+                        Mappings mappings = (Mappings) result;
+                        return switch (format.toUpperCase()) {
+                            case "XML" -> ResultFormat.create(mappings, ResultFormat.format.XML_FORMAT).toString();
+                            case "JSON" -> ResultFormat.create(mappings, ResultFormat.format.JSON_FORMAT).toString();
+                            case "CSV" -> ResultFormat.create(mappings, ResultFormat.format.CSV_FORMAT).toString();
+                            case "TSV" -> ResultFormat.create(mappings, ResultFormat.format.TSV_FORMAT).toString();
+                            default -> ResultFormat.create(mappings, ResultFormat.format.MARKDOWN_FORMAT).toString();
+                        };
+                    }
+                    case "CONSTRUCT", "DESCRIBE" -> {
+                        Graph resultGraph = (Graph) result;
+                        return switch (format.toUpperCase()) {
+                            case "TURTLE" -> ResultFormat.create(resultGraph, ResultFormat.format.TURTLE_FORMAT).toString();
+                            case "RDF/XML" -> ResultFormat.create(resultGraph, ResultFormat.format.RDF_XML_FORMAT).toString();
+                            case "JSONLD" -> ResultFormat.create(resultGraph, ResultFormat.format.JSONLD_FORMAT).toString();
+                            case "NTRIPLES" -> ResultFormat.create(resultGraph, ResultFormat.format.NTRIPLES_FORMAT).toString();
+                            case "NQUADS" -> ResultFormat.create(resultGraph, ResultFormat.format.NQUADS_FORMAT).toString();
+                            default -> ResultFormat.create(resultGraph, ResultFormat.format.TRIG_FORMAT).toString();
+                        };
+                    }
+                    default -> throw new IllegalArgumentException("Unsupported query type for format conversion: " + queryType);
+                }
+            } catch (Exception e) {
+                addLogEntry("Error formatting result: " + e.getMessage());
+                return "Error formatting result: " + e.getMessage();
+            }
+        }
+
+        // Getters et autres méthodes existantes...
+
+        public void clearGraph() {
+            this.graph = Graph.create();
+            this.exec = QueryProcess.create(graph);
+            if (ruleModel != null) {
+                ruleModel.setGraph(this.graph);
+            }
+            addLogEntry("Graph cleared");
+        }
+
+
+    // Constructor for dependency injection and testing
+    public ProjectDataModel(List<String> logEntries, SemanticGraph semanticGraph) {
+        this.logEntries = logEntries;
+        this.semanticGraph = semanticGraph;
+        this.fileListModel = new FileListModel();
+        this.ruleModel = new RuleModel();
     }
 
-    /**
-     * Ajoute un fichier à la liste des fichiers.
-     *
-     * @param fileName Le nom du fichier à ajouter
-     */
     public void addFile(String fileName) {
         fileListModel.addFile(fileName);
     }
 
-    /**
-     * Efface tous les fichiers de la liste.
-     */
     public void clearFiles() {
         fileListModel.clearFiles();
     }
 
-    /**
-     * Efface le graphe sémantique.
-     */
-    public void clearGraph() {
-        this.graph = Graph.create();
-
-        // Mettre à jour le graphe dans le modèle de règles
-        if (ruleModel != null) {
-            ruleModel.setGraph(this.graph);
-        }
-
-        addLogEntry("Graph cleared");
-    }
-
-    /**
-     * Recharge tous les fichiers précédemment chargés.
-     */
     public void reloadFiles() {
         clearGraph();
-
-        List<FileItem> files = new ArrayList<>(fileListModel.getFiles());
-        for (FileItem item : files) {
+        for (FileItem item : fileListModel.getFiles()) {
             try {
-                // Supposer que le chemin est relatif au répertoire du projet
                 String filePath = projectPath != null
                         ? Paths.get(projectPath, item.getName()).toString()
                         : item.getName();
 
                 File file = new File(filePath);
                 if (file.exists()) {
-                    Load ld = Load.create(graph);
-                    ld.parse(file.getAbsolutePath());
+                    loadFile(file);
                     addLogEntry("Reloaded file: " + file.getName());
                 } else {
                     addLogEntry("Warning: File not found during reload: " + filePath);
                 }
-            } catch (LoadException e) {
+            } catch (Exception e) {
                 addLogEntry("Error reloading file " + item.getName() + ": " + e.getMessage());
             }
         }
-
-        // Réappliquer les règles après rechargement
-        if (ruleModel != null) {
-            ruleModel.process();
-            addLogEntry("Reapplied " + ruleModel.getLoadedRulesCount() + " rules to the graph");
-        }
     }
 
-    /**
-     * Charge un projet à partir d'un répertoire.
-     *
-     * @param directory Le répertoire contenant le projet
-     */
     public void loadProject(File directory) {
         clearGraph();
         clearFiles();
         this.projectPath = directory.getAbsolutePath();
         addLogEntry("Loading project from: " + directory.getAbsolutePath());
 
-        // Charger les fichiers TTL
+        // Essayer de charger le contexte d'abord
+        try {
+            File contextFile = new File(directory, "project.context");
+            if (contextFile.exists()) {
+                semanticGraph.loadContext(contextFile.getAbsolutePath());
+                addLogEntry("Project context restored");
+            }
+        } catch (Exception e) {
+            addLogEntry("Could not restore project context: " + e.getMessage());
+            // Continuer avec le chargement normal
+            loadProjectFiles(directory);
+            loadProjectRules(directory);
+        }
+    }
+
+    private void loadProjectFiles(File directory) {
         File[] ttlFiles = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".ttl"));
         if (ttlFiles != null) {
             for (File file : ttlFiles) {
                 try {
-                    Load ld = Load.create(graph);
-                    ld.parse(file.getAbsolutePath());
+                    loadFile(file);
                     fileListModel.addFile(file.getName());
-                    addLogEntry("Loaded file: " + file.getName());
-                } catch (LoadException e) {
+                } catch (Exception e) {
                     addLogEntry("Error loading file " + file.getName() + ": " + e.getMessage());
                 }
             }
         }
+    }
 
-        // Charger les fichiers de règles
+    private void loadProjectRules(File directory) {
         File rulesDir = new File(directory, "rules");
         if (rulesDir.exists() && rulesDir.isDirectory()) {
             File[] ruleFiles = rulesDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".rul"));
@@ -232,124 +246,105 @@ public class ProjectDataModel {
                 }
             }
         }
-
-        // Appliquer les règles après chargement
-        if (ruleModel != null) {
-            ruleModel.process();
-            addLogEntry("Applied " + ruleModel.getLoadedRulesCount() + " rules to the graph");
-        }
     }
 
-    /**
-     * Sauvegarde le projet dans un fichier cible.
-     *
-     * @param targetFile Le fichier cible pour la sauvegarde
-     */
     public void saveProject(File targetFile) {
-        String directory = targetFile.getParent();
-        String baseName = targetFile.getName();
-        if (!baseName.endsWith(".ttl")) {
-            baseName += ".ttl";
-        }
-
         try {
-            // Créer le répertoire du projet si nécessaire
-            Path projectDir = Paths.get(directory);
+            Path projectDir = Paths.get(targetFile.getParent());
             Files.createDirectories(projectDir);
 
-            // Sauvegarder le graphe principal
-            String ttlContent = graph.toString();
-            File graphFile = new File(projectDir.toFile(), baseName);
-            try (FileWriter writer = new FileWriter(graphFile)) {
-                writer.write(ttlContent);
-            }
-            addLogEntry("Graph saved to: " + graphFile.getAbsolutePath());
+            // Sauvegarder le contexte
+            semanticGraph.saveContext();
 
-            // Créer le répertoire des règles
-            Path rulesDir = projectDir.resolve("rules");
-            Files.createDirectories(rulesDir);
+            saveRulesConfiguration(projectDir);
+            saveProjectConfiguration(targetFile);
 
-            // Sauvegarder l'état des règles prédéfinies dans un fichier de configuration
-            StringBuilder configContent = new StringBuilder();
-            configContent.append("# Rules configuration\n");
-            configContent.append("RDFS_SUBSET=").append(ruleModel.isRDFSSubsetEnabled()).append("\n");
-            configContent.append("RDFS_RL=").append(ruleModel.isRDFSRLEnabled()).append("\n");
-            configContent.append("OWL_RL=").append(ruleModel.isOWLRLEnabled()).append("\n");
-            configContent.append("OWL_RL_EXTENDED=").append(ruleModel.isOWLRLExtendedEnabled()).append("\n");
-            configContent.append("OWL_RL_TEST=").append(ruleModel.isOWLRLTestEnabled()).append("\n");
-            configContent.append("OWL_CLEAN=").append(ruleModel.isOWLCleanEnabled()).append("\n");
-
-            File configFile = new File(projectDir.toFile(), "rules.config");
-            try (FileWriter writer = new FileWriter(configFile)) {
-                writer.write(configContent.toString());
-            }
-            addLogEntry("Rules configuration saved to: " + configFile.getAbsolutePath());
-
-            // Le projet est maintenant sauvegardé
             this.projectPath = projectDir.toString();
-            addLogEntry("Project saved successfully to: " + projectDir.toString());
-
-        } catch (IOException e) {
+            addLogEntry("Project and context saved successfully to: " + projectDir.toString());
+        } catch (Exception e) {
             addLogEntry("Error saving project: " + e.getMessage());
         }
     }
 
-    /**
-     * Compte le nombre d'éléments sémantiques dans le graphe.
-     *
-     * @return Le nombre d'éléments sémantiques
-     */
+    private void saveRulesConfiguration(Path projectDir) throws IOException {
+        Path rulesDir = projectDir.resolve("rules");
+        Files.createDirectories(rulesDir);
+
+        StringBuilder configContent = createRulesConfigContent();
+        File configFile = new File(projectDir.toFile(), "rules.config");
+        try (FileWriter writer = new FileWriter(configFile)) {
+            writer.write(configContent.toString());
+        }
+        addLogEntry("Rules configuration saved to: " + configFile.getAbsolutePath());
+    }
+
+    private StringBuilder createRulesConfigContent() {
+        StringBuilder configContent = new StringBuilder();
+        configContent.append("# Rules configuration\n");
+        configContent.append("RDFS_SUBSET=").append(ruleModel.isRDFSSubsetEnabled()).append("\n");
+        configContent.append("RDFS_RL=").append(ruleModel.isRDFSRLEnabled()).append("\n");
+        configContent.append("OWL_RL=").append(ruleModel.isOWLRLEnabled()).append("\n");
+        configContent.append("OWL_RL_EXTENDED=").append(ruleModel.isOWLRLExtendedEnabled()).append("\n");
+        configContent.append("OWL_RL_TEST=").append(ruleModel.isOWLRLTestEnabled()).append("\n");
+        configContent.append("OWL_CLEAN=").append(ruleModel.isOWLCleanEnabled()).append("\n");
+        return configContent;
+    }
+
+    private void saveProjectConfiguration(File targetFile) throws IOException {
+        String baseName = targetFile.getName();
+        if (!baseName.endsWith(".ttl")) {
+            baseName += ".ttl";
+        }
+        File graphFile = new File(targetFile.getParentFile(), baseName);
+        try (FileWriter writer = new FileWriter(graphFile)) {
+            writer.write(((CoreseGraph)semanticGraph).getCoreseGraph().toString());
+        }
+        addLogEntry("Graph saved to: " + graphFile.getAbsolutePath());
+    }
+
+    // Delegated methods
     public int getSemanticElementsCount() {
-        if (graph == null) return 0;
-        try {
-            return graph.size() / 3;
-        } catch (Exception e) {
-            addLogEntry("Error counting semantic elements: " + e.getMessage());
-            return 0;
-        }
+        return semanticGraph.getSemanticElementsCount();
     }
 
-    /**
-     * Récupère le nombre de triplets dans le graphe.
-     *
-     * @return Le nombre de triplets
-     */
     public int getTripletCount() {
-        return graph != null ? graph.size() : 0;
+        return semanticGraph.getTripletCount();
     }
 
-    /**
-     * Récupère le nombre de graphes.
-     *
-     * @return Le nombre de graphes
-     */
     public int getGraphCount() {
-        if (graph == null) return 0;
-        try {
-            // Méthode simplifiée qui tente d'accéder à la méthode appropriée selon la version
-            try {
-                java.lang.reflect.Method getNamedGraphsMethod = graph.getClass().getMethod("getNamedGraphs");
-                Object result = getNamedGraphsMethod.invoke(graph);
-                if (result instanceof java.util.List) {
-                    return ((java.util.List<?>) result).size() + 1;
-                }
-            } catch (NoSuchMethodException e) {
-                // La méthode n'existe pas, essayer autre chose
-                try {
-                    java.lang.reflect.Method getGraphNamesMethod = graph.getClass().getMethod("getGraphNames");
-                    Object result = getGraphNamesMethod.invoke(graph);
-                    if (result instanceof java.util.List) {
-                        return ((java.util.List<?>) result).size() + 1;
-                    }
-                } catch (NoSuchMethodException ex) {
-                    // Aucune des méthodes n'existe
-                    return 1; // On suppose qu'il y a au moins le graphe par défaut
-                }
-            }
-            return 1; // Valeur par défaut
-        } catch (Exception e) {
-            addLogEntry("Error counting graphs: " + e.getMessage());
-            return 1; // On suppose qu'il y a au moins le graphe par défaut
-        }
+        return semanticGraph.getGraphCount();
+    }
+
+    public void addLogEntry(String entry) {
+        semanticGraph.addLogEntry(entry);
+    }
+
+    public List<String> getLogEntries() {
+        return semanticGraph.getLogEntries();
+    }
+
+    // Getters
+    public FileListModel getFileListModel() {
+        return fileListModel;
+    }
+
+    public RuleModel getRuleModel() {
+        return ruleModel;
+    }
+
+    public int getRulesLoadedCount() {
+        return rulesLoadedCount;
+    }
+
+    public void setRulesLoadedCount(int count) {
+        this.rulesLoadedCount = count;
+    }
+
+    public List<File> getLoadedFiles() {
+        return semanticGraph.getLoadedFiles();
+    }
+
+    public List<File> getLoadedRules() {
+        return semanticGraph.getLoadedRules();
     }
 }

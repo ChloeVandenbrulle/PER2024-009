@@ -8,7 +8,7 @@ import javafx.scene.layout.AnchorPane;
 public class CodeEditorView extends AnchorPane {
     private final CodeMirrorView codeMirrorView;
     private final IconButtonBarView iconButtonBarView;
-    private final CustomButton runButton;
+    private CustomButton runButton;
     private boolean runButtonDisplayed = false;
 
     public CodeEditorView() {
@@ -34,6 +34,16 @@ public class CodeEditorView extends AnchorPane {
     }
 
     public void displayRunButton() {
+        System.out.println("Displaying Run Button in CodeEditorView");
+
+        if (runButton == null) {
+            runButton = new CustomButton(ButtonType.RUN);
+            // Ajouter le bouton à votre mise en page
+            // Par exemple :
+            // buttonContainer.getChildren().add(runButton);
+        }
+        runButton.setVisible(true);
+
         if (!runButtonDisplayed) {
             runButton.setStyle("-fx-padding: 3 6; -fx-background-radius: 2; -fx-cursor: hand; -fx-font-size: 14px;" +
                     "-fx-background-color: #2196F3; -fx-text-fill: white; -fx-min-width: 50px");

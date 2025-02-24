@@ -1,5 +1,6 @@
 package fr.inria.corese.demo.controller;
 
+import fr.inria.corese.demo.model.ProjectDataModel;
 import fr.inria.corese.demo.view.NavigationBarView;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
@@ -31,6 +32,7 @@ import javafx.scene.control.Button;
 public class NavigationBarController {
     private final NavigationBarView view;
     private final BorderPane mainContent;
+    private final ProjectDataModel projectDataModel;
 
     /**
      * Construit un contrôleur de barre de navigation.
@@ -41,14 +43,16 @@ public class NavigationBarController {
      * - Initialisation des boutons de navigation
      *
      * @param mainContent Le conteneur principal de l'application
+     * @param projectDataModel Le modèle de données du projet
      * @throws IllegalArgumentException si le contenu principal est null
      */
-    public NavigationBarController(BorderPane mainContent) {
+    public NavigationBarController(BorderPane mainContent, ProjectDataModel projectDataModel) {
         if (mainContent == null) {
             throw new IllegalArgumentException("mainContent cannot be null");
         }
         this.mainContent = mainContent;
         this.view = new NavigationBarView();
+        this.projectDataModel = projectDataModel;
         System.out.println("NavigationBarController initialized with mainContent: " + mainContent);
         initializeButtons();
     }
@@ -113,8 +117,19 @@ public class NavigationBarController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             System.out.println("FXML Loader created for: " + fxmlPath);
 
+            // Load the view
             Node content = loader.load();
-            System.out.println("Content loaded successfully");
+
+            // Get the controller and inject dependencies
+            Object controller = loader.getController();
+
+            // Inject ProjectDataModel based on controller type
+            if (controller instanceof DataViewController) {
+                ((DataViewController) controller).setProjectDataModel(projectDataModel);
+            } else if (controller instanceof QueryViewController) {
+                ((QueryViewController) controller).setProjectDataModel(projectDataModel);
+            }
+            // Add other controller types as needed
 
             if (mainContent == null) {
                 System.err.println("mainContent is null when trying to set center!");

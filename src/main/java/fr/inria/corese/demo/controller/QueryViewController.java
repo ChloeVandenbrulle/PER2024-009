@@ -1,22 +1,27 @@
 package fr.inria.corese.demo.controller;
 
-import fr.inria.corese.core.Graph;
-import fr.inria.corese.core.load.Load;
-import fr.inria.corese.core.query.QueryProcess;
+
 import fr.inria.corese.demo.enums.icon.IconButtonBarType;
+import fr.inria.corese.demo.model.ProjectDataModel;
 import fr.inria.corese.demo.model.TabEditorModel;
 import fr.inria.corese.demo.view.CustomButton;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.Node;
+
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.file.Files;
 import javafx.application.Platform;
+import javafx.scene.web.WebView;
 
 
 /**
@@ -45,240 +50,321 @@ import javafx.application.Platform;
  */
 public class QueryViewController {
     @FXML private StackPane editorContainer;
-    @FXML private TextArea resultTextArea;
     @FXML private BorderPane mainBorderPane;
     @FXML private SplitPane mainSplitPane;
+    @FXML private TabPane resultsTabPane;
+    @FXML private TextArea resultTextArea;
+    @FXML private WebView graphView;
+    @FXML private WebView xmlView;
 
     private TabEditorController tabEditorController;
-    private Graph graph;
-    private QueryProcess exec;
-    public TabPane resultsTabPane;
+    private ProjectDataModel projectDataModel;
+    private TableView<String[]> resultTable;
 
-    /**
-     * Constructeur par défaut du contrôleur de vue de requêtes.
-     *
-     * Initialise les composants de base du contrôleur.
-     */
     public QueryViewController() {
         System.out.println("QueryViewController initialized");
     }
 
-    /**
-     * Initialise les composants de la vue de requêtes.
-     *
-     * Actions principales :
-     * - Initialisation du moteur Corese
-     * - Création d'un fichier temporaire avec des données de test
-     * - Configuration du contrôleur d'éditeur de requêtes
-     * - Configuration des écouteurs d'événements
-     * - Gestion de la disposition de l'interface utilisateur
-     */
+    public void setProjectDataModel(ProjectDataModel projectDataModel) {
+        this.projectDataModel = projectDataModel;
+    }
+
     @FXML
     public void initialize() {
-        // Initialiser Corese
-        initializeCorese();
+        // Initialiser juste le TabEditor sans onglet par défaut
+        tabEditorController = new TabEditorController(IconButtonBarType.QUERY);
 
-        // Créer un fichier temporaire avec les données de test
-        try {
-            // Créer fichier temporaire
-            File tempFile = File.createTempFile("test", ".ttl");
-            tempFile.deleteOnExit();
-
-            // Données de test
-            String testData = """
-            @prefix ex: <http://example.org/> .
-            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-            
-            ex:Alice rdf:type ex:Person ;
-                ex:name "Alice" ;
-                ex:age "25" ;
-                ex:knows ex:Bob .
-                
-            ex:Bob rdf:type ex:Person ;
-                ex:name "Bob" ;
-                ex:age "30" .
-            """;
-
-            // Écrire les données dans le fichier temporaire
-            try (FileWriter writer = new FileWriter(tempFile)) {
-                writer.write(testData);
-            }
-
-            // Charger les données de test
-            Load ld = Load.create(graph);
-            ld.load(tempFile.getAbsolutePath());
-            System.out.println("Données de test chargées avec succès");
-
-            // Créer le TabEditorController avec le type spécifique pour les requêtes
-            tabEditorController = new TabEditorController(IconButtonBarType.QUERY);
-
-            // Ajouter un onglet de requête avec une requête de test
-            String testQuery = """
-            PREFIX ex: <http://example.org/>
-            SELECT ?person ?name ?age
-            WHERE {
-                ?person ex:name ?name .
-                ?person ex:age ?age .
-            }
-            """;
-
-            addNewQueryTab("Test Query", testQuery);
-
-            // Injecter le TabEditor dans le conteneur
-            if (editorContainer != null) {
-                editorContainer.getChildren().add(tabEditorController.getView());
-            }
-
-            // Configurer le gestionnaire d'événements pour le bouton Run et Ctrl+Enter
-            setupRunButton();
-
-        } catch (IOException e) {
-            showError("Error Loading Test Data", e.getMessage());
+        // Injecter le TabEditor dans le conteneur
+        if (editorContainer != null) {
+            editorContainer.getChildren().add(tabEditorController.getView());
         }
 
-        // Définir la position initiale du diviseur à 0.6 (60% pour l'éditeur, 40% pour les résultats)
-        Platform.runLater(() -> mainSplitPane.setDividerPosition(0, 0.6));
+        setupResultsPane();
+        setupRunButton();
+        setupLayout();
 
-        // Ajouter un listener pour ajuster la position du diviseur
-        mainSplitPane.getDividers().get(0).positionProperty().addListener((obs, oldPos, newPos) -> {
-            if (newPos.doubleValue() < 0.25) { // Minimum 25% pour l'éditeur
-                Platform.runLater(() -> mainSplitPane.setDividerPosition(0, 0.25));
-            } else if (newPos.doubleValue() < 0.4) { // Entre 25% et 40%, on force à 40%
-                Platform.runLater(() -> mainSplitPane.setDividerPosition(0, 0.4));
-            }
-        });
-
-        // Ajouter un listener pour redimensionner en fonction de la hauteur de la fenêtre
-        mainBorderPane.heightProperty().addListener((obs, oldHeight, newHeight) -> {
-            if (newHeight.doubleValue() > 0) {
-                double currentDividerPos = mainSplitPane.getDividerPositions()[0];
-                double resultsPaneHeight = newHeight.doubleValue() * (1 - currentDividerPos);
-
-                if (resultsPaneHeight > newHeight.doubleValue() * 0.75) {
-                    // Si la partie résultats dépasse 75% de la hauteur totale
-                    double newDividerPos = 0.25; // On garde 25% minimum pour l'éditeur
-                    Platform.runLater(() -> mainSplitPane.setDividerPosition(0, newDividerPos));
+        // Ajouter un listener global pour configurer le bouton Run
+        Platform.runLater(() -> {
+            tabEditorController.getView().getTabPane().getTabs().addListener((ListChangeListener<Tab>) change -> {
+                while (change.next()) {
+                    if (change.wasAdded()) {
+                        for (Tab tab : change.getAddedSubList()) {
+                            if (tab != tabEditorController.getView().getAddTab()) {
+                                Platform.runLater(() -> {
+                                    CodeEditorController codeEditorController = tabEditorController.getModel().getControllerForTab(tab);
+                                    if (codeEditorController != null) {
+                                        System.out.println("Configuring Run Button for new tab: " + tab.getText());
+                                        codeEditorController.getView().displayRunButton();
+                                        configureEditorRunButton(codeEditorController);
+                                    } else {
+                                        System.err.println("No CodeEditorController found for tab: " + tab.getText());
+                                    }
+                                });
+                            }
+                        }
+                    }
                 }
-            }
+            });
         });
     }
 
-    /**
-     * Initialise le moteur de requêtage Corese.
-     *
-     * Crée un nouveau graphe et un processus de requêtage.
-     */
-    private void initializeCorese() {
-        try {
-            graph = Graph.create();
-            exec = QueryProcess.create(graph);
-        } catch (Exception e) {
-            showError("Error initializing Corese", e.getMessage());
-        }
-    }
-
-    /**
-     * Configure le bouton d'exécution de requête.
-     *
-     * Gère :
-     * - L'affichage du bouton Run
-     * - Les actions du bouton
-     * - Le raccourci clavier Ctrl+Entrée
-     */
     private void setupRunButton() {
-        // Configuration initiale pour l'onglet actif
-        Tab currentTab = tabEditorController.getView().getTabPane().getSelectionModel().getSelectedItem();
-        if (currentTab != null && currentTab != tabEditorController.getView().getAddTab()) {
-            CodeEditorController codeEditorController = tabEditorController.getModel().getControllerForTab(currentTab);
-            if (codeEditorController != null) {
-                configureEditorRunButton(codeEditorController);
-            }
-        }
+        System.out.println("=== Setting up Run Button Listener ===");
 
-        // Écouter les changements d'onglets
-        tabEditorController.getView().getTabPane().getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
-            if (newTab != null && newTab != tabEditorController.getView().getAddTab()) {
-                CodeEditorController codeEditorController = tabEditorController.getModel().getControllerForTab(newTab);
-                if (codeEditorController != null) {
-                    configureEditorRunButton(codeEditorController);
+        tabEditorController.getView().getTabPane().getTabs().addListener((ListChangeListener<Tab>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for (Tab tab : change.getAddedSubList()) {
+                        if (tab != tabEditorController.getView().getAddTab()) {
+                            // Ajouter un listener de contenu pour s'assurer que le contenu est chargé
+                            tab.contentProperty().addListener(new ChangeListener<Node>() {
+                                @Override
+                                public void changed(ObservableValue<? extends Node> observable, Node oldValue, Node newValue) {
+                                    if (newValue != null) {
+                                        // Retirer le listener après son déclenchement
+                                        tab.contentProperty().removeListener(this);
+
+                                        Platform.runLater(() -> {
+                                            CodeEditorController codeEditorController = tabEditorController.getModel().getControllerForTab(tab);
+                                            if (codeEditorController != null) {
+                                                System.out.println("Delayed Run Button Configuration for tab: " + tab.getText());
+                                                configureEditorRunButton(codeEditorController);
+                                            } else {
+                                                System.err.println("Still no CodeEditorController for tab: " + tab.getText());
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    }
                 }
             }
         });
     }
 
-    /**
-     * Configure le bouton d'exécution pour un éditeur de code spécifique.
-     *
-     * @param codeEditorController Le contrôleur de l'éditeur de code
-     */
     private void configureEditorRunButton(CodeEditorController codeEditorController) {
-        // S'assurer que le bouton Run est visible
+        System.out.println("=== Configuring Editor Run Button ===");
+
+        if (projectDataModel == null) {
+            System.err.println("ProjectDataModel is not initialized!");
+            return;
+        }
+
+        System.out.println("Displaying Run Button");
         codeEditorController.getView().displayRunButton();
 
-        // Configurer l'action du bouton Run
         CustomButton runButton = codeEditorController.getView().getRunButton();
+
+        if (runButton == null) {
+            System.err.println("Run Button is NULL!");
+            return;
+        }
+
+        System.out.println("Run Button Retrieved. Setting up event handlers.");
+
+        // Log current event handlers
+        System.out.println("Current Action Event Handlers: " +
+                (runButton.getOnAction() != null ? "Exists" : "None"));
+
+        // Clear previous event handlers
+        runButton.setOnAction(null);
+
+        // Ajouter le nouveau gestionnaire d'événements
         runButton.setOnAction(e -> {
-            System.out.println("Run button clicked");
+            System.out.println("Run Button Clicked!");
             executeQuery();
         });
 
-        // Configurer le raccourci Ctrl+Enter
+        // Configuration des raccourcis clavier
         codeEditorController.getView().setOnKeyPressed(event -> {
             if (event.isControlDown() && event.getCode() == KeyCode.ENTER) {
-                System.out.println("Ctrl+Enter pressed");
+                System.out.println("Ctrl+Enter Shortcut Triggered!");
                 executeQuery();
             }
         });
+
+        System.out.println("Run Button Configuration Complete for: " +
+                codeEditorController.getView().getClass().getSimpleName());
     }
 
-    /**
-     * Exécute la requête actuellement sélectionnée.
-     *
-     * Récupère et affiche le contenu de la requête depuis l'onglet actif.
-     */
     private void executeQuery() {
+        if (projectDataModel == null) {
+            showError("Error", "ProjectDataModel is not initialized!");
+            return;
+        }
+
         Tab selectedTab = tabEditorController.getView().getTabPane().getSelectionModel().getSelectedItem();
         if (selectedTab != null && selectedTab != tabEditorController.getView().getAddTab()) {
             CodeEditorController codeEditorController = tabEditorController.getModel().getControllerForTab(selectedTab);
             if (codeEditorController != null) {
-                // Obtenir le contenu directement depuis le CodeMirrorView
                 String queryContent = codeEditorController.getView().getCodeMirrorView().getContent();
                 System.out.println("Executing query: " + queryContent);
-                // Afficher directement la requête dans le TextArea
-                resultTextArea.setText(queryContent);
+
+                try {
+                    // Réinitialiser les vues avant l'exécution
+                    clearResultViews();
+
+                    Object[] result = projectDataModel.executeQuery(queryContent);
+                    String formattedResult = result[0].toString();
+                    String queryType = (String) result[1];
+
+                    Platform.runLater(() -> {
+                        switch (queryType) {
+                            case "SELECT":
+                                updateTableView(formattedResult);
+                                resultsTabPane.getSelectionModel().select(0);
+                                break;
+                            case "CONSTRUCT":
+                            case "DESCRIBE":
+                                updateGraphView(formattedResult);
+                                resultsTabPane.getSelectionModel().select(1);
+                                break;
+                            case "ASK":
+                                updateXMLView(formattedResult);
+                                resultsTabPane.getSelectionModel().select(2);
+                                break;
+                        }
+                    });
+                } catch (Exception e) {
+                    showError("Query Execution Error", e.getMessage());
+                }
             }
         }
     }
 
-    /**
-     * Affiche un message d'erreur à l'utilisateur.
-     *
-     * @param title Le titre de l'alerte
-     * @param message Le message d'erreur à afficher
-     */
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    private void clearResultViews() {
+        Platform.runLater(() -> {
+            // Réinitialiser la TextArea
+            if (resultTextArea != null) {
+                resultTextArea.clear();
+            }
+
+            // Réinitialiser la WebView pour Graph
+            if (graphView != null) {
+                graphView.getEngine().loadContent("");
+            }
+
+            // Réinitialiser la WebView pour XML
+            if (xmlView != null) {
+                xmlView.getEngine().loadContent("");
+            }
+
+            // Si vous avez une TableView, vous pouvez aussi la vider
+            if (resultTable != null) {
+                resultTable.getItems().clear();
+                resultTable.getColumns().clear();
+            }
+        });
     }
 
-    /**
-     * Ajoute un nouvel onglet avec le contenu spécifié
-     *
-     * @param title Titre de l'onglet
-     * @param content Contenu initial de l'éditeur
-     * @return L'onglet créé
-     */
+    private void setupResultsPane() {
+        resultsTabPane = new TabPane();
+
+        // Onglet Table
+        resultTable = new TableView<>();
+        Tab tableTab = new Tab("Table", resultTable);
+        tableTab.setClosable(false);
+
+        // Onglet Graph
+        graphView = new WebView();
+        Tab graphTab = new Tab("Graph", graphView);
+        graphTab.setClosable(false);
+
+        // Onglet XML
+        xmlView = new WebView();
+        Tab xmlTab = new Tab("XML", xmlView);
+        xmlTab.setClosable(false);
+
+        resultsTabPane.getTabs().addAll(tableTab, graphTab, xmlTab);
+    }
+
     public Tab addNewQueryTab(String title, String content) {
         CodeEditorController codeEditorController = new CodeEditorController(IconButtonBarType.QUERY, content);
-
-        // Créer l'onglet et l'ajouter au TabEditorView
         Tab tab = tabEditorController.getView().addNewEditorTab(title, codeEditorController.getView());
         tabEditorController.getModel().addTabModel(tab, codeEditorController);
 
+        // Ajout d'un délai supplémentaire pour s'assurer de la configuration
+        PauseTransition delay = new PauseTransition(Duration.millis(100));
+        delay.setOnFinished(event -> {
+            Platform.runLater(() -> {
+                System.out.println("Delayed Run Button Configuration in addNewQueryTab");
+                codeEditorController.getView().displayRunButton();
+                configureEditorRunButton(codeEditorController);
+            });
+        });
+        delay.play();
+
         return tab;
+    }
+
+    private void setupLayout() {
+        Platform.runLater(() -> {
+            mainSplitPane.setDividerPosition(0, 0.6);
+
+            // Gestion des positions du diviseur
+            mainSplitPane.getDividers().get(0).positionProperty().addListener((obs, oldPos, newPos) -> {
+                if (newPos.doubleValue() < 0.25) {
+                    Platform.runLater(() -> mainSplitPane.setDividerPosition(0, 0.25));
+                } else if (newPos.doubleValue() < 0.4) {
+                    Platform.runLater(() -> mainSplitPane.setDividerPosition(0, 0.4));
+                }
+            });
+
+            // Gestion du redimensionnement
+            mainBorderPane.heightProperty().addListener((obs, oldHeight, newHeight) -> {
+                if (newHeight.doubleValue() > 0) {
+                    double currentDividerPos = mainSplitPane.getDividerPositions()[0];
+                    double resultsPaneHeight = newHeight.doubleValue() * (1 - currentDividerPos);
+
+                    if (resultsPaneHeight > newHeight.doubleValue() * 0.75) {
+                        Platform.runLater(() -> mainSplitPane.setDividerPosition(0, 0.25));
+                    }
+                }
+            });
+        });
+    }
+
+    private void updateTableView(String formattedResult) {
+        Platform.runLater(() -> {
+            if (resultTextArea != null) {
+                resultTextArea.setText(formattedResult);
+                // Scroll to top
+                resultTextArea.positionCaret(0);
+            }
+        });
+    }
+
+    private void updateGraphView(String content) {
+        Platform.runLater(() -> {
+            if (graphView != null) {
+                graphView.getEngine().loadContent(
+                        String.format("<html><body><pre>%s</pre></body></html>",
+                                content.replace("<", "&lt;").replace(">", "&gt;"))
+                );
+            }
+        });
+    }
+
+    private void updateXMLView(String content) {
+        Platform.runLater(() -> {
+            if (xmlView != null) {
+                xmlView.getEngine().loadContent(
+                        String.format("<html><body><pre>%s</pre></body></html>",
+                                content.replace("<", "&lt;").replace(">", "&gt;"))
+                );
+            }
+        });
+    }
+
+    private void showError(String title, String message) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
     }
 
     /**

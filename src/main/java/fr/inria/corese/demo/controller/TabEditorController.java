@@ -8,6 +8,7 @@ import fr.inria.corese.demo.view.TabEditorView;
 import fr.inria.corese.demo.factory.popup.PopupFactory;
 import fr.inria.corese.demo.factory.popup.SaveConfirmationPopup;
 import fr.inria.corese.demo.view.TopBar;
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -33,13 +34,14 @@ public class TabEditorController {
         this.model = new TabEditorModel();
         this.type = type;
 
-        initializeFirstTab();
+        initializeTabPane();
         initializeKeyboardShortcuts();
         initializeTopBar();
 
     }
 
-    private void initializeFirstTab() {
+    private void initializeTabPane() {
+        // S'assurer que l'onglet "+" reste toujours à la fin
         view.getTabPane().getTabs().addListener((ListChangeListener<Tab>) change -> {
             if (view.getTabPane().getTabs().isEmpty()) {
                 view.getTabPane().getTabs().add(view.getAddTab());
@@ -48,8 +50,23 @@ public class TabEditorController {
             }
         });
 
+        // Configurer le bouton "+" pour créer un nouvel onglet
         view.getAddTabButton().setOnAction(e -> {
             addNewTab("Untitled");
+        });
+    }
+
+    public void addNewTab(String title) {
+        System.out.println("Adding new tab: " + title);
+        CodeEditorController codeEditorController = new CodeEditorController(type);
+        Tab tab = view.addNewEditorTab(title, codeEditorController.getView());
+
+        // Assurer que le modèle est mis à jour immédiatement
+        model.addTabModel(tab, codeEditorController);
+
+        // Forcer l'affichage du bouton Run
+        Platform.runLater(() -> {
+            codeEditorController.getView().displayRunButton();
         });
     }
 
@@ -164,13 +181,6 @@ public class TabEditorController {
             model.getTabControllers().remove(tab);
             return true;
         }
-    }
-
-    public void addNewTab(String title) {
-        CodeEditorController codeEditorController = new CodeEditorController(type);
-        System.out.println(codeEditorController.getModel().modifiedProperty());
-        Tab tab = view.addNewEditorTab(title, codeEditorController.getView());
-        model.addTabModel(tab, codeEditorController);
     }
 
     private void addNewTab(File file) {

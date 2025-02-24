@@ -6,6 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.web.WebView?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="fr.inria.corese.demo.controller.QueryViewController"
@@ -30,6 +31,16 @@
                                           editable="false"
                                           wrapText="true"
                                           style="-fx-font-family: monospace;"/>
+                            </content>
+                        </Tab>
+                        <Tab text="Graph" closable="false">
+                            <content>
+                                <WebView fx:id="graphView"/>
+                            </content>
+                        </Tab>
+                        <Tab text="XML" closable="false">
+                            <content>
+                                <WebView fx:id="xmlView"/>
                             </content>
                         </Tab>
                     </tabs>
