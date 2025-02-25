@@ -19,7 +19,7 @@ import java.util.function.Consumer;
  * @since 2025
  */
 public class CustomButton extends Button {
-    private ButtonType type;
+    private final ButtonType type;
     private Consumer<CustomButton> onClick;
 
     /**

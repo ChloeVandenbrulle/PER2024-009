@@ -16,11 +16,8 @@ public class Main extends Application {
         Application.setUserAgentStylesheet(new NordLight().getUserAgentStylesheet());
 
         try {
-            System.out.println("Starting application...");
-
             // Charger main-view.fxml comme vue principale
             String mainView = "/fr/inria/corese/demo/main-view.fxml";
-            System.out.println("Loading main view: " + mainView);
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource(mainView));
             if (loader.getLocation() == null) {
@@ -29,15 +26,11 @@ public class Main extends Application {
             }
 
             Parent root = loader.load();
-            System.out.println("Main view loaded successfully");
 
             Scene scene = new Scene(root);
             primaryStage.setTitle("Corese-GUI");
             primaryStage.setScene(scene);
             primaryStage.show();
-
-            System.out.println("Application started successfully");
-
         } catch(Exception e) {
             System.err.println("Error starting application:");
             e.printStackTrace();

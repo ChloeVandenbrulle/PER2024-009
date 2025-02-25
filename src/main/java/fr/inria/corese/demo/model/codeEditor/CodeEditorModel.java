@@ -10,7 +10,7 @@ import java.util.Stack;
 public class CodeEditorModel {
     private final StringProperty content = new SimpleStringProperty("");
     private String currentSavedContent;
-    private BooleanProperty modified = new SimpleBooleanProperty(false);
+    private final BooleanProperty modified = new SimpleBooleanProperty(false);
     private final Stack<CodeEditorChange> undoStack = new Stack<>();
     private final Stack<CodeEditorChange> redoStack = new Stack<>();
     private String currentFile;

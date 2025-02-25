@@ -6,7 +6,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 
 public class DocumentationPopup extends BasePopup {
-    private TextArea documentationTextArea;
+    private final TextArea documentationTextArea;
 
     public DocumentationPopup() {
         setTitle("Documentation");

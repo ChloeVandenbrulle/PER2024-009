@@ -15,14 +15,14 @@ import java.io.File;
 import java.nio.file.Files;
 
 public class IconButtonBarController {
-    private IconButtonBarView view;
-    private IconButtonBarModel model;
-    private PopupFactory popupFactory;
+    private final IconButtonBarView view;
+    private final IconButtonBarModel model;
+    private final PopupFactory popupFactory;
 
     public IconButtonBarController(IconButtonBarModel model, IconButtonBarView view) {
         this.model = model;
         this.view = view;
-        this.popupFactory = new PopupFactory(null);
+        this.popupFactory = new PopupFactory();
 
         view.initializeButtons(model.getAvailableButtons());
         initializeButtonHandlers();
@@ -59,7 +59,6 @@ public class IconButtonBarController {
     }
 
     private void onSaveButtonClick() {
-        System.out.println("Save button clicked");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save File");
         fileChooser.getExtensionFilters().addAll(
@@ -72,7 +71,7 @@ public class IconButtonBarController {
         if (file != null) {
             try {
                 Files.writeString(file.toPath(), model.getCodeEditorModel().getContent());
-                IPopup successPopup = PopupFactory.getInstance(null).createPopup(PopupFactory.TOAST_NOTIFICATION);
+                IPopup successPopup = PopupFactory.getInstance().createPopup(PopupFactory.TOAST_NOTIFICATION);
                 successPopup.setMessage("File has been saved successfully!");
                 successPopup.displayPopup();
             } catch (Exception e) {
@@ -82,7 +81,6 @@ public class IconButtonBarController {
     }
 
     private void onOpenFilesButtonClick() {
-        System.out.println("Open files button clicked");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open File");
         fileChooser.getExtensionFilters().addAll(
@@ -141,7 +139,6 @@ public class IconButtonBarController {
     }
 
     private void onClearButtonClick() {
-        System.out.println("Clear button clicked");
         model.getCodeEditorModel().setContent("");
     }
 
@@ -152,7 +149,6 @@ public class IconButtonBarController {
     }
 
     private void onUndoButtonClick() {
-        System.out.println("Undo button clicked");
         CodeEditorModel editorModel = model.getCodeEditorModel();
         if (editorModel.canUndo()) {
             editorModel.undo();
@@ -162,7 +158,6 @@ public class IconButtonBarController {
     }
 
     private void onRedoButtonClick() {
-        System.out.println("Redo button clicked");
         CodeEditorModel editorModel = model.getCodeEditorModel();
         if (editorModel.canRedo()) {
             editorModel.redo();
@@ -172,21 +167,20 @@ public class IconButtonBarController {
     }
 
     private void onDocumentationButtonClick() {
-        System.out.println("Documentation button clicked");
         DocumentationPopup documentationPopup = new DocumentationPopup();
         documentationPopup.displayPopup();
     }
 
     private void onZoomInButtonClick() {
-        System.out.println("Zoom in button clicked");
+        //TODO
     }
 
     private void onZoomOutButtonClick() {
-        System.out.println("Zoom out button clicked");
+        //TODO
     }
 
     private void onFullScreenButtonClick() {
-        System.out.println("Full screen button clicked");
+        //TODO
     }
 
     private void showError(String title, String content) {

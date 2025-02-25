@@ -11,11 +11,11 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 public class SaveConfirmationPopup extends Stage implements IPopup {
-    private Label messageLabel;
-    private Button saveButton;
-    private Button closeWithoutSavingButton;
-    private Button cancelButton;
-    private VBox layout;
+    private final Label messageLabel;
+    private final Button saveButton;
+    private final Button closeWithoutSavingButton;
+    private final Button cancelButton;
+    private final VBox layout;
     private String result;
     private Runnable onSaveCallback;
 

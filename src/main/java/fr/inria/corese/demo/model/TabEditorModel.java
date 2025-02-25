@@ -13,7 +13,6 @@ public class TabEditorModel {
     }
 
     public void addTabModel(Tab tab, CodeEditorController controller) {
-        System.out.println("Adding tab model - Tab: " + tab.getText() + ", Controller: " + controller);
         tabControllers.put(tab, controller);
     }
 

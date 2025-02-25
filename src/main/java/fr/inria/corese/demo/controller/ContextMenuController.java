@@ -11,8 +11,8 @@ import java.io.File;
 import java.util.function.Consumer;
 
 public class ContextMenuController {
-    private ContextMenuModel model;
-    private ContextMenuView view;
+    private final ContextMenuModel model;
+    private final ContextMenuView view;
     private Consumer<TreeItem<String>> onItemRenamed;
     private Consumer<TreeItem<String>> onItemDeleted;
 
@@ -34,7 +34,7 @@ public class ContextMenuController {
     }
 
     private void handleRename() {
-        RenamePopup renamePopup = (RenamePopup) PopupFactory.getInstance(null)
+        RenamePopup renamePopup = (RenamePopup) PopupFactory.getInstance()
                 .createPopup("rename");
         renamePopup.setInitialName(model.getSelectedFile().getName());
         renamePopup.setOnConfirm(() -> {
@@ -52,7 +52,7 @@ public class ContextMenuController {
     }
 
     private void handleDelete() {
-        DeleteConfirmationPopup deletePopup = (DeleteConfirmationPopup) PopupFactory.getInstance(null)
+        DeleteConfirmationPopup deletePopup = (DeleteConfirmationPopup) PopupFactory.getInstance()
                 .createPopup("delete");
 
         if (deletePopup.getResult()) {

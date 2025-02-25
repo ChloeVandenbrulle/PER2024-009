@@ -71,6 +71,7 @@ public class TabEditorView extends VBox {
         modifiedFile.setIconSize(5);
         modifiedFile.setIconColor(Color.web("#2196F3"));
 
+
         Label emptyStateTitle = new Label("No file opened");
         Label emptyStateMessage = new Label("Open a file from the file explorer to display\nits content in the code editor");
         String emptyStateImage = "M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z";
@@ -115,8 +116,6 @@ public class TabEditorView extends VBox {
 
         tabPane.getTabs().add(tabPane.getTabs().size() - 1, tab);
         tabPane.getSelectionModel().select(tab);
-
-        System.out.println("Adding tab: " + title + ", CodeEditorView: " + codeEditorView);
 
         return tab;
     }

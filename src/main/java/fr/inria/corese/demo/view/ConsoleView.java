@@ -10,7 +10,7 @@ import javafx.scene.layout.VBox;
 
 public class ConsoleView extends StackPane {
     private final TextArea consoleOutput;
-    private IconButtonView exportButton;
+    private final IconButtonView exportButton;
 
     public ConsoleView() {
         String cssPath = "/styles/console-validation.css";

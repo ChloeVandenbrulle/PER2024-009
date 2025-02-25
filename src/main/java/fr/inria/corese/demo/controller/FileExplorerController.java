@@ -15,10 +15,10 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 public class FileExplorerController {
-    private FileExplorerModel model;
-    private FileExplorerView view;
+    private final FileExplorerModel model;
+    private final FileExplorerView view;
     private Consumer<File> onFileOpenRequest;
-    private ContextMenuController contextMenuController;
+    private final ContextMenuController contextMenuController;
 
     public FileExplorerController() {
         this.model = new FileExplorerModel();
@@ -33,18 +33,12 @@ public class FileExplorerController {
         view.getNewFileButton().setOnAction(e -> handleAddFile());
         view.getNewFolderButton().setOnAction(e -> handleAddFolder());
         view.getOpenFolderButton().setOnAction(e -> openProject());
-
-        System.out.println("All button handlers initialized");
     }
 
     private void initializeTreeViewEvents() {
         view.getTreeView().setOnMouseClicked(event -> {
             TreeItem<String> selectedItem = view.getTreeView().getSelectionModel().getSelectedItem();
-            if (selectedItem != null) {
-                System.out.println("Selected: " + selectedItem.getValue());
-            }
             if (event.getClickCount() == 2) {
-                System.out.println("Double click detected");
                 if (selectedItem != null && selectedItem.getChildren().isEmpty()) {
                     String path = buildPath(selectedItem);
                     File file = new File(path);
@@ -76,7 +70,6 @@ public class FileExplorerController {
     }
 
     private String buildPath(TreeItem<String> item) {
-        System.out.println("buildPath");
         if (model.getRootPath() == null) {
             return "";
         }
@@ -85,13 +78,11 @@ public class FileExplorerController {
         TreeItem<String> current = item;
 
         while (current != null && current.getParent() != null) {
-            System.out.println(path);
             path.insert(0, current.getValue());
             path.insert(0, File.separator);
             current = current.getParent();
         }
-        System.out.println(model.getRootPath() + path.toString());
-        return model.getRootPath() + path.toString();
+        return model.getRootPath() + path;
     }
 
     public void setOnFileOpenRequest(Consumer<File> handler) {
@@ -108,20 +99,18 @@ public class FileExplorerController {
     }
 
     private void handleAddFile() {
-        System.out.println("Add file button clicked");
         TreeItem<String> selectedItem = view.getTreeView().getSelectionModel().getSelectedItem();
         if (selectedItem == null) {
             selectedItem = view.getTreeView().getRoot();
         }
 
-        NewFilePopup newFilePopup = (NewFilePopup) PopupFactory.getInstance(null).createPopup("newFile");
+        NewFilePopup newFilePopup = (NewFilePopup) PopupFactory.getInstance().createPopup("newFile");
         TreeItem<String> finalSelectedItem = selectedItem;
         newFilePopup.setOnConfirm(() -> {
             String fileName = newFilePopup.getFileName();
             if (fileName != null && !fileName.isEmpty()) {
                 try {
                     String fullPath = buildPath(finalSelectedItem) + File.separator + fileName;
-                    System.out.println("fullPath : "+ fullPath);
                     File newFile = new File(fullPath);
 
                     if (newFile.createNewFile()) {
@@ -138,19 +127,17 @@ public class FileExplorerController {
     }
 
     private void handleAddFolder() {
-        System.out.println("Add folder button clicked");
         TreeItem<String> selectedItem = view.getTreeView().getSelectionModel().getSelectedItem();
         if (selectedItem == null) {
             selectedItem = view.getTreeView().getRoot();
         }
 
-        NewFilePopup newFolderPopup = (NewFilePopup) PopupFactory.getInstance(null).createPopup("newFile");
+        NewFilePopup newFolderPopup = (NewFilePopup) PopupFactory.getInstance().createPopup("newFile");
         TreeItem<String> finalSelectedItem = selectedItem;
         newFolderPopup.setOnConfirm(() -> {
             String folderName = newFolderPopup.getFileName();
             if (folderName != null && !folderName.isEmpty()) {
                 String fullPath = buildPath(finalSelectedItem) + File.separator + folderName;
-                System.out.println("fullPath : "+ fullPath);
 
                 if (new File(fullPath).mkdir()) {
                     model.addFolder(finalSelectedItem, new FileItem(folderName));

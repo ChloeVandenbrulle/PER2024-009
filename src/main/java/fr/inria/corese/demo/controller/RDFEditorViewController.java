@@ -31,16 +31,12 @@ public class RDFEditorViewController {
         checkFXMLInjections();
 
         try {
-            System.out.println("Initializing RDFEditorViewController");
-
             // Initialize components
             setupFileTree();
             initializeTopBar();
             initializeTabEditor();
             initializeSplitPane();
             setupComponentInteractions();
-
-            System.out.println("RDFEditorViewController initialization complete");
         } catch (Exception e) {
             System.err.println("Error during initialization:");
             e.printStackTrace();
@@ -93,8 +89,6 @@ public class RDFEditorViewController {
     }
 
     private void toggleLeftPane() {
-        System.out.println("Toggling left pane");
-        System.out.println(splitPane.getDividerPositions()[0]);
         if (splitPane.getDividerPositions()[0] > 0.01) {
             splitPane.setDividerPositions(0.00);
         } else {

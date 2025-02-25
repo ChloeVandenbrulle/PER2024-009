@@ -1,6 +1,6 @@
 package fr.inria.corese.demo.factory.popup;
 
-import fr.inria.corese.demo.model.ProjectDataModel;
+import fr.inria.corese.demo.manager.ApplicationStateManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,14 +20,26 @@ public class PopupFactory {
 
 
     private final Map<String, IPopup> popupCache = new HashMap<>();
-    private final ProjectDataModel model;
+    private static PopupFactory instance;
+    private final ApplicationStateManager stateManager;
 
-    public PopupFactory(ProjectDataModel model) {
-        this.model = model;
+    /**
+     * Private constructor for singleton pattern.
+     */
+    public PopupFactory() {
+        this.stateManager = ApplicationStateManager.getInstance();
     }
 
-    public static PopupFactory getInstance(ProjectDataModel model) {
-        return new PopupFactory(model);
+    /**
+     * Gets the singleton instance.
+     *
+     * @return The singleton instance
+     */
+    public static synchronized PopupFactory getInstance() {
+        if (instance == null) {
+            instance = new PopupFactory();
+        }
+        return instance;
     }
 
     public IPopup createPopup(String type) {
@@ -38,7 +50,7 @@ public class PopupFactory {
         IPopup popup = switch (type) {
             case WARNING_POPUP -> new WarningPopup();
             case FILE_INFO_POPUP -> new FileInfoPopup();
-            case LOG_POPUP -> new LogDialog(model);
+            case LOG_POPUP -> new LogDialog();
             case NEW_FILE_POPUP -> new NewFilePopup();
             case RULE_INFO_POPUP -> new RuleInfoPopup();
             case TOAST_NOTIFICATION -> new ToastNotification();

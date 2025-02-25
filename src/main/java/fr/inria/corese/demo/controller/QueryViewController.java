@@ -4,9 +4,6 @@ import fr.inria.corese.demo.enums.icon.IconButtonBarType;
 import fr.inria.corese.demo.enums.icon.IconButtonType;
 import fr.inria.corese.demo.factory.popup.DocumentationPopup;
 import fr.inria.corese.demo.manager.ApplicationStateManager;
-import fr.inria.corese.demo.model.ProjectDataModel;
-import fr.inria.corese.demo.model.TabEditorModel;
-import fr.inria.corese.demo.model.graph.SemanticGraph;
 import fr.inria.corese.demo.view.CustomButton;
 import javafx.collections.ListChangeListener;
 import fr.inria.corese.demo.view.TopBar;
@@ -32,7 +29,8 @@ import javafx.stage.FileChooser;
 
 
 /**
- * Contrôleur de la vue de requêtes pour une application de gestion de données sémantiques.
+ * Controller for the query view.
+ * Manages query editor and results display.
  */
 public class QueryViewController {
     @FXML private StackPane editorContainer;
@@ -45,81 +43,52 @@ public class QueryViewController {
     @FXML private TopBar topBar;
 
     private TabEditorController tabEditorController;
-    private ProjectDataModel projectDataModel;
+    private final ApplicationStateManager stateManager;
     private TableView<String[]> resultTable;
-    private ApplicationStateManager stateManager;
-    private boolean editorInitialized = false;
 
+    /**
+     * Constructor for the query view controller.
+     */
     public QueryViewController() {
-        System.out.println("QueryViewController initialized");
         this.stateManager = ApplicationStateManager.getInstance();
     }
 
-    public void setProjectDataModel(ProjectDataModel projectDataModel) {
-        this.projectDataModel = projectDataModel;
-
-        // Restaurer explicitement l'état
-        if (projectDataModel != null) {
-            projectDataModel.restoreState();
-        }
-
-        // Logs détaillés
-        System.out.println("=== QueryViewController Model Setup ===");
-
-        if (projectDataModel != null) {
-            // Utiliser le graphe sémantique pour obtenir les informations
-            SemanticGraph semanticGraph = projectDataModel.getSemanticGraph();
-
-            System.out.println("Loaded Files: " + semanticGraph.getLoadedFiles());
-            System.out.println("Loaded Rules: " + semanticGraph.getLoadedRules());
-            System.out.println("Triplet Count: " + semanticGraph.getTripletCount());
-            System.out.println("Semantic Elements: " + semanticGraph.getSemanticElementsCount());
-            System.out.println("OWL RL Enabled: " + projectDataModel.isOWLRLEnabled());
-        } else {
-            System.out.println("ProjectDataModel is null");
-        }
-    }
-
+    /**
+     * Initializes the controller.
+     */
     @FXML
     public void initialize() {
-        System.out.println("QueryViewController.initialize() started");
-        initializeTopBar();
-        // S'assurer que le gestionnaire d'état est disponible
-        if (stateManager == null) {
-            stateManager = ApplicationStateManager.getInstance();
-            System.out.println("StateManager initialized in QueryViewController");
-        }
+        stateManager.addLogEntry("QueryViewController.initialize() started");
 
         // Initialiser le TabEditor - IMPORTANT: Ne pas ajouter au conteneur ici!
         tabEditorController = new TabEditorController(IconButtonBarType.QUERY);
-        System.out.println("TabEditorController created with type QUERY");
 
         setupResultsPane();
-        setupRunButton(); // Utiliser la méthode de l'ancienne version
+        setupRunButton();
         setupLayout();
+        initializeTopBar();
 
-        // Dans la méthode initialize(), modifiez l'appel à addNewQueryTab comme suit:
+        // Add the editor to the container and create a default tab
         Platform.runLater(() -> {
             if (editorContainer != null) {
-                // Ajouter l'éditeur au conteneur seulement maintenant
                 editorContainer.getChildren().clear();
                 editorContainer.getChildren().add(tabEditorController.getView());
-                System.out.println("TabEditorController view added to editorContainer");
 
-                // Créer un onglet par défaut avec un délai pour garantir que le TabEditor est prêt
+                // Create a default tab with a delay to ensure the tab editor is ready
                 PauseTransition delay = new PauseTransition(Duration.millis(200));
                 delay.setOnFinished(e -> {
-                    // Appeler addNewQueryTab avec un contenu vide
-                    System.out.println("Creating empty default query tab");
                     addNewQueryTab("Untitled", "");
                 });
                 delay.play();
             } else {
-                System.err.println("Error: editorContainer is null");
+                stateManager.addLogEntry("Error: editorContainer is null");
             }
         });
     }
 
+    /**
+     * Sets up the run button listener.
+     */
     private void initializeTopBar() {
         List<IconButtonType> buttons = new ArrayList<>();
         buttons.add(IconButtonType.OPEN_FILE);
@@ -134,7 +103,6 @@ public class QueryViewController {
     }
 
     private void onOpenFilesButtonClick() {
-        System.out.println("Open files button clicked");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open File");
         fileChooser.getExtensionFilters().addAll(
@@ -161,28 +129,25 @@ public class QueryViewController {
      * - Le raccourci clavier Ctrl+Entrée
      */
     private void setupRunButton() {
-        System.out.println("=== Setting up Run Button Listener ===");
-
         tabEditorController.getView().getTabPane().getTabs().addListener((ListChangeListener<Tab>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
                     for (Tab tab : change.getAddedSubList()) {
                         if (tab != tabEditorController.getView().getAddTab()) {
-                            // Ajouter un listener de contenu pour s'assurer que le contenu est chargé
+                            // Add a content listener to ensure that content is loaded
                             tab.contentProperty().addListener(new ChangeListener<Node>() {
                                 @Override
                                 public void changed(ObservableValue<? extends Node> observable, Node oldValue, Node newValue) {
                                     if (newValue != null) {
-                                        // Retirer le listener après son déclenchement
+                                        // Remove listener after it fires
                                         tab.contentProperty().removeListener(this);
 
                                         Platform.runLater(() -> {
                                             CodeEditorController codeEditorController = tabEditorController.getModel().getControllerForTab(tab);
                                             if (codeEditorController != null) {
-                                                System.out.println("Delayed Run Button Configuration for tab: " + tab.getText());
                                                 configureEditorRunButton(codeEditorController);
                                             } else {
-                                                System.err.println("Still no CodeEditorController for tab: " + tab.getText());
+                                                stateManager.addLogEntry("No CodeEditorController for tab: " + tab.getText());
                                             }
                                         });
                                     }
@@ -195,69 +160,61 @@ public class QueryViewController {
         });
     }
 
+    /**
+     * Configures the run button for a code editor.
+     *
+     * @param codeEditorController The code editor controller
+     */
     private void configureEditorRunButton(CodeEditorController codeEditorController) {
-        System.out.println("=== Configuring Editor Run Button ===");
+        stateManager.addLogEntry("Configuring editor run button");
 
-        if (projectDataModel == null) {
-            System.err.println("ProjectDataModel is not initialized!");
-            return;
-        }
-
-        System.out.println("Displaying Run Button");
         codeEditorController.getView().displayRunButton();
-
         CustomButton runButton = codeEditorController.getView().getRunButton();
 
         if (runButton == null) {
-            System.err.println("Run Button is NULL!");
+            stateManager.addLogEntry("Run button is null");
             return;
         }
-
-        System.out.println("Run Button Retrieved. Setting up event handlers.");
-
-        // Log current event handlers
-        System.out.println("Current Action Event Handlers: " +
-                (runButton.getOnAction() != null ? "Exists" : "None"));
 
         // Clear previous event handlers
         runButton.setOnAction(null);
 
-        // Ajouter le nouveau gestionnaire d'événements
+        // Add new event handler
         runButton.setOnAction(e -> {
-            System.out.println("Run Button Clicked!");
+            stateManager.addLogEntry("Run button clicked");
             executeQuery();
         });
 
-        // Configuration des raccourcis clavier
+        // Set up keyboard shortcuts
         codeEditorController.getView().setOnKeyPressed(event -> {
             if (event.isControlDown() && event.getCode() == KeyCode.ENTER) {
-                System.out.println("Ctrl+Enter Shortcut Triggered!");
+                stateManager.addLogEntry("Ctrl+Enter shortcut triggered");
                 executeQuery();
             }
         });
-
-        System.out.println("Run Button Configuration Complete for: " +
-                codeEditorController.getView().getClass().getSimpleName());
     }
 
+    /**
+     * Sets up the results pane.
+     */
     private void setupResultsPane() {
-        // Si resultsTabPane est déjà créé dans le FXML, on l'utilise directement
+        // Use existing results tab pane from FXML if available
         if (resultsTabPane == null) {
             resultsTabPane = new TabPane();
 
-            // Onglet Table
+            // Table tab
             resultTable = new TableView<>();
             Tab tableTab = new Tab("Table", resultTable);
             tableTab.setClosable(false);
 
-            // Onglet Graph
+            // Graph tab
             if (graphView == null) {
                 graphView = new WebView();
             }
             Tab graphTab = new Tab("Graph", graphView);
             graphTab.setClosable(false);
 
-            // Onglet XML
+            // XML tab
             if (xmlView == null) {
                 xmlView = new WebView();
             }
@@ -268,12 +225,15 @@ public class QueryViewController {
         }
     }
 
+    /**
+     * Sets up the layout.
+     */
     private void setupLayout() {
         Platform.runLater(() -> {
             if (mainSplitPane != null) {
                 mainSplitPane.setDividerPosition(0, 0.6);
 
-                // Gestion des positions du diviseur
+                // Manage divider positions
                 mainSplitPane.getDividers().get(0).positionProperty().addListener((obs, oldPos, newPos) -> {
                     if (newPos.doubleValue() < 0.25) {
                         Platform.runLater(() -> mainSplitPane.setDividerPosition(0, 0.25));
@@ -282,7 +242,7 @@ public class QueryViewController {
                     }
                 });
 
-                // Gestion du redimensionnement
+                // Handle resizing
                 mainBorderPane.heightProperty().addListener((obs, oldHeight, newHeight) -> {
                     if (newHeight.doubleValue() > 0) {
                         double currentDividerPos = mainSplitPane.getDividerPositions()[0];
@@ -297,40 +257,32 @@ public class QueryViewController {
         });
     }
 
+    /**
+     * Executes a SPARQL query.
+     */
     public void executeQuery() {
-        ApplicationStateManager stateManager = ApplicationStateManager.getInstance();
-        ProjectDataModel projectDataModel = stateManager.getProjectDataModel();
+        stateManager.addLogEntry("Executing query");
 
-        // Déboguer l'état avant l'exécution
-        System.out.println("=== Executing Query ===");
-        System.out.println("Loaded Files: " + stateManager.getLoadedFiles().size());
-        System.out.println("OWL RL Enabled: " + stateManager.isOWLRLEnabled());
-
-        if (projectDataModel == null) {
-            showError("Error", "ProjectDataModel is not initialized!");
-            return;
-        }
-
+        // Get the selected tab
         Tab selectedTab = tabEditorController.getView().getTabPane().getSelectionModel().getSelectedItem();
         if (selectedTab != null && selectedTab != tabEditorController.getView().getAddTab()) {
             CodeEditorController codeEditorController = tabEditorController.getModel().getControllerForTab(selectedTab);
             if (codeEditorController != null) {
                 String queryContent = codeEditorController.getView().getCodeMirrorView().getContent();
-                System.out.println("\nQuery Content:\n" + queryContent);
+                stateManager.addLogEntry("Query content:\n" + queryContent);
 
                 try {
-                    // Réinitialiser les vues avant l'exécution
+                    // Clear result views
                     clearResultViews();
 
-                    Object[] result = projectDataModel.executeQuery(queryContent);
+                    // Execute query
+                    Object[] result = stateManager.executeQuery(queryContent);
                     String formattedResult = result[0].toString();
                     String queryType = (String) result[1];
 
-                    System.out.println("\nQuery Execution Result:");
-                    System.out.println("Type: " + queryType);
-                    System.out.println("Result: " + formattedResult.substring(0,
-                            Math.min(100, formattedResult.length())) + "...");
+                    stateManager.addLogEntry("Query executed successfully. Type: " + queryType);
 
+                    // Update the appropriate view based on query type
                     Platform.runLater(() -> {
                         switch (queryType) {
                             case "SELECT":
@@ -349,7 +301,7 @@ public class QueryViewController {
                         }
                     });
                 } catch (Exception e) {
-                    System.err.println("Query Execution Error Details:");
+                    stateManager.addLogEntry("Query execution error: " + e.getMessage());
                     e.printStackTrace();
                     showError("Query Execution Error", e.getMessage());
                 }
@@ -357,24 +309,27 @@ public class QueryViewController {
         }
     }
 
+    /**
+     * Clears all result views.
+     */
     private void clearResultViews() {
         Platform.runLater(() -> {
-            // Réinitialiser la TextArea
+            // Clear text area
             if (resultTextArea != null) {
                 resultTextArea.clear();
             }
 
-            // Réinitialiser la WebView pour Graph
+            // Clear graph view
             if (graphView != null) {
                 graphView.getEngine().loadContent("");
             }
 
-            // Réinitialiser la WebView pour XML
+            // Clear XML view
             if (xmlView != null) {
                 xmlView.getEngine().loadContent("");
             }
 
-            // Si vous avez une TableView, vous pouvez aussi la vider
+            // Clear table view
             if (resultTable != null) {
                 resultTable.getItems().clear();
                 resultTable.getColumns().clear();
@@ -382,17 +337,23 @@ public class QueryViewController {
         });
     }
 
+    /**
+     * Creates a new query tab.
+     *
+     * @param title The tab title
+     * @param content The tab content
+     * @return The created tab
+     */
     public Tab addNewQueryTab(String title, String content) {
-        System.out.println("Creating new query tab: " + title);
+        stateManager.addLogEntry("Creating new query tab: " + title);
         CodeEditorController codeEditorController = new CodeEditorController(IconButtonBarType.QUERY, content);
         Tab tab = tabEditorController.getView().addNewEditorTab(title, codeEditorController.getView());
         tabEditorController.getModel().addTabModel(tab, codeEditorController);
 
-        // Ajout d'un délai plus long pour s'assurer de la configuration complète
+        // Add a delay for the run button configuration
         PauseTransition delay = new PauseTransition(Duration.millis(300));
         delay.setOnFinished(event -> {
             Platform.runLater(() -> {
-                System.out.println("Delayed Run Button Configuration in addNewQueryTab");
                 codeEditorController.getView().displayRunButton();
                 configureEditorRunButton(codeEditorController);
             });
@@ -402,6 +363,11 @@ public class QueryViewController {
         return tab;
     }
 
+    /**
+     * Updates the table view with query results.
+     *
+     * @param formattedResult The formatted query result
+     */
     private void updateTableView(String formattedResult) {
         Platform.runLater(() -> {
             if (resultTextArea != null) {
@@ -412,6 +378,11 @@ public class QueryViewController {
         });
     }
 
+    /**
+     * Updates the graph view with query results.
+     *
+     * @param content The graph content
+     */
     private void updateGraphView(String content) {
         Platform.runLater(() -> {
             if (graphView != null) {
@@ -423,6 +394,11 @@ public class QueryViewController {
         });
     }
 
+    /**
+     * Updates the XML view with query results.
+     *
+     * @param content The XML content
+     */
     private void updateXMLView(String content) {
         Platform.runLater(() -> {
             if (xmlView != null) {
@@ -434,6 +410,12 @@ public class QueryViewController {
         });
     }
 
+    /**
+     * Shows an error dialog.
+     *
+     * @param title The error title
+     * @param message The error message
+     */
     private void showError(String title, String message) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -445,31 +427,31 @@ public class QueryViewController {
     }
 
     /**
-     * Ouvre un fichier de requête dans un nouvel onglet
+     * Opens a query file in a new tab.
      *
-     * @param file Le fichier à ouvrir
+     * @param file The file to open
      */
     public void openQueryFile(File file) {
         try {
-            // Vérifier si le fichier est déjà ouvert
+            // Check if the file is already open
             for (Tab tab : tabEditorController.getView().getTabPane().getTabs()) {
                 if (tab != tabEditorController.getView().getAddTab()) {
                     CodeEditorController controller = tabEditorController.getModel().getControllerForTab(tab);
                     if (controller != null && file.getPath().equals(controller.getModel().getCurrentFile())) {
-                        // Fichier déjà ouvert, sélectionner son onglet
+                        // File already open, select its tab
                         tabEditorController.getView().getTabPane().getSelectionModel().select(tab);
                         return;
                     }
                 }
             }
 
-            // Lire le contenu du fichier
+            // Read file content
             String content = Files.readString(file.toPath());
 
-            // Créer un nouvel onglet avec le contenu du fichier
+            // Create a new tab with the file content
             Tab tab = addNewQueryTab(file.getName(), content);
 
-            // Enregistrer le chemin du fichier dans le modèle
+            // Save the file path in the model
             CodeEditorController controller = tabEditorController.getModel().getControllerForTab(tab);
             if (controller != null) {
                 controller.getModel().setCurrentFile(file.getPath());
@@ -478,26 +460,17 @@ public class QueryViewController {
             }
 
         } catch (Exception e) {
-            System.err.println("Error opening query file: " + e.getMessage());
+            stateManager.addLogEntry("Error opening query file: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     /**
-     * Récupère le contrôleur d'éditeur d'onglets.
+     * Gets the tab editor controller.
      *
-     * @return Le contrôleur d'éditeur d'onglets
+     * @return The tab editor controller
      */
     public TabEditorController getTabEditorController() {
         return tabEditorController;
-    }
-
-    /**
-     * Récupère le modèle d'éditeur d'onglets.
-     *
-     * @return Le modèle d'éditeur d'onglets
-     */
-    public TabEditorModel getTabEditorModel() {
-        return tabEditorController.getModel();
     }
 }

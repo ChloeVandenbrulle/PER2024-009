@@ -37,7 +37,6 @@ public class ValidationViewController {
             initializeConsole();
             initializeSplitPane();
             initializeTopBar();
-            System.out.println("Validation initialization complete");
         } catch (Exception e) {
             System.err.println("Error during initialization:");
             e.printStackTrace();

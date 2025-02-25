@@ -36,7 +36,7 @@ public class IconButtonView extends Button{
             case RELOAD -> createIconButton(MaterialDesignR.REFRESH, "Reload files");
             case LOGS -> createIconButton(MaterialDesignB.BOOK_OPEN_VARIANT, "Show logs");
             case DELETE -> createIconButton(MaterialDesignT.TRASH_CAN, "Clear graph");
-        };
+        }
     }
 
     private void createIconButton(Ikon icon, String tooltipText) {

@@ -5,7 +5,7 @@ import javafx.scene.control.ButtonType;
 import java.util.Optional;
 
 public class ClearGraphConfirmationPopup implements IPopup {
-    private Alert alert;
+    private final Alert alert;
     private boolean result;
 
     public ClearGraphConfirmationPopup() {

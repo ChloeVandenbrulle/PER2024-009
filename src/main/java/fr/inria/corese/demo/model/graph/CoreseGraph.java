@@ -6,11 +6,9 @@ import fr.inria.corese.core.load.LoadException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.Properties;
 
 public class CoreseGraph implements SemanticGraph {
-    private static final Logger logger = Logger.getLogger(CoreseGraph.class.getName());
     private Graph graph;
     private final GraphContext context;
     private final List<String> logEntries = new ArrayList<>();
@@ -176,7 +174,6 @@ public class CoreseGraph implements SemanticGraph {
     @Override
     public void addLogEntry(String entry) {
         logEntries.add(entry);
-        logger.info(entry);
     }
 
     @Override

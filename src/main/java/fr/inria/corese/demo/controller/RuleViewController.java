@@ -2,7 +2,6 @@ package fr.inria.corese.demo.controller;
 
 import fr.inria.corese.demo.enums.icon.IconButtonType;
 import fr.inria.corese.demo.manager.ApplicationStateManager;
-import fr.inria.corese.demo.model.ProjectDataModel;
 import fr.inria.corese.demo.view.icon.IconButtonView;
 import fr.inria.corese.demo.view.rule.RuleItem;
 import fr.inria.corese.demo.view.rule.RuleView;
@@ -17,60 +16,42 @@ import java.io.File;
 import java.util.*;
 
 /**
- * Contrôleur pour la gestion des règles dans l'application.
- *
- * Responsable de l'affichage et de la gestion des règles prédéfinies et personnalisées,
- * ainsi que de leur interaction avec le modèle de données et le gestionnaire d'état global.
+ * Controller for the rule view.
+ * Manages rule display, activation, and loading.
  */
 public class RuleViewController {
-    private ProjectDataModel projectDataModel;
-    private ApplicationStateManager stateManager;
+    private final ApplicationStateManager stateManager;
     private RuleView view;
-    private Map<String, RuleItem> ruleItems;
-    private PopupFactory popupFactory;
+    private final Map<String, RuleItem> ruleItems;
+    private final PopupFactory popupFactory;
     private Runnable owlRLAction;
     private Runnable owlRLExtendedAction;
 
-    @FXML
-    private VBox rdfsRulesContainer;
-    @FXML
-    private VBox owlRulesContainer;
-    @FXML
-    private VBox customRulesContainer;
-    @FXML
-    private Button loadRuleButton;
+    @FXML private VBox rdfsRulesContainer;
+    @FXML private VBox owlRulesContainer;
+    @FXML private VBox customRulesContainer;
+    @FXML private Button loadRuleButton;
 
     /**
-     * Constructeur par défaut.
-     * Initialise les composants de base du contrôleur.
+     * Constructor for the rule view controller.
      */
     public RuleViewController() {
         this.view = new RuleView();
         this.ruleItems = new HashMap<>();
         this.stateManager = ApplicationStateManager.getInstance();
+        this.popupFactory = PopupFactory.getInstance();
     }
 
     /**
-     * Injecte les dépendances nécessaires après la construction.
-     * Maintenant uniquement ProjectDataModel car toutes les fonctions
-     * de règles sont intégrées dedans.
-     *
-     * @param projectDataModel Le modèle de données du projet
-     */
-    public void injectDependencies(ProjectDataModel projectDataModel) {
-        this.projectDataModel = projectDataModel;
-        this.popupFactory = PopupFactory.getInstance(projectDataModel);
-    }
-
-    /**
-     * Initialise les composants du contrôleur après le chargement FXML.
+     * Initializes the controller.
+     * Sets up the rule view and containers.
      */
     @FXML
     public void initialize() {
         view = new RuleView();
-        stateManager = ApplicationStateManager.getInstance();
         initializeRules();
 
+        // Set up custom rules container
         if (customRulesContainer != null) {
             Label noRulesLabel = new Label("No custom rules loaded");
             noRulesLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #888888;");
@@ -78,82 +59,15 @@ public class RuleViewController {
             customRulesContainer.getChildren().add(noRulesLabel);
         }
 
+        // Set up load rule button
         if (loadRuleButton != null) {
             loadRuleButton.setOnAction(e -> handleLoadRuleFile());
         }
     }
 
     /**
-     * Gère le chargement d'un fichier de règles.
-     * Affiche un dialogue de sélection de fichier et charge la règle sélectionnée.
-     */
-    @FXML
-    public void handleLoadRuleFile() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Rule files (*.rul)", "*.rul")
-        );
-
-        File selectedFile = fileChooser.showOpenDialog(rdfsRulesContainer.getScene().getWindow());
-        if (selectedFile != null) {
-            try {
-                // Ajouter un log pour suivre le chargement
-                if (projectDataModel != null) {
-                    projectDataModel.addLogEntry("Starting to load rule file: " + selectedFile.getName());
-                }
-
-                // Chargement de la règle via ApplicationStateManager pour assurer la cohérence
-                stateManager.processLoadedRuleFile(selectedFile);
-
-                // Message de succès dans les logs
-                if (projectDataModel != null) {
-                    projectDataModel.addLogEntry("Rule file loaded successfully: " + selectedFile.getName());
-                }
-
-                // Afficher une notification de succès
-                if (popupFactory != null) {
-                    IPopup successPopup = popupFactory.createPopup(PopupFactory.TOAST_NOTIFICATION);
-                    successPopup.setMessage("Rule file '" + selectedFile.getName() + "' has been successfully loaded!");
-                    successPopup.displayPopup();
-                } else {
-                    // Fallback si popupFactory n'est pas disponible
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Success");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Rule file '" + selectedFile.getName() + "' has been successfully loaded!");
-                    alert.showAndWait();
-                }
-
-                // Mettre à jour l'affichage
-                updateView();
-
-            } catch (Exception e) {
-                String errorMessage = "Error loading rule file: " + e.getMessage();
-
-                if (projectDataModel != null) {
-                    projectDataModel.addLogEntry("ERROR: " + errorMessage);
-                }
-
-                // Afficher une popup d'erreur
-                if (popupFactory != null) {
-                    IPopup errorPopup = popupFactory.createPopup(PopupFactory.WARNING_POPUP);
-                    errorPopup.setMessage(errorMessage);
-                    ((WarningPopup) errorPopup).getResult();
-                } else {
-                    // Fallback si popupFactory n'est pas disponible
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error");
-                    alert.setHeaderText("Error Loading Rule");
-                    alert.setContentText(errorMessage);
-                    alert.showAndWait();
-                }
-            }
-        }
-    }
-
-    /**
-     * Initialise les items de règles prédéfinies.
-     * Crée et configure les items pour les règles RDFS et OWL.
+     * Initializes rules.
+     * Sets up predefined rules and updates the view.
      */
     public void initializeRules() {
         if (rdfsRulesContainer != null && owlRulesContainer != null) {
@@ -171,23 +85,24 @@ public class RuleViewController {
             addRuleItem(owlRulesContainer, "OWL Clean", true);
         }
 
-        // Charger l'état à partir du gestionnaire d'état
+        // Update view with current state
         updateView();
     }
 
     /**
-     * Met à jour l'affichage des règles en fonction de l'état actuel.
-     * Synchronise l'interface utilisateur avec l'état des règles dans le gestionnaire d'état.
+     * Updates the view.
+     * Updates rule states and custom rules.
      */
     public void updateView() {
-        // Mettre à jour les états des règles RDFS et OWL
+        // Update predefined rule states
         updatePredefinedRuleStates();
 
+        // Update custom rules
         if (customRulesContainer != null) {
-            // Récupérer les règles personnalisées via ApplicationStateManager
-            ArrayList<File> customRules = new ArrayList<>(stateManager.getLoadedRuleFiles());
+            // Get custom rules from state manager
+            List<File> customRules = new ArrayList<>(stateManager.getLoadedRules());
 
-            // Filtrer pour ne garder que les règles personnalisées
+            // Filter out predefined rules
             customRules.removeIf(rule ->
                     rule.getName().equals("RDFS Subset") ||
                             rule.getName().equals("RDFS RL") ||
@@ -196,21 +111,20 @@ public class RuleViewController {
                             rule.getName().equals("OWL RL Test") ||
                             rule.getName().equals("OWL Clean"));
 
-            // Afficher les règles personnalisées
+            // Display custom rules
             displayCustomRules(customRules);
         }
     }
 
     /**
-     * Met à jour l'état visuel des règles prédéfinies.
-     * Synchronise l'état des cases à cocher avec l'état du gestionnaire d'état.
+     * Updates predefined rule states.
      */
     private void updatePredefinedRuleStates() {
         for (Map.Entry<String, RuleItem> entry : ruleItems.entrySet()) {
             String ruleName = entry.getKey();
             RuleItem item = entry.getValue();
 
-            // Utiliser ApplicationStateManager pour récupérer l'état des règles
+            // Get rule state from state manager
             boolean isEnabled = switch (ruleName) {
                 case "RDFS Subset" -> stateManager.isRDFSSubsetEnabled();
                 case "RDFS RL" -> stateManager.isRDFSRLEnabled();
@@ -226,11 +140,11 @@ public class RuleViewController {
     }
 
     /**
-     * Ajoute un item de règle au conteneur spécifié.
+     * Adds a rule item to a container.
      *
-     * @param container Le conteneur auquel ajouter l'item
-     * @param ruleName Le nom de la règle
-     * @param predefined Indique si la règle est prédéfinie
+     * @param container The container to add the rule item to
+     * @param ruleName The name of the rule
+     * @param predefined Whether the rule is predefined
      */
     private void addRuleItem(VBox container, String ruleName, boolean predefined) {
         RuleItem ruleItem = new RuleItem(ruleName);
@@ -243,24 +157,79 @@ public class RuleViewController {
     }
 
     /**
-     * Gère l'affichage de la documentation pour une règle spécifique.
-     *
-     * @param ruleName Le nom de la règle
+     * Handles loading a rule file.
      */
-    private void handleShowDocumentation(String ruleName) {
-        //TODO: open documentation with external link
+    @FXML
+    public void handleLoadRuleFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Rule files (*.rul)", "*.rul")
+        );
+
+        File selectedFile = fileChooser.showOpenDialog(rdfsRulesContainer.getScene().getWindow());
+        if (selectedFile != null) {
+            try {
+                // Log loading
+                stateManager.addLogEntry("Starting to load rule file: " + selectedFile.getName());
+
+                // Load rule file
+                stateManager.loadRuleFile(selectedFile);
+                stateManager.addLogEntry("Rule file loaded successfully: " + selectedFile.getName());
+
+                // Show success notification
+                if (popupFactory != null) {
+                    IPopup successPopup = popupFactory.createPopup(PopupFactory.TOAST_NOTIFICATION);
+                    successPopup.setMessage("Rule file '" + selectedFile.getName() + "' has been successfully loaded!");
+                    successPopup.displayPopup();
+                } else {
+                    // Fallback if popupFactory is not available
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Success");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Rule file '" + selectedFile.getName() + "' has been successfully loaded!");
+                    alert.showAndWait();
+                }
+
+                // Update the view
+                updateView();
+
+            } catch (Exception e) {
+                String errorMessage = "Error loading rule file: " + e.getMessage();
+                stateManager.addLogEntry("ERROR: " + errorMessage);
+
+                // Show error notification
+                if (popupFactory != null) {
+                    IPopup errorPopup = popupFactory.createPopup(PopupFactory.WARNING_POPUP);
+                    errorPopup.setMessage(errorMessage);
+                    ((WarningPopup) errorPopup).getResult();
+                } else {
+                    // Fallback if popupFactory is not available
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Error Loading Rule");
+                    alert.setContentText(errorMessage);
+                    alert.showAndWait();
+                }
+            }
+        }
     }
 
     /**
-     * Gère l'activation/désactivation d'une règle.
+     * Handles showing documentation for a rule.
      *
-     * @param ruleName Le nom de la règle
-     * @param selected L'état d'activation de la règle
+     * @param ruleName The name of the rule
+     */
+    private void handleShowDocumentation(String ruleName) {
+        // TODO: Open documentation with external link
+    }
+
+    /**
+     * Handles toggling a rule.
+     *
+     * @param ruleName The name of the rule
+     * @param selected Whether the rule is selected
      */
     private void handleRuleToggle(String ruleName, boolean selected) {
-        // Utiliser le gestionnaire d'état pour maintenir la cohérence entre les vues
-        ApplicationStateManager stateManager = ApplicationStateManager.getInstance();
-
         switch (ruleName) {
             case "RDFS Subset":
                 stateManager.setRDFSSubsetEnabled(selected);
@@ -273,7 +242,7 @@ public class RuleViewController {
                     owlRLAction.run();
                 }
                 stateManager.setOWLRLEnabled(selected);
-                // Sauvegarder l'état actuel pour le partager entre les vues
+                // Save current state
                 stateManager.saveCurrentState();
                 break;
             case "OWL RL Extended":
@@ -281,7 +250,7 @@ public class RuleViewController {
                     owlRLExtendedAction.run();
                 }
                 stateManager.setOWLRLExtendedEnabled(selected);
-                // Sauvegarder l'état actuel pour le partager entre les vues
+                // Save current state
                 stateManager.saveCurrentState();
                 break;
             case "OWL RL Test":
@@ -291,62 +260,61 @@ public class RuleViewController {
                 stateManager.setOWLCleanEnabled(selected);
                 break;
             default:
-                // Gestion des règles personnalisées
+                // Custom rule handling
                 stateManager.setCustomRuleEnabled(ruleName, selected);
                 break;
         }
 
-        // Mettre à jour l'interface après le changement d'état
+        // Update the view
         updateView();
     }
 
     /**
-     * Affiche les règles personnalisées dans le conteneur approprié.
+     * Displays custom rules.
      *
-     * @param customRules Liste des fichiers de règles personnalisées
+     * @param customRules The list of custom rules
      */
-    private void displayCustomRules(ArrayList<File> customRules) {
-        // Vérifier que le conteneur existe
+    private void displayCustomRules(List<File> customRules) {
+        // Check that the container exists
         if (customRulesContainer == null) {
-            System.err.println("Custom rules container not found in FXML");
+            stateManager.addLogEntry("Custom rules container not found in FXML");
             return;
         }
 
-        // Effacer le conteneur
+        // Clear the container
         customRulesContainer.getChildren().clear();
 
         if (customRules.isEmpty()) {
-            // Afficher un message si aucune règle personnalisée n'est chargée
+            // Show message if no custom rules are loaded
             Label noRulesLabel = new Label("No custom rules loaded");
             noRulesLabel.setStyle("-fx-font-style: italic; -fx-text-fill: #888888;");
             customRulesContainer.getChildren().add(noRulesLabel);
         } else {
-            // Ajouter chaque règle personnalisée au conteneur
+            // Add each custom rule to the container
             for (File ruleFile : customRules) {
                 RuleItem ruleItem = new RuleItem(ruleFile);
                 String ruleName = ruleFile.getName();
 
-                // Ajouter à la map pour pouvoir retrouver l'item plus tard
+                // Add to map
                 ruleItems.put(ruleName, ruleItem);
 
-                // Configurer le checkbox en fonction de l'état dans le gestionnaire d'état
+                // Set checkbox state from state manager
                 boolean isEnabled = stateManager.isCustomRuleEnabled(ruleName);
                 ruleItem.getCheckBox().setSelected(isEnabled);
 
-                // Configurer le checkbox pour mettre à jour l'état quand il change
+                // Configure checkbox to update state when changed
                 ruleItem.getCheckBox().setOnAction(e ->
                         handleRuleToggle(ruleName, ruleItem.getCheckBox().isSelected()));
 
-                // Transformer le bouton de documentation en bouton de suppression
+                // Replace documentation button with delete button
                 Button deleteButton = ruleItem.getDocumentationButton();
-                // Changer l'icône du bouton pour un icône de suppression
+                // Change button to delete icon
                 IconButtonView deleteIconButton = new IconButtonView(IconButtonType.DELETE);
 
-                // Si le bouton original est un IconButtonView, on peut simplement changer son type
                 if (deleteButton instanceof IconButtonView) {
                     ((IconButtonView) deleteButton).setType(IconButtonType.DELETE);
                 } else {
-                    // Sinon, on remplace le bouton existant par notre nouveau bouton
+                    // Replace existing button with new button
                     HBox parent = (HBox) deleteButton.getParent();
                     int index = parent.getChildren().indexOf(deleteButton);
                     parent.getChildren().remove(deleteButton);
@@ -354,23 +322,23 @@ public class RuleViewController {
                     deleteButton = deleteIconButton;
                 }
 
-                // Configurer l'action du bouton de suppression
+                // Configure delete button action
                 final String finalRuleName = ruleName;
                 deleteButton.setOnAction(e -> handleDeleteCustomRule(finalRuleName));
 
-                // Ajouter l'élément de règle au conteneur
+                // Add the rule item to the container
                 customRulesContainer.getChildren().add(ruleItem);
             }
         }
     }
 
     /**
-     * Gère la suppression d'une règle personnalisée.
+     * Handles deleting a custom rule.
      *
-     * @param ruleName Le nom de la règle à supprimer
+     * @param ruleName The name of the rule to delete
      */
     private void handleDeleteCustomRule(String ruleName) {
-        // Confirmation avant suppression
+        // Confirm before deletion
         Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
         confirmDialog.setTitle("Delete Rule");
         confirmDialog.setHeaderText("Delete Custom Rule");
@@ -379,25 +347,25 @@ public class RuleViewController {
         Optional<ButtonType> result = confirmDialog.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                // Supprimer la règle via ApplicationStateManager pour assurer la cohérence
-                stateManager.setCustomRuleEnabled(ruleName, false); // Désactive d'abord la règle
+                // Disable the rule first
+                stateManager.setCustomRuleEnabled(ruleName, false);
 
-                // Puis supprimer la règle du modèle de projet
-                projectDataModel.removeRule(ruleName);
+                // Remove the rule from the model
+                stateManager.removeRule(ruleName);
 
-                // Mettre à jour l'état interne
+                // Save current state
                 stateManager.saveCurrentState();
 
-                // Mettre à jour l'affichage
+                // Update the view
                 updateView();
 
-                // Notification de succès via PopupFactory si disponible
+                // Show success notification
                 if (popupFactory != null) {
                     IPopup successPopup = popupFactory.createPopup(PopupFactory.TOAST_NOTIFICATION);
                     successPopup.setMessage("Rule '" + ruleName + "' has been deleted successfully!");
                     successPopup.displayPopup();
                 } else {
-                    // Fallback vers Alert si PopupFactory n'est pas disponible
+                    // Fallback to Alert
                     Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
                     successAlert.setTitle("Rule Deleted");
                     successAlert.setHeaderText(null);
@@ -405,7 +373,7 @@ public class RuleViewController {
                     successAlert.showAndWait();
                 }
             } catch (Exception ex) {
-                // Notification d'erreur en cas de problème
+                // Show error notification
                 if (popupFactory != null) {
                     IPopup errorPopup = popupFactory.createPopup(PopupFactory.WARNING_POPUP);
                     errorPopup.setMessage("Failed to delete rule: " + ex.getMessage());
@@ -422,18 +390,18 @@ public class RuleViewController {
     }
 
     /**
-     * Définit l'action à exécuter lors de l'activation des règles OWL RL.
+     * Sets the action to execute when OWL RL rules are activated.
      *
-     * @param action L'action à exécuter
+     * @param action The action to execute
      */
     public void setOWLRLAction(Runnable action) {
         this.owlRLAction = action;
     }
 
     /**
-     * Définit l'action à exécuter lors de l'activation des règles OWL RL Extended.
+     * Sets the action to execute when OWL RL Extended rules are activated.
      *
-     * @param action L'action à exécuter
+     * @param action The action to execute
      */
     public void setOWLRLExtendedAction(Runnable action) {
         this.owlRLExtendedAction = action;

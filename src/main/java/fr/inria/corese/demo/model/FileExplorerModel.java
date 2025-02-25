@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileExplorerModel {
-    private List<FileItem> files;
+    private final List<FileItem> files;
     private List<FileItem> folders;
     private String rootPath;
 
-    private BooleanProperty isOpen = new SimpleBooleanProperty(true);
+    private final BooleanProperty isOpen = new SimpleBooleanProperty(true);
 
     public FileExplorerModel() {
         this.files = new ArrayList<>();

@@ -34,8 +34,6 @@ public class CodeEditorView extends AnchorPane {
     }
 
     public void displayRunButton() {
-        System.out.println("Displaying Run Button in CodeEditorView");
-
         if (runButton == null) {
             runButton = new CustomButton(ButtonType.RUN);
             // Ajouter le bouton à votre mise en page

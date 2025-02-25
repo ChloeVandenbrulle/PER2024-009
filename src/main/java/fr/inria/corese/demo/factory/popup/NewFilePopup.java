@@ -5,7 +5,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
 public class NewFilePopup extends BasePopup {
-    private TextField fileNameField;
+    private final TextField fileNameField;
     private Runnable onConfirm;
 
     public NewFilePopup() {

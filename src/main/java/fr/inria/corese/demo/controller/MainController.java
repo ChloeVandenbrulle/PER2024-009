@@ -1,44 +1,41 @@
 package fr.inria.corese.demo.controller;
 
 import fr.inria.corese.demo.manager.ApplicationStateManager;
-import fr.inria.corese.demo.model.ProjectDataModel;
 import javafx.fxml.FXML;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
+/**
+ * Main controller for the application.
+ * Manages the main container, navigation, and content area.
+ */
 public class MainController {
     @FXML private BorderPane mainContainer;
     @FXML private VBox navigationContainer;
     @FXML private BorderPane contentArea;
 
     private NavigationBarController navigationBarController;
-    private ProjectDataModel projectDataModel;
     private ApplicationStateManager stateManager;
 
+    /**
+     * Initializes the controller.
+     * Sets up the state manager and navigation.
+     */
     @FXML
     public void initialize() {
-        // Initialiser le gestionnaire d'état global
+        // Get the global state manager
         stateManager = ApplicationStateManager.getInstance();
 
-        // Obtenir le modèle de données partagé via le gestionnaire d'état
-        projectDataModel = stateManager.getProjectDataModel();
+        // Initialize the navigation controller with the content area
+        navigationBarController = new NavigationBarController(contentArea);
 
-        System.out.println("MainController: initializing with shared ProjectDataModel");
-
-        // Initialiser le contrôleur de navigation avec le conteneur principal et le modèle de données
-        navigationBarController = new NavigationBarController(contentArea, projectDataModel);
-
-        // Ajouter la vue de navigation
+        // Set up the navigation view
         navigationContainer.getChildren().clear();
         navigationContainer.getChildren().add(navigationBarController.getView());
 
-        // Charger la vue validation par défaut
+        // Load the default view
         navigationBarController.selectView("data-view");
 
-        System.out.println("MainController initialization complete");
-    }
-
-    public ProjectDataModel getProjectDataModel() {
-        return projectDataModel;
+        stateManager.addLogEntry("MainController initialization complete");
     }
 }

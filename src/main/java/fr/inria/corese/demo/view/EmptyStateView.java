@@ -26,9 +26,9 @@ import javafx.scene.layout.StackPane;
  * @since 2025
  */
 public class EmptyStateView extends StackPane {
-    private Label titleLabel;
-    private Label messageLabel;
-    private String image;
+    private final Label titleLabel;
+    private final Label messageLabel;
+    private final String image;
 
     /**
      * Constructeur pour créer une vue d'état vide.

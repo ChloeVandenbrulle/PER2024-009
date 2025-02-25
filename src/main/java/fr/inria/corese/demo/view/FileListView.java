@@ -5,7 +5,6 @@ import fr.inria.corese.demo.model.fileList.FileListModel;
 import fr.inria.corese.demo.factory.popup.IPopup;
 import fr.inria.corese.demo.factory.popup.PopupFactory;
 import fr.inria.corese.demo.factory.popup.WarningPopup;
-import fr.inria.corese.demo.model.ProjectDataModel;
 import fr.inria.corese.demo.enums.icon.IconButtonType;
 import fr.inria.corese.demo.view.icon.IconButtonView;
 import javafx.beans.binding.Bindings;
@@ -35,7 +34,6 @@ import java.io.IOException;
  */
 public class FileListView extends VBox {
     private FileListModel model;
-    private ProjectDataModel projectDataModel;
     private PopupFactory popupFactory;
     private EmptyStateView emptyStateView;
     private Button clearButton;
@@ -133,16 +131,6 @@ public class FileListView extends VBox {
             // Bind empty state visibility to model's file list size
             emptyStateView.visibleProperty().bind(Bindings.isEmpty(model.getFiles()));
         }
-    }
-
-    /**
-     * Définit le modèle de données de projet.
-     *
-     * @param projectDataModel Le modèle de données de projet
-     */
-    public void setProjectDataModel(ProjectDataModel projectDataModel) {
-        this.projectDataModel = projectDataModel;
-        this.popupFactory = PopupFactory.getInstance(projectDataModel);
     }
 
     /**

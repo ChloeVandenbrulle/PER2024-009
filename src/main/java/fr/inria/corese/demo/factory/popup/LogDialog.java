@@ -3,7 +3,7 @@ package fr.inria.corese.demo.factory.popup;
 import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.query.QueryProcess;
-import fr.inria.corese.demo.model.ProjectDataModel;
+import fr.inria.corese.demo.manager.ApplicationStateManager;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -15,10 +15,10 @@ public class LogDialog extends BasePopup {
     private final Graph graph;
     private final QueryProcess exec;
     private final Load ld;
-    private final ProjectDataModel model;
+    private final ApplicationStateManager model;
 
-    public LogDialog(ProjectDataModel model) {
-        this.model = model;
+    public LogDialog() {
+        this.model = ApplicationStateManager.getInstance();
         this.graph = Graph.create();
         this.exec = QueryProcess.create(graph);
         this.ld = Load.create(graph);
@@ -66,14 +66,13 @@ public class LogDialog extends BasePopup {
     }
 
     public void updateLogs() {
-        StringBuilder logs = new StringBuilder();
-        logs.append("=== Application Logs ===\n");
-        logs.append(model.getLogEntries());
-        logs.append("\n=== Corese Logs ===\n");
-        logs.append("Graph size: ").append(graph.size()).append(" triples\n");
-        logs.append("Query engine status: ").append(exec.toString());
+        String logs = "=== Application Logs ===\n" +
+                model.getLogEntries() +
+                "\n=== Corese Logs ===\n" +
+                "Graph size: " + graph.size() + " triples\n" +
+                "Query engine status: " + exec.toString();
 
-        logTextArea.setText(logs.toString());
+        logTextArea.setText(logs);
     }
 
     public void clearLogs() {

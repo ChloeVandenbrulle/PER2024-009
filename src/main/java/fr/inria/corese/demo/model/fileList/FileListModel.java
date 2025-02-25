@@ -41,7 +41,6 @@ public class FileListModel {
      * @param name Nom du fichier à ajouter
      */
     public void addFile(String name) {
-        System.out.println("Adding file to FileListModel: " + name);
         files.add(new FileItem(name));
     }
 

@@ -11,10 +11,10 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 public class WarningPopup extends Stage implements IPopup {
-    private Label messageLabel;
-    private Button closeButton;
-    private Button continueButton;
-    private VBox layout;
+    private final Label messageLabel;
+    private final Button closeButton;
+    private final Button continueButton;
+    private final VBox layout;
     private boolean result;
 
     public WarningPopup() {

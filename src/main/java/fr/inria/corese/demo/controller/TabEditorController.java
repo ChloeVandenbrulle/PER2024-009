@@ -1,25 +1,35 @@
 package fr.inria.corese.demo.controller;
 
 import fr.inria.corese.demo.enums.icon.IconButtonBarType;
+import fr.inria.corese.demo.enums.icon.IconButtonType;
+import fr.inria.corese.demo.factory.popup.DocumentationPopup;
 import fr.inria.corese.demo.model.TabEditorModel;
 import fr.inria.corese.demo.view.TabEditorView;
 import fr.inria.corese.demo.factory.popup.PopupFactory;
 import fr.inria.corese.demo.factory.popup.SaveConfirmationPopup;
+import fr.inria.corese.demo.view.TopBar;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Tab;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.StackPane;
+import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class TabEditorController {
     private final TabEditorView view;
     private final TabEditorModel model;
     private final IconButtonBarType type;
+    private TopBar topBar;
 
     public TabEditorController(IconButtonBarType type) {
         this.view = new TabEditorView();
@@ -28,6 +38,7 @@ public class TabEditorController {
 
         initializeTabPane();
         initializeKeyboardShortcuts();
+
     }
 
     private void initializeTabPane() {
@@ -47,7 +58,6 @@ public class TabEditorController {
     }
 
     public void addNewTab(String title) {
-        System.out.println("Adding new tab: " + title);
         CodeEditorController codeEditorController = new CodeEditorController(type);
         Tab tab = view.addNewEditorTab(title, codeEditorController.getView());
 
@@ -84,6 +94,32 @@ public class TabEditorController {
             }
         });
     }
+    
+    private void onOpenFilesButtonClick() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open File");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("RDF Files", "*.ttl", "*.rdf", "*.n3"),
+                new FileChooser.ExtensionFilter("All Files", "*.*")
+        );
+
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            try {
+                addNewTab(file);
+            } catch (Exception e) {
+                showError("Error Opening File", "Could not open the file: " + e.getMessage());
+            }
+        }
+    }
+
+    private void showError(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
 
     private void handleSaveShortcut() {
         Tab selectedTab = view.getTabPane().getSelectionModel().getSelectedItem();
@@ -98,7 +134,7 @@ public class TabEditorController {
     private boolean handleCloseFile(Tab tab) {
         CodeEditorController controller = model.getControllerForTab(tab);
         if (controller != null && controller.getModel().isModified()) {
-            SaveConfirmationPopup saveConfirmationPopup = (SaveConfirmationPopup) PopupFactory.getInstance(null).createPopup("saveFileConfirmation");
+            SaveConfirmationPopup saveConfirmationPopup = (SaveConfirmationPopup) PopupFactory.getInstance().createPopup("saveFileConfirmation");
             saveConfirmationPopup.setOnSaveCallback(() -> {
                 controller.saveFile();
             });

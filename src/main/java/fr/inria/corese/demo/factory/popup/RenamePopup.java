@@ -5,7 +5,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
 public class RenamePopup extends BasePopup {
-    private TextField nameField;
+    private final TextField nameField;
     private Runnable onConfirm;
 
     public RenamePopup() {

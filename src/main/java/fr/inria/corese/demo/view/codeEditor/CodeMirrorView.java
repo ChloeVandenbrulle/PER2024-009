@@ -497,11 +497,6 @@ public class CodeMirrorView extends VBox {
                 isInternalUpdate = false;
             });
         }
-
-        public void log(String message) {
-            System.out.println("JS Log: " + message);
-        }
-
     }
 
     private void updateEditorContent(String content) {

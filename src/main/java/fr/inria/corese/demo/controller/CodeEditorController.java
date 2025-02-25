@@ -17,16 +17,15 @@ public class CodeEditorController {
     private final CodeEditorModel model;
     private boolean isUpdatingContent = false;
     private final IconButtonBarController iconButtonBarController;
-    private CodeMirrorView editorContainer;
+    private final CodeMirrorView editorContainer;
     private String content = "";
-    private IconButtonBarType type;
+    private final IconButtonBarType type;
 
     public CodeEditorController(IconButtonBarType type) {
         this.view = new CodeEditorView();
         this.model = new CodeEditorModel();
         this.iconButtonBarController = IconButtonBarFactory.create(type);
         this.type = type;
-        System.out.println("Initializing CodeEditorController");
 
         this.editorContainer = view.getCodeMirrorView();
 
@@ -37,7 +36,6 @@ public class CodeEditorController {
         this.view = new CodeEditorView();
         this.model = new CodeEditorModel();
         this.iconButtonBarController = IconButtonBarFactory.create(type);
-        System.out.println("Initializing CodeEditorController");
         this.content = content;
         this.type = type;
 
@@ -74,7 +72,6 @@ public class CodeEditorController {
 
                     // Écouter les changements de la vue
                     editorContainer.contentProperty().addListener((obs, oldVal, newVal) -> {
-                        System.out.println("Contenu modifié");
                         model.recordCurrentChange(newVal);
                     });
                 } else {
@@ -100,12 +97,11 @@ public class CodeEditorController {
 
     public void saveFile() {
         String currentFile = model.getCurrentFile();
-        System.out.println("Saving file: " + currentFile);
 
         if (currentFile != null) {
             try (FileWriter writer = new FileWriter(currentFile)) {
                 writer.write(model.getContent());
-                IPopup successPopup = PopupFactory.getInstance(null).createPopup(PopupFactory.TOAST_NOTIFICATION);
+                IPopup successPopup = PopupFactory.getInstance().createPopup(PopupFactory.TOAST_NOTIFICATION);
                 successPopup.setMessage("File has been saved successfully!");
                 successPopup.displayPopup();
                 model.setModified(false);

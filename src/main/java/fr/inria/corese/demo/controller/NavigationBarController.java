@@ -1,7 +1,6 @@
 package fr.inria.corese.demo.controller;
 
 import fr.inria.corese.demo.manager.ApplicationStateManager;
-import fr.inria.corese.demo.model.ProjectDataModel;
 import fr.inria.corese.demo.view.NavigationBarView;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
@@ -10,25 +9,8 @@ import java.io.IOException;
 import javafx.scene.control.Button;
 
 /**
- * Contrôleur de la barre de navigation pour une application de gestion de données sémantiques.
- *
- * Responsabilités principales :
- * - Gestion de la navigation entre différentes vues de l'application
- * - Configuration des boutons de navigation
- * - Chargement dynamique des vues
- *
- * Fonctionnalités clés :
- * - Initialisation des gestionnaires d'événements pour les boutons de navigation
- * - Sélection et chargement des vues (Données, Éditeur RDF, Validation, Requête, Paramètres)
- * - Mise à jour de l'interface principale
- *
- * Le contrôleur gère :
- * - NavigationBarView pour l'affichage de la barre de navigation
- * - BorderPane principal pour le contenu de l'application
- *
- * @author Clervie Causer
- * @version 1.0
- * @since 2025
+ * Controller for the navigation bar.
+ * Manages navigation between different views of the application.
  */
 public class NavigationBarController {
     private final BorderPane mainContent;
@@ -36,7 +18,12 @@ public class NavigationBarController {
     private final NavigationBarView view;
     private String currentViewName;
 
-    public NavigationBarController(BorderPane mainContent, ProjectDataModel projectDataModel) {
+    /**
+     * Constructor for the navigation bar controller.
+     *
+     * @param mainContent The main content pane
+     */
+    public NavigationBarController(BorderPane mainContent) {
         if (mainContent == null) {
             throw new IllegalArgumentException("mainContent cannot be null");
         }
@@ -47,15 +34,20 @@ public class NavigationBarController {
         initializeButtons();
     }
 
+    /**
+     * Selects and loads a view.
+     *
+     * @param viewName The name of the view to select
+     */
     public void selectView(String viewName) {
         try {
-            // Sauvegarde de l'état actuel avant de changer de vue
+            // Save current state before changing views
             if (currentViewName != null) {
                 stateManager.saveCurrentState();
-                System.out.println("State saved before navigating from " + currentViewName + " to " + viewName);
+                stateManager.addLogEntry("State saved before navigating from " + currentViewName + " to " + viewName);
             }
 
-            // Mémoriser le nom de la vue courante pour les opérations futures
+            // Remember the current view name for future operations
             currentViewName = viewName;
 
             String fxmlPath = "/fr/inria/corese/demo/" + viewName + ".fxml";
@@ -64,90 +56,71 @@ public class NavigationBarController {
             Node content = loader.load();
             Object controller = loader.getController();
 
-            ProjectDataModel projectDataModel = stateManager.getProjectDataModel();
-
-            // Injection du ProjectDataModel et restauration de l'état
+            // Inject dependencies and restore state based on controller type
             if (controller instanceof DataViewController) {
-                ((DataViewController) controller).setProjectDataModel(projectDataModel);
-                stateManager.restoreState();  // Restaurer l'état global pour cette vue
-                System.out.println("Restored state for DataViewController");
+                stateManager.restoreState();
+                stateManager.addLogEntry("Restored state for DataViewController");
             } else if (controller instanceof QueryViewController) {
-                QueryViewController queryController = (QueryViewController) controller;
-                queryController.setProjectDataModel(projectDataModel);
-                stateManager.restoreState();  // Restaurer explicitement l'état pour la vue Query
-                System.out.println("Restored state for QueryViewController");
+                stateManager.restoreState();
+                stateManager.addLogEntry("Restored state for QueryViewController");
             } else if (controller instanceof RDFEditorViewController) {
-                // Assurer que l'état global est restauré aussi pour l'éditeur RDF
                 stateManager.restoreState();
-                System.out.println("Restored state for RDFEditorViewController");
+                stateManager.addLogEntry("Restored state for RDFEditorViewController");
             } else if (controller instanceof ValidationViewController) {
-                // Assurer que l'état global est restauré aussi pour la vue de validation
                 stateManager.restoreState();
-                System.out.println("Restored state for ValidationViewController");
+                stateManager.addLogEntry("Restored state for ValidationViewController");
             }
 
-            // Sélection visuelle du bouton correspondant
+            // Update button selection
             Button selectedButton = getButtonForView(viewName);
             if (selectedButton != null) {
                 view.setButtonSelected(selectedButton);
             }
 
             mainContent.setCenter(content);
+            stateManager.addLogEntry("View changed to " + viewName);
 
-            // Log de debug
-            System.out.println("View changed to " + viewName);
         } catch (IOException e) {
-            System.err.println("Error loading view: " + e.getMessage());
+            stateManager.addLogEntry("Error loading view: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     /**
-     * Initialise les gestionnaires d'événements pour les boutons de navigation.
-     *
-     * Configure les actions pour les boutons :
-     * - Données
-     * - Éditeur RDF
-     * - Validation
-     * - Requête
-     * - Paramètres
-     *
-     * Chaque bouton déclenche le chargement de sa vue correspondante.
+     * Initializes the button event handlers.
      */
     private void initializeButtons() {
         view.getDataButton().setOnAction(e -> {
-            System.out.println("Data button clicked");
+            stateManager.addLogEntry("Data button clicked");
             selectView("data-view");
         });
 
         view.getRdfEditorButton().setOnAction(e -> {
-            System.out.println("RDF Editor button clicked");
+            stateManager.addLogEntry("RDF Editor button clicked");
             selectView("rdf-editor-view");
         });
 
         view.getValidationButton().setOnAction(e -> {
-            System.out.println("Validation button clicked");
+            stateManager.addLogEntry("Validation button clicked");
             selectView("validation-view");
         });
 
         view.getQueryButton().setOnAction(e -> {
-            System.out.println("Query button clicked");
+            stateManager.addLogEntry("Query button clicked");
             selectView("query-view");
         });
 
         view.getSettingsButton().setOnAction(e -> {
-            System.out.println("Settings button clicked");
+            stateManager.addLogEntry("Settings button clicked");
             selectView("settings-view");
         });
-
-        System.out.println("All button handlers initialized");
     }
 
     /**
-     * Récupère le bouton correspondant à une vue spécifique.
+     * Gets the button for a specific view.
      *
-     * @param viewName Le nom de la vue
-     * @return Le bouton associé à la vue, ou null si aucun bouton correspondant n'est trouvé
+     * @param viewName The name of the view
+     * @return The button for the view
      */
     private Button getButtonForView(String viewName) {
         return switch (viewName) {
@@ -161,9 +134,9 @@ public class NavigationBarController {
     }
 
     /**
-     * Récupère la vue de la barre de navigation.
+     * Gets the navigation bar view.
      *
-     * @return La NavigationBarView associée à ce contrôleur
+     * @return The navigation bar view
      */
     public NavigationBarView getView() {
         return view;
