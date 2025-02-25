@@ -31,6 +31,7 @@ import javafx.scene.control.Button;
 public class NavigationBarController {
     private final NavigationBarView view;
     private final BorderPane mainContent;
+    private final ViewManager viewManager;
 
     /**
      * Construit un contrôleur de barre de navigation.
@@ -48,6 +49,7 @@ public class NavigationBarController {
             throw new IllegalArgumentException("mainContent cannot be null");
         }
         this.mainContent = mainContent;
+        this.viewManager = new ViewManager(mainContent);
         this.view = new NavigationBarView();
         System.out.println("NavigationBarController initialized with mainContent: " + mainContent);
         initializeButtons();

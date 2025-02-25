@@ -97,6 +97,7 @@ public class FileExplorerView extends HBox {
 
     private void initializeButtonBar() {
         buttonBar = new HBox(5);
+        buttonBar.setStyle("-fx-background-color: #eef5ff");
         buttonBar.setAlignment(Pos.CENTER);
         buttonBar.getChildren().addAll(openFolderButton, newFileButton, newFolderButton);
     }

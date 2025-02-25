@@ -13,12 +13,13 @@ import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.*;
 
-public class TabEditorView extends StackPane {
+public class TabEditorView extends VBox {
     private TabPane tabPane;
     private Tab addTab;
     private Button addTabButton;
     private FontIcon modifiedFile;
     private EmptyStateView emptyStateView;
+    private StackPane mainContainer;
 
     public TabEditorView() {
         tabPane = new TabPane();
@@ -70,7 +71,6 @@ public class TabEditorView extends StackPane {
         modifiedFile.setIconSize(5);
         modifiedFile.setIconColor(Color.web("#2196F3"));
 
-
         Label emptyStateTitle = new Label("No file opened");
         Label emptyStateMessage = new Label("Open a file from the file explorer to display\nits content in the code editor");
         String emptyStateImage = "M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z";
@@ -81,7 +81,10 @@ public class TabEditorView extends StackPane {
         VBox.setVgrow(emptyStateView, Priority.ALWAYS);
         emptyStateView.setAlignment(Pos.CENTER);
 
-        getChildren().addAll(emptyStateView, tabPane);
+        mainContainer = new StackPane();
+        mainContainer.getChildren().addAll(tabPane);
+        VBox.setVgrow(mainContainer, Priority.ALWAYS);
+        getChildren().addAll(mainContainer);
     }
 
     public Tab addNewEditorTab(String title, CodeEditorView codeEditorView) {
@@ -119,12 +122,10 @@ public class TabEditorView extends StackPane {
         FontIcon icon = new FontIcon(MaterialDesignR.RECORD);
         icon.setIconSize(2);
         if (isModified) {
-            icon.setVisible(true);
+            tab.setGraphic(icon);
         } else {
-            icon.setVisible(false);
+            tab.setGraphic(null);
         }
-
-        tab.setGraphic(icon);
     }
 
     public Tab getAddTab() {

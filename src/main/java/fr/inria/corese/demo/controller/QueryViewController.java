@@ -4,8 +4,11 @@ import fr.inria.corese.core.Graph;
 import fr.inria.corese.core.load.Load;
 import fr.inria.corese.core.query.QueryProcess;
 import fr.inria.corese.demo.enums.icon.IconButtonBarType;
+import fr.inria.corese.demo.enums.icon.IconButtonType;
+import fr.inria.corese.demo.factory.popup.DocumentationPopup;
 import fr.inria.corese.demo.model.TabEditorModel;
 import fr.inria.corese.demo.view.CustomButton;
+import fr.inria.corese.demo.view.TopBar;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -16,7 +19,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.application.Platform;
+import javafx.stage.FileChooser;
 
 
 /**
@@ -48,6 +55,7 @@ public class QueryViewController {
     @FXML private TextArea resultTextArea;
     @FXML private BorderPane mainBorderPane;
     @FXML private SplitPane mainSplitPane;
+    @FXML private TopBar topBar;
 
     private TabEditorController tabEditorController;
     private Graph graph;
@@ -77,6 +85,7 @@ public class QueryViewController {
     public void initialize() {
         // Initialiser Corese
         initializeCorese();
+        initializeTopBar();
 
         // Créer un fichier temporaire avec les données de test
         try {
@@ -174,6 +183,38 @@ public class QueryViewController {
             exec = QueryProcess.create(graph);
         } catch (Exception e) {
             showError("Error initializing Corese", e.getMessage());
+        }
+    }
+
+    private void initializeTopBar() {
+        List<IconButtonType> buttons = new ArrayList<>();
+        buttons.add(IconButtonType.OPEN_FILE);
+        buttons.add(IconButtonType.DOCUMENTATION);
+        topBar.addRightButtons(buttons);
+
+        topBar.getButton(IconButtonType.OPEN_FILE).setOnAction(e -> onOpenFilesButtonClick());
+        topBar.getButton(IconButtonType.DOCUMENTATION).setOnAction(e -> {
+            DocumentationPopup documentationPopup = new DocumentationPopup();
+            documentationPopup.displayPopup();
+        });
+    }
+
+    private void onOpenFilesButtonClick() {
+        System.out.println("Open files button clicked");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open File");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("RDF Files", "*.ttl", "*.rdf", "*.n3"),
+                new FileChooser.ExtensionFilter("All Files", "*.*")
+        );
+
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            try {
+                tabEditorController.addNewTab(file);
+            } catch (Exception e) {
+                showError("Error Opening File", "Could not open the file: " + e.getMessage());
+            }
         }
     }
 
