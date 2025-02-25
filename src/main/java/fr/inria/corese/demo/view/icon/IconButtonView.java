@@ -31,7 +31,7 @@ public class IconButtonView extends Button{
             case FULL_SCREEN -> createIconButton(MaterialDesignF.FULLSCREEN, "Full screen");
             case NEW_FILE -> createIconButton(MaterialDesignF.FILE_PLUS_OUTLINE, "New file");
             case NEW_FOLDER -> createIconButton(MaterialDesignF.FOLDER_PLUS_OUTLINE, "New folder");
-            case OPEN_FOLDER -> createIconButton(MaterialDesignF.FOLDER_OPEN_OUTLINE, "Open folder");
+            case OPEN_FOLDER -> createIconButton(MaterialDesignF.FOLDER_OPEN, "Open folder");
             case CLOSE_FILE_EXPLORER -> createIconButton(MaterialDesignF.FOLDER_OUTLINE, "Close file explorer");
             case RELOAD -> createIconButton(MaterialDesignR.REFRESH, "Reload files");
             case LOGS -> createIconButton(MaterialDesignB.BOOK_OPEN_VARIANT, "Show logs");

@@ -1,6 +1,9 @@
 package fr.inria.corese.demo.controller;
 
 import fr.inria.corese.demo.enums.icon.IconButtonBarType;
+import fr.inria.corese.demo.enums.icon.IconButtonType;
+import fr.inria.corese.demo.factory.popup.DocumentationPopup;
+import fr.inria.corese.demo.view.TopBar;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.SplitPane;
@@ -9,12 +12,16 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class RDFEditorViewController {
     @FXML private BorderPane mainContainer;
     @FXML private BorderPane contentContainer;
     @FXML private VBox fileExplorerContainer;
     @FXML private StackPane editorContainer;
     @FXML private SplitPane splitPane;
+    @FXML private TopBar topbar;
 
     private FileExplorerController fileExplorerController;
     private TabEditorController tabEditorController;
@@ -28,6 +35,7 @@ public class RDFEditorViewController {
 
             // Initialize components
             setupFileTree();
+            initializeTopBar();
             initializeTabEditor();
             initializeSplitPane();
             setupComponentInteractions();
@@ -44,6 +52,17 @@ public class RDFEditorViewController {
         tabEditorController.getView().setMaxWidth(Double.MAX_VALUE);
         tabEditorController.getView().setMaxHeight(Double.MAX_VALUE);
         editorContainer.getChildren().add(tabEditorController.getView());
+    }
+
+    private void initializeTopBar() {
+        List<IconButtonType> buttons = new ArrayList<>();
+        buttons.add(IconButtonType.DOCUMENTATION);
+        topbar.addRightButtons(buttons);
+        topbar.getButton(IconButtonType.DOCUMENTATION).setOnAction(e -> {
+            DocumentationPopup documentationPopup = new DocumentationPopup();
+            documentationPopup.displayPopup();
+        });
+
     }
 
     private void setupFileTree() {
@@ -94,5 +113,4 @@ public class RDFEditorViewController {
             System.err.println("Missing FXML injections: " + missingInjections);
         }
     }
-
 }

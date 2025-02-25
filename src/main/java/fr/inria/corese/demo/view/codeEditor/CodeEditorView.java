@@ -45,13 +45,8 @@ public class CodeEditorView extends AnchorPane {
         runButton.setVisible(true);
 
         if (!runButtonDisplayed) {
-            runButton.setStyle("-fx-padding: 3 6; -fx-background-radius: 2; -fx-cursor: hand; -fx-font-size: 14px;" +
-                    "-fx-background-color: #2196F3; -fx-text-fill: white; -fx-min-width: 50px");
-
-            runButton.setOnMouseEntered(e -> runButton.setStyle("-fx-padding: 3 6; -fx-background-radius: 2; -fx-cursor: hand; -fx-font-size: 14px;" +
-                    "-fx-background-color: #1976D2; -fx-text-fill: white; -fx-min-width: 50px"));
-            runButton.setOnMouseExited(e -> runButton.setStyle("-fx-padding: 3 6; -fx-background-radius: 2; -fx-cursor: hand; -fx-font-size: 14px;" +
-                    "-fx-background-color: #2196F3; -fx-text-fill: white; -fx-min-width: 50px"));
+            String cssPath = "/styles/buttons.css";
+            this.getStylesheets().add(getClass().getResource(cssPath).toExternalForm());
 
             getChildren().add(runButton);
             runButtonDisplayed = true;

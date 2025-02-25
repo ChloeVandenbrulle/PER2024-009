@@ -1,12 +1,15 @@
 package fr.inria.corese.demo.controller;
 
 import fr.inria.corese.demo.enums.icon.IconButtonBarType;
+import fr.inria.corese.demo.enums.icon.IconButtonType;
+import fr.inria.corese.demo.factory.popup.DocumentationPopup;
 import fr.inria.corese.demo.manager.ApplicationStateManager;
 import fr.inria.corese.demo.model.ProjectDataModel;
 import fr.inria.corese.demo.model.TabEditorModel;
 import fr.inria.corese.demo.model.graph.SemanticGraph;
 import fr.inria.corese.demo.view.CustomButton;
 import javafx.collections.ListChangeListener;
+import fr.inria.corese.demo.view.TopBar;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -20,8 +23,13 @@ import javafx.scene.Node;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.application.Platform;
 import javafx.scene.web.WebView;
+import javafx.stage.FileChooser;
+
 
 /**
  * Contrôleur de la vue de requêtes pour une application de gestion de données sémantiques.
@@ -34,6 +42,7 @@ public class QueryViewController {
     @FXML private TextArea resultTextArea;
     @FXML private WebView graphView;
     @FXML private WebView xmlView;
+    @FXML private TopBar topBar;
 
     private TabEditorController tabEditorController;
     private ProjectDataModel projectDataModel;
@@ -74,7 +83,7 @@ public class QueryViewController {
     @FXML
     public void initialize() {
         System.out.println("QueryViewController.initialize() started");
-
+        initializeTopBar();
         // S'assurer que le gestionnaire d'état est disponible
         if (stateManager == null) {
             stateManager = ApplicationStateManager.getInstance();
@@ -111,6 +120,46 @@ public class QueryViewController {
         });
     }
 
+    private void initializeTopBar() {
+        List<IconButtonType> buttons = new ArrayList<>();
+        buttons.add(IconButtonType.OPEN_FILE);
+        buttons.add(IconButtonType.DOCUMENTATION);
+        topBar.addRightButtons(buttons);
+
+        topBar.getButton(IconButtonType.OPEN_FILE).setOnAction(e -> onOpenFilesButtonClick());
+        topBar.getButton(IconButtonType.DOCUMENTATION).setOnAction(e -> {
+            DocumentationPopup documentationPopup = new DocumentationPopup();
+            documentationPopup.displayPopup();
+        });
+    }
+
+    private void onOpenFilesButtonClick() {
+        System.out.println("Open files button clicked");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open File");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("RDF Files", "*.ttl", "*.rdf", "*.n3"),
+                new FileChooser.ExtensionFilter("All Files", "*.*")
+        );
+
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            try {
+                tabEditorController.addNewTab(file);
+            } catch (Exception e) {
+                showError("Error Opening File", "Could not open the file: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Configure le bouton d'exécution de requête.
+     *
+     * Gère :
+     * - L'affichage du bouton Run
+     * - Les actions du bouton
+     * - Le raccourci clavier Ctrl+Entrée
+     */
     private void setupRunButton() {
         System.out.println("=== Setting up Run Button Listener ===");
 
